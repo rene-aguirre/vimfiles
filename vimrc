@@ -434,6 +434,31 @@ noremap <S-C-h> :%s#\<<c-r>=expand("<cword>")<CR>\>#
 noremap <S-C-f> /<c-r>=expand("<cword>")<CR>
 
 " search & replace {
+function! GetFtExtension(sFt, sFile, sRootPrefix)
+" sFt, given filetype
+" sFile, reference filename
+" sRootPrefix, top leve path
+
+python << endpython
+import vim
+import os.path
+ft_map = {
+    'c' :   ['.c', '.h'],
+    'asm':  ['.asm', '.h'],
+    'kalimba': ['.asm', '.h'],
+}
+default_ext = os.path.splitext(vim.eval("a:sFile"))[1].strip()
+all_ext = ft_map.get(vim.eval("a:sFt"), [default_ext,])
+if default_ext and default_ext not in all_ext:
+    # desirable to include current file ext
+    all_ext.insert(0, default_ext)
+if vim.eval("a:sRootPrefix").strip():
+    result_str = " ".join([os.path.join(vim.eval("a:sRootPrefix").strip(), '*'+the_file.strip()) for the_file in all_ext])
+else:
+    result_str = " ".join(['*' + the_file.strip() for the_file in all_ext])
+vim.command('return "{0}"'.format(result_str))
+endpython
+endfunction
     " This opens the results of 'grep -r' in a bottom window
     " and uses 'git grep' when in a git repo and regular grep otherwise.
     " :G <word> runs grep 
@@ -447,16 +472,16 @@ noremap <S-C-f> /<c-r>=expand("<cword>")<CR>
             else
                 let g:mygrepprg="grep\\ -nr"
             endif
-            let g:grepcmd="silent! grep " . a:args . " ." 
+            let g:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), g:gitroot)
+
         else
             if a:ignorecase
                 let g:mygrepprg="git\\ grep\\ -ni"
             else
                 let g:mygrepprg="git\\ grep\\ -n"
             endif
-            let g:grepcmd="silent! grep " . a:args . g:gitroot
+            let g:grepcmd="silent! grep " . a:args . " -- " . GetFtExtension(&filetype, bufname('%'), g:gitroot)
         endif
-
         exec "set grepprg=" . g:mygrepprg
         execute g:grepcmd
         botright copen
@@ -468,8 +493,8 @@ noremap <S-C-f> /<c-r>=expand("<cword>")<CR>
     command! -nargs=1 Gi call Grep( '<args>', 1)
 
     " find with grep
-    noremap <leader>ff :G <c-r>=expand("<cword>") . " *." . expand("%:e")<CR>
-    noremap <leader>fi :Gi <c-r>=expand("<cword>") . " *." . expand("%:e")<CR>
+    noremap <leader>ff :G <c-r>=expand("<cword>") . " -- *." . expand("%:e")<CR>
+    noremap <leader>fi :Gi <c-r>=expand("<cword>") . " -- *." . expand("%:e")<CR>
 
     " find in file including subdirectories
     noremap <leader>fs :silent grep! /s <c-r>=expand("<cword>") . " *." . expand("%:e")<CR> \| :botright copen
@@ -478,7 +503,7 @@ noremap <S-C-f> /<c-r>=expand("<cword>")<CR>
     noremap <leader>vg :noa vimgrep! <c-r>=expand("<cword>") . "/gj *." . expand("%:e")<CR> \| :botright copen
 
     " find in git repo with fugitive
-    noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") . " -- *.[ch]"<CR> \| :botright copen
+    noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") . " -- " . GetFtExtension(&filetype, bufname('%'), '')<CR> \| :botright copen
 " }
 
 " F5 as running current file
