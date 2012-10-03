@@ -446,6 +446,7 @@ ft_map = {
     'c' :   ['.c', '.h'],
     'asm':  ['.asm', '.h'],
     'kalimba': ['.asm', '.h'],
+    'cpp': ['.c', '.cpp', '.asm', '.h', '.hpp'],
 }
 default_ext = os.path.splitext(vim.eval("a:sFile"))[1].strip()
 all_ext = ft_map.get(vim.eval("a:sFt"), [default_ext,])
@@ -472,7 +473,7 @@ endfunction
             else
                 let g:mygrepprg="grep\\ -nr"
             endif
-            let g:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), g:gitroot)
+            let g:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), '')
 
         else
             if a:ignorecase
