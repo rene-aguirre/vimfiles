@@ -272,12 +272,8 @@ set vb
 "set nofen
 
 if has("gui")
-    try
-        colorscheme desert
-        hi CursorLine term=bold cterm=bold guibg=Grey25 
-    catch /^Vim\%((\a\+)\)\=:E185/
-        colorscheme smyck
-    endtry
+    colorscheme desert
+    let g:molokai_original=1
 endif
 
 " Fonts {
@@ -318,8 +314,20 @@ set scrolloff=2
 nmap <leader>be :Bufferlist<CR>
 
 " Fugitive plug-in {
-    nmap <leader>gs :Gstatus<CR><C-W>K
-    nmap <leader>gd :Gdiff<CR>
+    " toggles the Fugitive status window.
+    function! s:GS_toggle()
+        for i in range(1, winnr('$'))
+            let bnum = winbufnr(i)
+            if getbufvar(bnum, '&filetype') == 'gitcommit'
+                execute "bdelete".bnum
+                return
+            endif
+        endfor
+        execute "topleft Gstatus"
+    endfunction
+
+    command! GSToggle call s:GS_toggle()
+    nmap <F9> :GSToggle<CR>
     autocmd Filetype gitcommit noremap <buffer> <ESC> <C-W>c
 " }
 
