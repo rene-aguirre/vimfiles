@@ -360,7 +360,7 @@ nmap <leader>be :Bufferlist<CR>
         \ 'types': {
             \ 1: ['.git', "cd %s && git ls-files | " . ctrlp_filter_greps],
             \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-            \ 3: ['.svn', 'svn status %s -q -v --xml | grep -e "\\s*path=" | sed ' . "'" . 's/\\s*path="\(.*\)".*$/\1/' . "' | " . ctrlp_filter_greps],
+            \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\{28\}\s*\(.*\s\)//' . "' | " . ctrlp_filter_greps],
             \ },
         \ 'fallback': 'dir %s /-n /b /s /a-d'
         \ }
@@ -445,7 +445,7 @@ noremap <S-C-f> /<c-r>=expand("<cword>")<CR>
 function! GetFtExtension(sFt, sFile, sRootPrefix)
 " sFt, given filetype
 " sFile, reference filename
-" sRootPrefix, top leve path
+" sRootPrefix, top level path
 
 python << endpython
 import vim
@@ -477,9 +477,9 @@ endfunction
         let g:gitroot=system('git rev-parse --show-cdup')
         if v:shell_error
             if a:ignorecase
-                let g:mygrepprg="grep\\ -nir"
+                let g:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /i\\ /p"
             else
-                let g:mygrepprg="grep\\ -nr"
+                let g:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /p"
             endif
             let g:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), '')
 
@@ -502,8 +502,8 @@ endfunction
     command! -nargs=1 Gi call Grep( '<args>', 1)
 
     " find with grep
-    noremap <leader>ff :G <c-r>=expand("<cword>") . " -- *." . expand("%:e")<CR>
-    noremap <leader>fi :Gi <c-r>=expand("<cword>") . " -- *." . expand("%:e")<CR>
+    noremap <leader>ff :G <c-r>=expand("<cword>")<CR>
+    noremap <leader>fi :Gi <c-r>=expand("<cword>")<CR>
 
     " find in file including subdirectories
     noremap <leader>fs :silent grep! /s <c-r>=expand("<cword>") . " *." . expand("%:e")<CR> \| :botright copen
