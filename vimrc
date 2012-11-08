@@ -462,9 +462,14 @@ if default_ext and default_ext not in all_ext:
     # desirable to include current file ext
     all_ext.insert(0, default_ext)
 if vim.eval("a:sRootPrefix").strip():
-    result_str = " ".join([os.path.join(vim.eval("a:sRootPrefix").strip(), '*'+the_file.strip()) for the_file in all_ext])
-else:
+    if default_ext:
+        result_str = " ".join([os.path.join(vim.eval("a:sRootPrefix").strip(), '*'+the_file.strip()) for the_file in all_ext])
+    else:
+        result_str = os.path.split( vim.eval("a:sFile") )[1]
+elif default_ext:
     result_str = " ".join(['*' + the_file.strip() for the_file in all_ext])
+else:
+    result_str = os.path.split( vim.eval("a:sFile") )[1]
 vim.command('return "{0}"'.format(result_str))
 endpython
 endfunction
@@ -501,18 +506,14 @@ endfunction
     command! -nargs=1 G call Grep( '<args>', 0)
     command! -nargs=1 Gi call Grep( '<args>', 1)
 
-    " find with grep
-    noremap <leader>ff :G <c-r>=expand("<cword>")<CR>
-    noremap <leader>fi :Gi <c-r>=expand("<cword>")<CR>
-
-    " find in file including subdirectories
-    noremap <leader>fs :silent grep! /s <c-r>=expand("<cword>") . " *." . expand("%:e")<CR> \| :botright copen
-    noremap <leader>fc :silent grep! /s <c-r>=expand("<cword>") . " *.c"<CR> \| :botright copen
-    noremap <leader>fh :silent grep! /s <c-r>=expand("<cword>") . " *.h"<CR> \| :botright copen
-    noremap <leader>vg :noa vimgrep! <c-r>=expand("<cword>") . "/gj *." . expand("%:e")<CR> \| :botright copen
-
     " find in git repo with fugitive
-    noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") . " -- " . GetFtExtension(&filetype, bufname('%'), '')<CR> \| :botright copen
+    noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") . 
+        \ " -- " . GetFtExtension(&filetype, bufname('%'), '')<CR> \| :botright copen
+    noremap <leader>ff :silent grep! /r /s /p <c-r>=expand("<cword>") . 
+        \ " " . GetFtExtension(&filetype, bufname('%'), '')<CR> \| :botright copen
+    noremap <leader>fi :silent grep! /i /r /s /p <c-r>=expand("<cword>") . 
+        \ " " . GetFtExtension(&filetype, bufname('%'), '')<CR> \| :botright copen
+    noremap <leader>fh :silent grep! /i /r /s /p <c-r>=expand("<cword>") . " *.h" <CR> \| :botright copen
 " }
 
 " F5 as running current file
