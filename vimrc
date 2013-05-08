@@ -35,18 +35,27 @@ set encoding=utf-8
     Bundle "godlygeek/tabular"
 
     " another buffer explorer
-    Bundle 'sandeepcr529/Buffet.vim'
+    " Bundle 'sandeepcr529/Buffet.vim'
 
+if has("win32") || has("win64")
+    " Run shell commands in background
+    Bundle 'xolox/vim-shell'
+endif
+    
     " much better than snipMate
     Bundle 'SirVer/ultisnips'
 
-    " \bd buffer delete mappin
+    " \bd buffer delete mapping
     Bundle 'kwbdi.vim'
 
+    " Ascii drawing helper
     " Bundle 'DrawIt'
 
     " RST Markup helper
-    Bundle 'VST'
+    " Bundle 'VST'
+
+    " full reST support
+    Bundle "Rykka/riv.vim"
 
     " software caps lock
     Bundle "capslock.vim"
@@ -60,11 +69,24 @@ set encoding=utf-8
     " git helper
     Bundle 'tpope/vim-fugitive.git'
 
+    " Extradite for fugitive
+    Bundle 'grota/vim-extradite'
+
     " three file diffs
     " Bundle 'sjl/splice.vim.git'
 
     " file manager
     Bundle 'kien/ctrlp.vim'
+
+    Bundle 'scrooloose/nerdcommenter'
+    
+    Bundle 'vimwiki'
+
+    " expand selection incrementally
+    Bundle 'terryma/vim-expand-region'
+
+    " vertical indexing lines
+    " Bundle 'Yggdroot/indentLine'
 
     " Extended %
     runtime macros/matchit.vim
@@ -310,9 +332,6 @@ set scrolloff=2
     omap <F3> <C-C>:TagbarToggle<CR>
 " }
 
-" Buffet.vim plug-ing
-nmap <leader>be :Bufferlist<CR>
-
 " Fugitive plug-in {
     " toggles the Fugitive status window.
     function! s:GS_toggle()
@@ -332,6 +351,12 @@ nmap <leader>be :Bufferlist<CR>
 " }
 
 " ctrlp.vim plug-in {
+    " CtrlP browse buffers 
+    nmap <leader>be :CtrlPBuffer<CR>
+
+    " work on tags
+    let g:ctrlp_extensions = ['tag']
+
     " open files extra files in hidden buffers
     let g:ctrlp_open_multiple_files = '1jr'
 
@@ -427,6 +452,9 @@ onoremap <C-PageUp> <C-C><C-W><C-W>
     inoremap <F8> <C-O>:QFix<CR>
     onoremap <F8> <C-C>:QFix<CR>
 " } Quicklist
+"
+map <F1> <Esc>
+map! <F1> <Esc>
 
 " map to shift indent
 vnoremap > >gv
@@ -516,15 +544,28 @@ endfunction
     noremap <leader>fh :silent grep! /i /r /s /p <c-r>=expand("<cword>") . " *.h" <CR> \| :botright copen
 " }
 
+"  tag helpers (ctags) {
+    " run ctags in the current folder
+    command! BuildTags execute '!' . expand('~') . "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+    " work with git hooks (so top level repo path applies)
+    set notagrelative
+" }
+
 " F5 as running current file
 noremap <F5> :update<CR>:silent !%<CR>
 inoremap <F5> <ESC>:update<CR>:silent !%<CR>
 
 " alt+key to exit and move
-inoremap è <esc>h
-inoremap ê <esc>j
-inoremap ë <esc>k
-inoremap ì <esc>l
+inoremap è <esc>gh
+inoremap ê <esc>gj
+inoremap ë <esc>gk
+inoremap ì <esc>gl
+
+" at+key move by visible lines
+noremap è gh
+noremap ê gj
+noremap ë gk
+noremap ì gl
 
 " convert current word to uppercase
 noremap <leader>u m`gUiw``
@@ -564,4 +605,7 @@ let asmsyntax = "kalimba"
 
 " save bookmarks
 set viminfo='50,f1
+
+" start with folding disabled
+set nofoldenable
 
