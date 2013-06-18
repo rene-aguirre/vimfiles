@@ -295,7 +295,7 @@ set vb
 "set nofen
 
 if has("gui")
-    colorscheme desert
+    colorscheme desert-luna
     let g:molokai_original=1
 endif
 
