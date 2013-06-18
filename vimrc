@@ -40,6 +40,7 @@ set encoding=utf-8
 if has("win32") || has("win64")
     " Run shell commands in background
     Bundle 'xolox/vim-shell'
+    Bundle 'xolox/vim-misc'
 endif
     
     " much better than snipMate
