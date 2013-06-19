@@ -61,8 +61,8 @@ endif
     " software caps lock
     Bundle "capslock.vim"
 
-    " highlight bar
-    Bundle 'Lokaltog/vim-powerline'
+    " DON'T USE Until get fixed Windows installation
+    " Bundle 'Lokaltog/powerline'
 
     " file browser
     Bundle 'scrooloose/nerdtree'
@@ -287,7 +287,18 @@ nmap <leader>s :set list!<CR>
 " }
 
 set laststatus=2 " always show status window
-set statusline=%F%m%r%h%w\ %{exists('*CapsLockSTATUSLINE')?CapsLockSTATUSLINE():''}\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%04.8b]\ [HEX=\%04.4B]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
+
+set statusline=
+set statusline +=%*\ %n%*            "buffer number
+set statusline +=%*\ %{fugitive#statusline()}%*
+set statusline +=%*\ %<%F%*            "full path
+set statusline +=%*%m%*                "modified flag
+set statusline +=%*\ %y%*              "file type
+set statusline +=%*\ %{&ff}%*          "file format
+set statusline +=%*%=%5l%*             "current line
+set statusline +=%*/%L%*               "total lines
+set statusline +=%*%4v\ %*             "virtual column number
+set statusline +=%*0x%04B\ %*          "character under cursor
 
 " remove visual and audio bells
 set vb
@@ -295,13 +306,13 @@ set vb
 "set nofen
 
 if has("gui")
-    colorscheme desert-luna
+    colorscheme desert_luna
     let g:molokai_original=1
 endif
 
 " Fonts {
-    set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h9,DejaVu\ Sans\ Mono:h9,Consolas:h10
-    let Powerline_symbols = 'fancy'
+    " set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h9,DejaVu\ Sans\ Mono:h9,Consolas:h10
+    set guifont=DejaVu\ Sans\ Mono:h9,Consolas:h10
 " }
 
 "display line numbers on left of window
@@ -310,12 +321,11 @@ set number
 " visible lines above or below the cursor
 set scrolloff=2
 
-" Vundle plugin {
-    if !has("unix")
-        set shellxquote=
-    endif
+" Powerline plugin {
+    " set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
+    " let Powerline_symbols = 'fancy'
 " }
-
+"
 " NERDTree plug-ing {
     nmap <F2> :NERDTreeToggle<CR>
     imap <F2> <C-O>:NERDTreeToggle<CR>
@@ -355,6 +365,8 @@ set scrolloff=2
     " CtrlP browse buffers 
     nmap <leader>be :CtrlPBuffer<CR>
 
+    let g:ctrlp_working_path_mode = 'ra'
+
     " work on tags
     let g:ctrlp_extensions = ['tag']
 
@@ -374,21 +386,18 @@ set scrolloff=2
     else
     " windows
     let ctrlp_filter_greps = "".
-        \ 'grep -iv "\\.\(' .
+        \ 'grep -iv "\\.\\(' .
         \ 'exe\|jar\|class\|swp\|swo\|log\|so\|o\|pyc\|jpe?g\|png\|gif\|mo\|po' .
         \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
-        \ '\)$"'
-    "   \ '\)$" | ' .
-    "   \ 'grep -v "^\(\\./\)?\(' .
-    "   \ 'deploy\\\|lib\\\|classes\\\|libs\\\|deploy\\vendor\\\|\\.git\\\|\\.hg\\\|\\.svn\\\|\\.*migrations\\\)'
-    "    \ '\)"'
-    let g:ctrlp_user_command = {
+        \ '\\)$"'
+    let g:ctrlp_user_command2 = {
         \ 'types': {
             \ 1: ['.git', "cd %s && git ls-files | " . ctrlp_filter_greps],
             \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-            \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\{28\}\s*\(.*\s\)//' . "' | " . ctrlp_filter_greps],
+            \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//' . "' | " . ctrlp_filter_greps],
             \ },
-        \ 'fallback': 'dir %s /-n /b /s /a-d'
+        \ 'fallback': 'dir %s /-n /b /s /a-d',
+        \ 'ignore': 0
         \ }
     endif
 " }
