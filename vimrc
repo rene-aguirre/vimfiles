@@ -34,9 +34,6 @@ set encoding=utf-8
     " Tab helper
     Bundle "godlygeek/tabular"
 
-    " another buffer explorer
-    " Bundle 'sandeepcr529/Buffet.vim'
-
 if has("win32") || has("win64")
     " Run shell commands in background
     Bundle 'xolox/vim-shell'
@@ -61,11 +58,11 @@ endif
     " software caps lock
     Bundle "capslock.vim"
 
-    " DON'T USE Until get fixed Windows installation
-    " Bundle 'Lokaltog/powerline'
+    " Non bloated, works on Windows cool statusline
+    Bundle 'bling/vim-airline'
 
     " file browser
-    Bundle 'scrooloose/nerdtree'
+    " Bundle 'scrooloose/nerdtree'
 
     " git helper
     Bundle 'tpope/vim-fugitive.git'
@@ -85,9 +82,6 @@ endif
 
     " expand selection incrementally
     Bundle 'terryma/vim-expand-region'
-
-    " vertical indexing lines
-    " Bundle 'Yggdroot/indentLine'
 
     " Extended %
     runtime macros/matchit.vim
@@ -325,7 +319,11 @@ set scrolloff=2
     " set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
     " let Powerline_symbols = 'fancy'
 " }
-"
+
+" airline plugin {
+    let g:airline_enable_fugitive = 1
+" }
+
 " NERDTree plug-ing {
     nmap <F2> :NERDTreeToggle<CR>
     imap <F2> <C-O>:NERDTreeToggle<CR>
@@ -356,6 +354,14 @@ set scrolloff=2
         execute "topleft Gstatus"
     endfunction
 
+    nnoremap <Leader>gb :Gblame -w<cr>
+    nnoremap <Leader>gc :Gcommit<cr>
+    nnoremap <Leader>gd :Gdiff<cr>
+    nnoremap <Leader>gs :Gstatus<cr>
+    " nnoremap <Leader>gp :Git push<cr>
+    " nnoremap <Leader>gr :Gremove<cr>
+    " nnoremap <Leader>gw :Gwrite<cr>
+
     command! GSToggle call s:GS_toggle()
     nmap <F9> :GSToggle<CR>
     autocmd Filetype gitcommit noremap <buffer> <ESC> <C-W>c
@@ -365,13 +371,14 @@ set scrolloff=2
     " CtrlP browse buffers 
     nmap <leader>be :CtrlPBuffer<CR>
 
-    let g:ctrlp_working_path_mode = 'ra'
-
     " work on tags
     let g:ctrlp_extensions = ['tag']
 
     " open files extra files in hidden buffers
     let g:ctrlp_open_multiple_files = '1jr'
+
+    " special wildignore
+    let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 
     " indexing speed up
     if has("unix")
@@ -390,14 +397,14 @@ set scrolloff=2
         \ 'exe\|jar\|class\|swp\|swo\|log\|so\|o\|pyc\|jpe?g\|png\|gif\|mo\|po' .
         \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
         \ '\\)$"'
+    " vim currently broken
     let g:ctrlp_user_command2 = {
         \ 'types': {
-            \ 1: ['.git', "cd %s && git ls-files | " . ctrlp_filter_greps],
+            \ 1: ['.git', "git --git-dir=%s/.git ls-files -oc --exclude-standard | " . ctrlp_filter_greps],
             \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-            \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//' . "' | " . ctrlp_filter_greps],
+            \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
             \ },
         \ 'fallback': 'dir %s /-n /b /s /a-d',
-        \ 'ignore': 0
         \ }
     endif
 " }
@@ -590,7 +597,7 @@ noremap <leader>cd :lcd %:p:h<CR>:pwd<CR>
 nmap ¯ :set hls!<CR>
 
 " some plug-ins rely on wildignore
-set wildignore+=*.o,*.obj,*.a,*.bak,*.lib,.svn,.git,.hg
+set wildignore+=*.o,*.obj,*.a,*.bak,*.lib,.svn,.hg
 set wildignore+=*.pyc
 set wildignore+=*.bmp,*.gif,*.jpg,*.png
 set wildignore+=*.gz,*.bz,*.tar,*.zip
