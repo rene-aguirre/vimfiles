@@ -412,6 +412,10 @@ set scrolloff=2
     endif
 " }
 
+" vimwiki plug-in {
+    let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/'}]
+" }
+
 " gui options {
     if has("gui_running")
         " set guioptions+=e   " tab bar displayed
