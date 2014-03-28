@@ -417,13 +417,16 @@ let g:tagbar_type_c = {
     " use ctrlp-cmatcher extension
     let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
 
+    " speed up repos
+    let g:ctrlp_working_path_mode = 'ra'
+
     " indexing speed up
     if has("unix")
     let g:ctrlp_user_command = {
         \ 'types': {
-            \ 1: ['.git', 'cd %s && git ls-files'],
+            \ 1: ['.git', "cd %s && (git ls-files -oc --exclude-standard"],
             \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-            \ 3: ['.svn', 'find %s -type f'],
+            \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
             \ },
         \ 'fallback': 'find %s -type f'
         \ }
@@ -435,15 +438,20 @@ let g:tagbar_type_c = {
         \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
         \ '\\)$"'
     " vim currently broken
-    let g:ctrlp_user_command2 = {
+    let g:ctrlp_user_command = {
         \ 'types': {
-            \ 1: ['.git', "git --git-dir=%s/.git ls-files -oc --exclude-standard | " . ctrlp_filter_greps],
+            \ 1: ['.git', "git --git-dir=%s/.git ls-files -oc --exclude-standard" .
+            \     " | " . ctrlp_filter_greps],
             \ 2: ['.hg', 'hg --cwd %s locate -I .'],
             \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
             \ },
         \ 'fallback': 'dir %s /-n /b /s /a-d',
         \ }
     endif
+" }
+
+" vimwiki plug-in {
+    let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/'}]
 " }
 
 " gui options {
