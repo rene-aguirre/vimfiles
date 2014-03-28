@@ -3,13 +3,13 @@
 " Author:	Rene F. Aguirre
 " Last change:	$date$
 "
-
+"
 " Use Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 filetype off
 set encoding=utf-8
-
+"
 " Pluggin management {
     set rtp+=~/.vim/bundle/vundle/
     call vundle#rc()
@@ -75,6 +75,7 @@ endif
 
     " file manager
     Bundle 'kien/ctrlp.vim'
+    Bundle 'JazzCore/ctrlp-cmatcher' 
 
     Bundle 'scrooloose/nerdcommenter'
     
@@ -110,7 +111,7 @@ endif
 
 " Only do this part when compiled with support for autocommands.
 " auto commands {
-    if has("autocmd")
+if has("autocmd")
     " put these in an autocmd group, so that we can delete them easily.
     augroup vimrcex
     au!
@@ -156,7 +157,7 @@ endif
     autocmd bufreadpost,bufnewfile *.psq set filetype=psr
     augroup end
 
-    endif " has("autocmd")
+endif " has("autocmd")
 " }
 
 " Convenient command to see the difference between the current buffer and the
@@ -300,13 +301,14 @@ set vb
 "set nofen
 
 if has("gui")
-    colorscheme desert_luna
+    " colorscheme desert_luna
+    colorscheme molokai
     let g:molokai_original=1
 endif
 
 " Fonts {
     " set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h9,DejaVu\ Sans\ Mono:h9,Consolas:h10
-    set guifont=DejaVu\ Sans\ Mono:h9,Consolas:h10
+    set guifont=Monaco:h13,DejaVu\ Sans\ Mono:h9,Consolas:h10
 " }
 
 "display line numbers on left of window
@@ -334,6 +336,38 @@ set scrolloff=2
     if has("win32") || has("win64")
         let g:tagbar_ctags_bin = '~/vimfiles/ctags.exe'
     endif
+
+let g:tagbar_type_cpp = {
+    \ 'kinds' : [
+        \ 'd:macros:1:0',
+        \ 'g:enums:1:0',
+        \ 'e:enumerators:1:0',
+        \ 't:typedefs:1:0',
+        \ 's:structs:1:0',
+        \ 'u:unions:1:0',
+        \ 'v:variables:1:0',
+        \ 'm:members:0:0',
+        \ 'p:prototypes',
+        \ 'f:functions',
+        \ 'n:namespaces',
+        \ 'c:classes',
+    \ ],
+\ }
+
+let g:tagbar_type_c = {
+    \ 'kinds' : [
+        \ 'd:macros:1:0',
+        \ 'g:enums:1:0',
+        \ 'e:enumerators:1:0',
+        \ 't:typedefs:1:0',
+        \ 's:structs:1:0',
+        \ 'u:unions:1:0',
+        \ 'v:variables:1:0',
+        \ 'm:members:0:0',
+        \ 'p:prototypes',
+        \ 'f:functions',
+    \ ],
+\ }
     " Sort by file order
     let g:tagbar_sort = 0
     nmap <F3> :TagbarToggle<CR>
@@ -379,6 +413,9 @@ set scrolloff=2
 
     " special wildignore
     let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+
+    " use ctrlp-cmatcher extension
+    let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
 
     " indexing speed up
     if has("unix")
@@ -487,7 +524,7 @@ noremap <S-C-h> :%s#\<<c-r>=expand("<cword>")<CR>\>#
 noremap <S-C-f> /<c-r>=expand("<cword>")<CR>
 
 " search & replace {
-function! GetFtExtension(sFt, sFile, sRootPrefix)
+function! GetFtExtension(sFt, sFile, sRootPrefix, bIsUnix)
 " sFt, given filetype
 " sFile, reference filename
 " sRootPrefix, top level path
@@ -496,28 +533,42 @@ python << endpython
 import vim
 import os.path
 ft_map = {
-    'c' :   ['.c', '.h'],
-    'asm':  ['.asm', '.h'],
-    'kalimba': ['.asm', '.h'],
-    'cpp': ['.c', '.cpp', '.asm', '.h', '.hpp'],
+    'c' :       ['c', 'h'],
+    'asm':      ['asm', 'h'],
+    'kalimba':  ['asm', 'h'],
+    'cpp':      ['c', 'cpp', 'asm', 'h', 'hpp'],
 }
+
 default_ext = os.path.splitext(vim.eval("a:sFile"))[1].strip()
+
+if default_ext and default_ext.startswith('.'):
+    default_ext = default_ext[1:]
+
 all_ext = ft_map.get(vim.eval("a:sFt"), [default_ext,])
+
 if default_ext and default_ext not in all_ext:
     # desirable to include current file ext
     all_ext.insert(0, default_ext)
+
 if vim.eval("a:sRootPrefix").strip():
     if default_ext:
-        result_str = " ".join([os.path.join(vim.eval("a:sRootPrefix").strip(), '*'+the_file.strip()) for the_file in all_ext])
+        if vim.eval("a:bIsUnix"):
+            result_str = os.path.join(vim.eval("a:sRootPrefix").strip(), "*.{" + ",".join([the_file.strip() for the_file in all_ext]) + "}")
+        else:
+            result_str = " ".join([os.path.join(vim.eval("a:sRootPrefix").strip(), '*.'+the_file.strip()) for the_file in all_ext])
     else:
         result_str = os.path.split( vim.eval("a:sFile") )[1]
 elif default_ext:
-    result_str = " ".join(['*' + the_file.strip() for the_file in all_ext])
+    if vim.eval("a:bIsUnix"):
+        result_str = "*.{" + ",".join([the_file.strip() for the_file in all_ext]) + "}"
+    else:
+        result_str = " ".join(['*.' + the_file.strip() for the_file in all_ext])
 else:
     result_str = os.path.split( vim.eval("a:sFile") )[1]
 vim.command('return "{0}"'.format(result_str))
 endpython
 endfunction
+
     " This opens the results of 'grep -r' in a bottom window
     " and uses 'git grep' when in a git repo and regular grep otherwise.
     " :G <word> runs grep 
@@ -531,7 +582,7 @@ endfunction
             else
                 let g:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /p"
             endif
-            let g:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), '')
+            let g:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))
 
         else
             if a:ignorecase
@@ -539,7 +590,7 @@ endfunction
             else
                 let g:mygrepprg="git\\ grep\\ -n"
             endif
-            let g:grepcmd="silent! grep " . a:args . " -- " . GetFtExtension(&filetype, bufname('%'), g:gitroot)
+            let g:grepcmd="silent! grep " . a:args . " -- " . GetFtExtension(&filetype, bufname('%'), g:gitroot, has("unix"))
         endif
         exec "set grepprg=" . g:mygrepprg
         execute g:grepcmd
@@ -553,12 +604,16 @@ endfunction
 
     " find in git repo with fugitive
     noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") . 
-        \ " -- " . GetFtExtension(&filetype, bufname('%'), '')<CR> \| :botright copen
-    noremap <leader>ff :silent grep! /r /s /p <c-r>=expand("<cword>") . 
-        \ " " . GetFtExtension(&filetype, bufname('%'), '')<CR> \| :botright copen
-    noremap <leader>fi :silent grep! /i /r /s /p <c-r>=expand("<cword>") . 
-        \ " " . GetFtExtension(&filetype, bufname('%'), '')<CR> \| :botright copen
-    noremap <leader>fh :silent grep! /i /r /s /p <c-r>=expand("<cword>") . " *.h" <CR> \| :botright copen
+        \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR> \| :botright copen
+    if has("unix")
+        noremap <leader>ff :silent grep! -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
+    else
+        noremap <leader>ff :silent grep! /r /s /p <c-r>=expand("<cword>") . 
+            \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR> \| :botright copen
+        noremap <leader>fi :silent grep! /i /r /s /p <c-r>=expand("<cword>") . 
+            \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR> \| :botright copen
+        noremap <leader>fh :silent grep! /i /r /s /p <c-r>=expand("<cword>") . " *.h" <CR> \| :botright copen
+    endif
 " }
 
 "  tag helpers (ctags) {
