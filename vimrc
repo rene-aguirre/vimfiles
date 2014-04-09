@@ -418,35 +418,36 @@ let g:tagbar_type_c = {
     let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
 
     " speed up repos
-    let g:ctrlp_working_path_mode = 'ra'
+    if has("win32") || has("win64")
+        let g:ctrlp_working_path_mode = 'ra'
+    endif
 
     " indexing speed up
     if has("unix")
-    let g:ctrlp_user_command = {
-        \ 'types': {
-            \ 1: ['.git', "cd %s && (git ls-files -oc --exclude-standard"],
-            \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-            \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
-            \ },
-        \ 'fallback': 'find %s -type f'
-        \ }
+        let g:ctrlp_user_command = {
+            \ 'types': {
+                \ 1: ['.hg', 'hg --cwd %s locate -I .'],
+                \ 2: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
+                \ },
+            \ 'fallback': 'find %s -type f'
+            \ }
     else
-    " windows
-    let ctrlp_filter_greps = "".
-        \ 'grep -iv "\\.\\(' .
-        \ 'exe\|jar\|class\|swp\|swo\|log\|so\|o\|pyc\|jpe?g\|png\|gif\|mo\|po' .
-        \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
-        \ '\\)$"'
-    " vim currently broken
-    let g:ctrlp_user_command = {
-        \ 'types': {
-            \ 1: ['.git', "git --git-dir=%s/.git ls-files -oc --exclude-standard" .
-            \     " | " . ctrlp_filter_greps],
-            \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-            \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
-            \ },
-        \ 'fallback': 'dir %s /-n /b /s /a-d',
-        \ }
+        " windows
+        let ctrlp_filter_greps = "".
+            \ 'grep -iv "\\.\\(' .
+            \ 'exe\|jar\|class\|swp\|swo\|log\|so\|o\|pyc\|jpe?g\|png\|gif\|mo\|po' .
+            \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
+            \ '\\)$"'
+        " vim currently broken
+        let g:ctrlp_user_command = {
+            \ 'types': {
+                \ 1: ['.git', "git --git-dir=%s/.git ls-files -oc --exclude-standard" .
+                \     " | " . ctrlp_filter_greps],
+                \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+                \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
+                \ },
+            \ 'fallback': 'dir %s /-n /b /s /a-d',
+            \ }
     endif
 " }
 
@@ -561,14 +562,20 @@ if default_ext and default_ext not in all_ext:
 if vim.eval("a:sRootPrefix").strip():
     if default_ext:
         if vim.eval("a:bIsUnix"):
-            result_str = os.path.join(vim.eval("a:sRootPrefix").strip(), "*.{" + ",".join([the_file.strip() for the_file in all_ext]) + "}")
+            if len(all_ext) == 1:
+                result_str = os.path.join(vim.eval("a:sRootPrefix").strip(), "*." + all_ext[0].strip())
+            else:
+                result_str = os.path.join(vim.eval("a:sRootPrefix").strip(), "*.{" + ",".join([the_file.strip() for the_file in all_ext]) + "}")
         else:
             result_str = " ".join([os.path.join(vim.eval("a:sRootPrefix").strip(), '*.'+the_file.strip()) for the_file in all_ext])
     else:
         result_str = os.path.split( vim.eval("a:sFile") )[1]
 elif default_ext:
     if vim.eval("a:bIsUnix"):
-        result_str = "*.{" + ",".join([the_file.strip() for the_file in all_ext]) + "}"
+        if len(all_ext) == 1:
+            result_str = "*." + all_ext[0].strip()
+        else:
+            result_str = "*.{" + ",".join([the_file.strip() for the_file in all_ext]) + "}"
     else:
         result_str = " ".join(['*.' + the_file.strip() for the_file in all_ext])
 else:
