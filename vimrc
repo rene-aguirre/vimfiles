@@ -417,10 +417,8 @@ let g:tagbar_type_c = {
     " use ctrlp-cmatcher extension
     let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
 
-    " speed up repos
-    if has("win32") || has("win64")
-        let g:ctrlp_working_path_mode = 'ra'
-    endif
+    " keep current dir, avoid messin with submodules
+    let g:ctrlp_working_path_mode = 'a'
 
     " indexing speed up
     if has("unix")
