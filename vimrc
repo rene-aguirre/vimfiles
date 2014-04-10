@@ -442,8 +442,7 @@ let g:tagbar_type_c = {
         " vim currently broken
         let g:ctrlp_user_command = {
             \ 'types': {
-                \ 1: ['.git', "git --git-dir=%s/.git ls-files -oc --exclude-standard" .
-                \     " | " . ctrlp_filter_greps],
+                \ 1: ['.git', 'cd %s && python %%userprofile%%\\vimfiles\\gitsub.py'],
                 \ 2: ['.hg', 'hg --cwd %s locate -I .'],
                 \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
                 \ },

@@ -13,8 +13,12 @@ import subprocess as subp
 __version__ = "0.0.1"
 __author__  = "Rene Aguirre"
 
-local_files = ['git', 'ls-files', '-oc', '--exclude-standard']
-submodules = ['git', 'submodule', '--quiet', 'foreach', 'echo $path']
+DEBUG_DIRS = False
+DIRECT_ACCESS = True
+
+cmd_ls_files = ['git', 'ls-files', '-oc', '--exclude-standard']
+cmd_ls_subs  = ['git', 'submodule', '--quiet', 'foreach', 'echo $path']
+cmd_git_subs = ['git', 'config', '-f', '.gitmodules', '--get-regexp', '^submodule\..*\.path$']
 
 def list_git_files(start_dir):
     "List git files on current repo and sub-repos"
@@ -23,14 +27,24 @@ def list_git_files(start_dir):
         os.chdir( start_dir )
 
     # first print local files
-    for item in subp.check_output(local_files).split('\n'):
-        if item:
-            print(os.path.join(start_dir, item))
+    if not DEBUG_DIRS:
+        for item in subp.check_output(cmd_ls_files).split('\n'):
+            if item:
+                print(os.path.join(start_dir, item))
+    else:
+        print(start_dir)
  
-    for dir_item in subp.check_output(submodules).split('\n'):
-        if dir_item:
-            list_git_files(dir_item)
-            # restore dir
+    if os.path.exists('.gitmodules'):
+        if DIRECT_ACCESS:
+            for key_value in subp.check_output(cmd_git_subs).split('\n'):
+                dir_item = " ".join( key_value.split(' ')[1:] )
+                if dir_item:
+                    list_git_files(dir_item)
+        else:
+            for dir_item in subp.check_output(cmd_ls_subs).split('\n'):
+                if dir_item:
+                    list_git_files(dir_item)
+    # restore dir
     os.chdir(restore_dir)
 
 
