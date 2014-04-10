@@ -426,8 +426,9 @@ let g:tagbar_type_c = {
     if has("unix")
         let g:ctrlp_user_command = {
             \ 'types': {
-                \ 1: ['.hg', 'hg --cwd %s locate -I .'],
-                \ 2: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
+                \ 1: ['.git', "cd %s && python ~/vimfiles/gitsub.py"],
+                \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+                \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
                 \ },
             \ 'fallback': 'find %s -type f'
             \ }
