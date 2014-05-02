@@ -567,7 +567,7 @@ if default_ext and default_ext not in all_ext:
 
 if vim.eval("a:sRootPrefix").strip():
     if default_ext:
-        if vim.eval("a:bIsUnix"):
+        if vim.eval("a:bIsUnix") == '1':
             if len(all_ext) == 1:
                 result_str = os.path.join(vim.eval("a:sRootPrefix").strip(), "*." + all_ext[0].strip())
             else:
@@ -577,7 +577,7 @@ if vim.eval("a:sRootPrefix").strip():
     else:
         result_str = os.path.split( vim.eval("a:sFile") )[1]
 elif default_ext:
-    if vim.eval("a:bIsUnix"):
+    if vim.eval("a:bIsUnix") == '1':
         if len(all_ext) == 1:
             result_str = "*." + all_ext[0].strip()
         else:
@@ -586,7 +586,9 @@ elif default_ext:
         result_str = " ".join(['*.' + the_file.strip() for the_file in all_ext])
 else:
     result_str = os.path.split( vim.eval("a:sFile") )[1]
+
 vim.command('return "{0}"'.format(result_str))
+
 endpython
 endfunction
 
