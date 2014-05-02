@@ -307,8 +307,12 @@ if has("gui")
 endif
 
 " Fonts {
-    " set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h9,DejaVu\ Sans\ Mono:h9,Consolas:h10
-    set guifont=Monaco:h13,DejaVu\ Sans\ Mono:h9,Consolas:h10
+    if has("gui_gtk2")
+        set guifont=DejaVu\ Sans\ Mono\ 10,Fixed\ 12
+        " set guifontwide=Microsoft\ Yahei\ 12,WenQuanYi\ Zen\ Hei\ 12
+    else
+        set guifont=Monaco:h13,DejaVu\ Sans\ Mono:h9,Consolas:h10
+    endif
 " }
 
 "display line numbers on left of window
@@ -535,6 +539,10 @@ function! GetFtExtension(sFt, sFile, sRootPrefix, bIsUnix)
 " sFt, given filetype
 " sFile, reference filename
 " sRootPrefix, top level path
+ 
+if a:sFile == ''
+    return
+endif
 
 python << endpython
 import vim
