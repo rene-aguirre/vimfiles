@@ -329,6 +329,7 @@ set scrolloff=2
 
 " airline plugin {
     let g:airline_enable_fugitive = 1
+    let g:airline#extensions#whitespace#enabled = 0
 " }
 
 " NERDTree plug-ing {
@@ -642,7 +643,11 @@ endfunction
 
 "  tag helpers (ctags) {
     " run ctags in the current folder
-    command! BuildTags execute '!' . expand('~') . "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+    if has("win32") || has("win64")
+		command! BuildTags execute '!' . expand('~') . "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+	else
+		command! BuildTags execute '!' . "ctags -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+	endif
     " work with git hooks (so top level repo path applies)
     set notagrelative
 " }
