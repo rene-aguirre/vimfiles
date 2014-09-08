@@ -271,7 +271,7 @@ nmap <leader>s :set list!<CR>
 
 " tabs and indentation {
     set tabstop=4
-    set softtabstop=4
+    set softtabstop=0
     set shiftwidth=4
     set shiftround  " multiples of shiftwidth when using >
     set smarttab
@@ -279,6 +279,7 @@ nmap <leader>s :set list!<CR>
     set autoindent
     set cindent
     set copyindent
+    set preserveindent
 " }
 
 set laststatus=2 " always show status window
