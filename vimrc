@@ -52,8 +52,8 @@ endif
     " RST Markup helper
     " Bundle 'VST'
 
-    " full reST support
-    Bundle "Rykka/riv.vim"
+    " full reST support (complains on clicable.vim)
+    " Bundle "Rykka/riv.vim"
 
     " software caps lock
     Bundle "capslock.vim"
@@ -76,6 +76,7 @@ endif
     " file manager
     Bundle 'kien/ctrlp.vim'
     Bundle 'JazzCore/ctrlp-cmatcher' 
+    Bundle 'd11wtq/ctrlp_bdelete.vim'
 
     Bundle 'scrooloose/nerdcommenter'
     
@@ -477,6 +478,11 @@ let g:tagbar_type_c = {
         " let &guioptions = substitute(&guioptions, "t", "", "g")
         set backupdir=$TMP
         set directory=$TMP
+    else
+        silent execute '!mkdir ~/.vim/backup > /dev/null 2>&1'
+        silent execute '!mkdir ~/.vim/swap > /dev/null 2>&1'
+        set backupdir=$HOME/.vim/backup//
+        set directory=$HOME/.vim/swap//
     endif
 " }
 
@@ -648,6 +654,7 @@ endfunction
 	else
 		command! BuildTags execute '!' . "ctags -R --c++-kinds=+p --fields=+iaS --extra=+q ."
 	endif
+	set tags=./tags;,tags;
     " work with git hooks (so top level repo path applies)
     set notagrelative
 " }
