@@ -25,6 +25,8 @@ set encoding=utf-8
     " handle brackets, quotes, etc. easier
     Bundle 'tpope/vim-surround'
 
+    Bundle 'gorkunov/smartpairs.vim'
+
     " better than taglist
     Bundle 'majutsushi/tagbar'
 
@@ -130,7 +132,7 @@ if has("autocmd")
     autocmd filetype python compiler pylint
 
     " close if last window is nerd tree
-    autocmd bufenter * if (winnr("$") == 1 && exists("b:nerdtreetype") && b:nerdtreetype == "primary") | q | endif
+    " autocmd bufenter * if (winnr("$") == 1 && exists("b:nerdtreetype") && b:nerdtreetype == "primary") | q | endif
 
     " when editing a file, always jump to the last known cursor position.
     " don't do it when the position is invalid or when inside an event handler
@@ -168,6 +170,7 @@ if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
 		  \ | wincmd p | diffthis
 endif
+set diffopt+=vertical
 
 " source $VIMRUNTIME/mswin.vim
 " set 'selection', 'selectmode', 'mousemodel' and 'keymodel' for MS-Windows
@@ -333,11 +336,13 @@ set scrolloff=2
     let g:airline#extensions#whitespace#enabled = 0
 " }
 
+if 0
 " NERDTree plug-ing {
     nmap <F2> :NERDTreeToggle<CR>
     imap <F2> <C-O>:NERDTreeToggle<CR>
     omap <F2> <C-C>:NERDTreeToggle<CR>
 " }
+endif
 
 " Tagbar plug-in {
     if has("win32") || has("win64")
