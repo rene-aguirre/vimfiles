@@ -21,6 +21,7 @@ set encoding=utf-8
     "
     " My Bundles here:
     "
+    Bundle 'tomasr/molokai'
     " original repos on github
     " handle brackets, quotes, etc. easier
     Bundle 'tpope/vim-surround'
@@ -305,11 +306,8 @@ set vb
 "set fdm=marker
 "set nofen
 
-if has("gui")
-    " colorscheme desert_luna
-    colorscheme molokai
-    let g:molokai_original=1
-endif
+" colorscheme desert_luna
+colorscheme molokai
 
 " Fonts {
     if has("gui_gtk2")
