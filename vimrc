@@ -330,8 +330,10 @@ set scrolloff=2
 " }
 
 " airline plugin {
-    let g:airline_enable_fugitive = 1
     let g:airline#extensions#whitespace#enabled = 0
+    " fugitive
+    let g:airline#extensions#branch#enabled = 1
+    let g:airline#extensions#branch#empty_message = ''
 " }
 
 if 0
