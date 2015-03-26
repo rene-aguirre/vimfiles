@@ -65,7 +65,7 @@ endif
     Bundle 'bling/vim-airline'
 
     " file browser
-    " Bundle 'scrooloose/nerdtree'
+    Bundle 'scrooloose/nerdtree'
 
     " git helper
     Bundle 'tpope/vim-fugitive.git'
@@ -133,7 +133,7 @@ if has("autocmd")
     autocmd filetype python compiler pylint
 
     " close if last window is nerd tree
-    " autocmd bufenter * if (winnr("$") == 1 && exists("b:nerdtreetype") && b:nerdtreetype == "primary") | q | endif
+    autocmd bufenter * if (winnr("$") == 1 && exists("b:nerdtreetype") && b:nerdtreetype == "primary") | q | endif
 
     " when editing a file, always jump to the last known cursor position.
     " don't do it when the position is invalid or when inside an event handler
@@ -336,13 +336,11 @@ set scrolloff=2
     let g:airline#extensions#branch#empty_message = ''
 " }
 
-if 0
 " NERDTree plug-ing {
     nmap <F2> :NERDTreeToggle<CR>
     imap <F2> <C-O>:NERDTreeToggle<CR>
     omap <F2> <C-C>:NERDTreeToggle<CR>
 " }
-endif
 
 " Tagbar plug-in {
     if has("win32") || has("win64")
