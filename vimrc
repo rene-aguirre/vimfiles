@@ -126,9 +126,6 @@ if has("autocmd")
     " for all text files set 'textwidth' to 78 characters.
     autocmd filetype text setlocal textwidth=78
 
-    " makefiles retain tabs
-    autocmd filetype make setlocal ts=4 sts=4 sw=4 noexpandtab
-    
     " only run pylint by :make
     let g:pylint_onwrite = 0
 
@@ -288,6 +285,12 @@ nmap <leader>s :set list!<CR>
     set cindent
     set copyindent
     set preserveindent
+
+    " makefiles retain tabs
+    autocmd filetype make setlocal ts=4 sw=4 noexpandtab
+    
+    " javascript size 2 tabstop
+    autocmd filetype javascript setlocal ts=2 sw=2
 " }
 
 set laststatus=2 " always show status window
