@@ -67,6 +67,9 @@ endif
     " file browser
     Bundle 'scrooloose/nerdtree'
 
+    " syntax checker
+    Bundle 'scrooloose/syntastic'
+
     " git helper
     Bundle 'tpope/vim-fugitive.git'
 
