@@ -11,13 +11,13 @@ filetype off
 set encoding=utf-8
 "
 " Pluggin management {
-    set rtp+=~/.vim/bundle/vundle/
-    call vundle#rc()
+set rtp+=~/.vim/bundle/Vundle.vim/
+call vundle#begin()
 
     " Vim Vundle, https://github.com/gmarik/vundl
     " Refresh with ":BundlesInstall"
     " let Vundle manage Vundle
-    Bundle 'gmarik/vundle'
+    Bundle 'gmarik/Vundle.vim'
     "
     " My Bundles here:
     "
@@ -86,6 +86,8 @@ endif
 
     " expand selection incrementally
     Bundle 'terryma/vim-expand-region'
+
+call vundle#end()
 
     " Extended %
     runtime macros/matchit.vim
