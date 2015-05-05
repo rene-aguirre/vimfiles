@@ -21,6 +21,7 @@ call vundle#begin()
     "
     " My Bundles here:
     "
+    Bundle 'tomasr/molokai'
     " original repos on github
     " handle brackets, quotes, etc. easier
     Bundle 'tpope/vim-surround'
@@ -64,7 +65,10 @@ endif
     Bundle 'bling/vim-airline'
 
     " file browser
-    " Bundle 'scrooloose/nerdtree'
+    Bundle 'scrooloose/nerdtree'
+
+    " syntax checker
+    Bundle 'scrooloose/syntastic'
 
     " git helper
     Bundle 'tpope/vim-fugitive.git'
@@ -124,9 +128,6 @@ if has("autocmd")
     " for all text files set 'textwidth' to 78 characters.
     autocmd filetype text setlocal textwidth=78
 
-    " makefiles retain tabs
-    autocmd filetype make setlocal ts=4 sts=4 sw=4 noexpandtab
-    
     " only run pylint by :make
     let g:pylint_onwrite = 0
 
@@ -134,7 +135,7 @@ if has("autocmd")
     autocmd filetype python compiler pylint
 
     " close if last window is nerd tree
-    " autocmd bufenter * if (winnr("$") == 1 && exists("b:nerdtreetype") && b:nerdtreetype == "primary") | q | endif
+    autocmd bufenter * if (winnr("$") == 1 && exists("b:nerdtreetype") && b:nerdtreetype == "primary") | q | endif
 
     " when editing a file, always jump to the last known cursor position.
     " don't do it when the position is invalid or when inside an event handler
@@ -286,6 +287,12 @@ nmap <leader>s :set list!<CR>
     set cindent
     set copyindent
     set preserveindent
+
+    " makefiles retain tabs
+    autocmd filetype make setlocal ts=4 sw=4 noexpandtab
+    
+    " javascript size 2 tabstop
+    autocmd filetype javascript setlocal ts=2 sw=2
 " }
 
 set laststatus=2 " always show status window
@@ -307,11 +314,8 @@ set vb
 "set fdm=marker
 "set nofen
 
-if has("gui")
-    " colorscheme desert_luna
-    colorscheme molokai
-    let g:molokai_original=1
-endif
+" colorscheme desert_luna
+colorscheme molokai
 
 " Fonts {
     if has("gui_gtk2")
@@ -334,17 +338,17 @@ set scrolloff=2
 " }
 
 " airline plugin {
-    let g:airline_enable_fugitive = 1
     let g:airline#extensions#whitespace#enabled = 0
+    " fugitive
+    let g:airline#extensions#branch#enabled = 1
+    let g:airline#extensions#branch#empty_message = ''
 " }
 
-if 0
 " NERDTree plug-ing {
     nmap <F2> :NERDTreeToggle<CR>
     imap <F2> <C-O>:NERDTreeToggle<CR>
     omap <F2> <C-C>:NERDTreeToggle<CR>
 " }
-endif
 
 " Tagbar plug-in {
     if has("win32") || has("win64")
