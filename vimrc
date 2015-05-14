@@ -14,13 +14,16 @@ set encoding=utf-8
 set rtp+=~/.vim/bundle/Vundle.vim/
 call vundle#begin()
 
-    " Vim Vundle, https://github.com/gmarik/vundl
-    " Refresh with ":BundlesInstall"
+    " Vim Vundle, https://github.com/gmarik/vundle
+    " First install Vundle:
+    " git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    " then refresh with ":BundlesInstall"
+
     " let Vundle manage Vundle
     Bundle 'gmarik/Vundle.vim'
-    "
+
     " My Bundles here:
-    "
+
     Bundle 'tomasr/molokai'
     " original repos on github
     " handle brackets, quotes, etc. easier
@@ -42,7 +45,7 @@ if has("win32") || has("win64")
     Bundle 'xolox/vim-shell'
     Bundle 'xolox/vim-misc'
 endif
-    
+
     " much better than snipMate
     Bundle 'SirVer/ultisnips'
 
