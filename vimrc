@@ -81,7 +81,7 @@ endif
 
     " file manager
     Bundle 'kien/ctrlp.vim'
-    Bundle 'JazzCore/ctrlp-cmatcher' 
+    Bundle 'FelikZ/ctrlp-py-matcher'
     Bundle 'd11wtq/ctrlp_bdelete.vim'
 
     Bundle 'scrooloose/nerdcommenter'
@@ -99,11 +99,7 @@ endif
 " }
 
 " Don't use Ex mode, use Q for formatting
-map Q gq
-
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
+nnoremap Q gq
 
 " In many terminal emulators the mouse works just fine, thus enable it.
 if has('mouse')
@@ -226,6 +222,14 @@ inoremap <C-S>		<C-O>:update<CR>
 " CTRL-Z is Undo; not in cmdline though
 noremap <C-Z> u
 inoremap <C-Z> <C-O>u
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+" persistent undo
+set undofile
+set undodir=~/.vim/undodir
 
 " CTRL-Y is Redo (although not repeat); not in cmdline though
 noremap <C-Y> <C-R>
@@ -429,9 +433,6 @@ let g:tagbar_type_c = {
 
     " special wildignore
     let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
-
-    " use ctrlp-cmatcher extension
-    let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
 
     " keep current dir, avoid messin with submodules
     let g:ctrlp_working_path_mode = 'a'
