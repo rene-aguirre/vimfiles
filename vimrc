@@ -40,6 +40,9 @@ call vundle#begin()
     " Tab helper
     Bundle "godlygeek/tabular"
 
+    " tabs whitespace and other heuristics
+    Bundle "tpope/vim-sleuth"
+
 if has("win32") || has("win64")
     " Run shell commands in background
     Bundle 'xolox/vim-shell'
@@ -84,16 +87,18 @@ endif
 
     " file manager
     Bundle 'kien/ctrlp.vim'
-    Bundle 'FelikZ/ctrlp-py-matcher'
+    Bundle 'JazzCore/ctrlp-cmatcher' 
+    " Bundle 'FelikZ/ctrlp-py-matcher'
     Bundle 'd11wtq/ctrlp_bdelete.vim'
 
     Bundle 'scrooloose/nerdcommenter'
-    
+
     Bundle 'vimwiki'
 
     " expand selection incrementally
     Bundle 'terryma/vim-expand-region'
 
+    Bundle 'JCLiang/vim-cscope-utils'
 call vundle#end()
 
     " Extended %
@@ -439,6 +444,9 @@ let g:tagbar_type_c = {
     " special wildignore
     let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 
+    " use ctrlp-cmatcher extension
+    let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
+ 
     " keep current dir, avoid messin with submodules
     let g:ctrlp_working_path_mode = 'a'
 
