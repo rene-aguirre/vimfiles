@@ -40,9 +40,6 @@ call vundle#begin()
     " Tab helper
     Bundle "godlygeek/tabular"
 
-    " tabs whitespace and other heuristics
-    Bundle "tpope/vim-sleuth"
-
 if has("win32") || has("win64")
     " Run shell commands in background
     Bundle 'xolox/vim-shell'
@@ -76,8 +73,9 @@ endif
     " syntax checker
     Bundle 'scrooloose/syntastic'
 
-    " git helper
+    " git helpers
     Bundle 'tpope/vim-fugitive.git'
+    Bundle 'airblade/vim-gitgutter'
 
     " Extradite for fugitive
     Bundle 'grota/vim-extradite'
@@ -86,25 +84,32 @@ endif
     " Bundle 'sjl/splice.vim.git'
 
     " file manager
-    Bundle 'kien/ctrlp.vim'
-    Bundle 'JazzCore/ctrlp-cmatcher' 
-    " Bundle 'FelikZ/ctrlp-py-matcher'
-    Bundle 'd11wtq/ctrlp_bdelete.vim'
+    Bundle 'ctrlpvim/ctrlp.vim'
+    Bundle 'JazzCore/ctrlp-cmatcher'
 
     Bundle 'scrooloose/nerdcommenter'
 
     Bundle 'vimwiki'
 
-    " expand selection incrementally
-    Bundle 'terryma/vim-expand-region'
+    " expand selection incrementally (removed: I'm not really using it)
+    " Bundle 'terryma/vim-expand-region'
 
-    Bundle 'JCLiang/vim-cscope-utils'
+    " Plant UML syntax and helper
+    Bundle 'aklt/plantuml-syntax'
+
+    Bundle 'ntpeters/vim-better-whitespace'
+
+    Bundle 'octol/vim-cpp-enhanced-highlight'
+
+    " Completion and highlighting while on active substitution
+    Bundle 'osyo-manga/vim-over'
+
 call vundle#end()
 
     " Extended %
     runtime macros/matchit.vim
 
-    filetype plugin on  
+    filetype plugin on
     filetype plugin indent on " allow plug-ins to detect filetypes
 " }
 
@@ -305,6 +310,7 @@ nmap <leader>s :set list!<CR>
     
     " javascript size 2 tabstop
     autocmd filetype javascript setlocal ts=2 sw=2
+
 " }
 
 set laststatus=2 " always show status window
