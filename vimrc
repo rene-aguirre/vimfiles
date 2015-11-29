@@ -24,7 +24,10 @@ call vundle#begin()
 
     " My Bundles here:
 
-    Bundle 'tomasr/molokai'
+    "Bundle 'tomasr/molokai'
+    Bundle 'crusoexia/vim-monokai'
+    Bundle 'NLKNguyen/papercolor-theme'
+
     " original repos on github
     " handle brackets, quotes, etc. easier
     Bundle 'tpope/vim-surround'
@@ -104,6 +107,8 @@ endif
     " Completion and highlighting while on active substitution
     Bundle 'osyo-manga/vim-over'
 
+    " cscope ctags dbbuild
+    Bundle 'brookhong/cscope.vim'
 call vundle#end()
 
     " Extended %
@@ -332,8 +337,12 @@ set vb
 "set fdm=marker
 "set nofen
 
+set background=dark
 " colorscheme desert_luna
-colorscheme molokai
+colorscheme monokai
+
+" set background=light
+" colorscheme PaperColor
 
 " Fonts {
     if has("gui_gtk2")
@@ -686,6 +695,27 @@ endfunction
 	set tags=./tags;,tags;
     " work with git hooks (so top level repo path applies)
     set notagrelative
+" }
+
+" cscope.vim {
+nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
+nnoremap <leader>l :call ToggleLocationList()<CR>
+" s: Find this C symbol
+nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
+" g: Find this definition
+nnoremap  <leader>fg :call CscopeFind('g', expand('<cword>'))<CR>
+" d: Find functions called by this function
+nnoremap  <leader>fd :call CscopeFind('d', expand('<cword>'))<CR>
+" c: Find functions calling this function
+nnoremap  <leader>fc :call CscopeFind('c', expand('<cword>'))<CR>
+" t: Find this text string
+nnoremap  <leader>ft :call CscopeFind('t', expand('<cword>'))<CR>
+" e: Find this egrep pattern
+nnoremap  <leader>fe :call CscopeFind('e', expand('<cword>'))<CR>
+" f: Find this file
+nnoremap  <leader>ff :call CscopeFind('f', expand('<cword>'))<CR>
+" i: Find files #including this file
+nnoremap  <leader>fi :call CscopeFind('i', expand('<cword>'))<CR>
 " }
 
 " F5 as running current file
