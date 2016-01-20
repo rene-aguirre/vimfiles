@@ -107,8 +107,6 @@ endif
     " Completion and highlighting while on active substitution
     Bundle 'osyo-manga/vim-over'
 
-    " cscope ctags dbbuild
-    Bundle 'brookhong/cscope.vim'
 call vundle#end()
 
     " Extended %
@@ -465,6 +463,9 @@ let g:tagbar_type_c = {
     " keep current dir, avoid messin with submodules
     let g:ctrlp_working_path_mode = 'a'
 
+    " limit max number of files
+    let g:ctrlp_max_files = 100000
+
     " indexing speed up
     if has("unix")
         let g:ctrlp_user_command = {
@@ -473,7 +474,7 @@ let g:tagbar_type_c = {
                 \ 2: ['.hg', 'hg --cwd %s locate -I .'],
                 \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
                 \ },
-            \ 'fallback': 'find %s -type f'
+            \ 'fallback': 'find %s -not -path "*/\.*" -type f \( ! -iname ".*" \)| head -50000'
             \ }
     else
         " windows
@@ -507,6 +508,19 @@ let g:tagbar_type_c = {
         set cursorline        " highlight current line
         set columns=99
         nmap <F10> :if &guioptions=~'m' \| set guioptions-=m \| else \| set guioptions+=m \| endif<cr>
+
+        " set the cursor to a vertical line in insert mode and a solid block
+        " in command mode
+        let &t_SI = "\<Esc>]50;CursorShape=1\x7" " Vertical bar in insert mode
+        let &t_EI = "\<Esc>]50;CursorShape=0\x7" " Block in normal mode
+        inoremap <special> <Esc> <Esc>hl
+
+        highlight Cursor guifg=black guibg=cyan
+        highlight iCursor guifg=black guibg=red
+        set guicursor=i:ver30-iCursor
+        set guicursor=n-v-c:block-Cursor
+        set guicursor+=n-v-c:blinkon0
+
     endif
     " For CTRL-V to work autoselect must be off.
     " On Unix we have two selections, autoselect can be used.
@@ -695,27 +709,6 @@ endfunction
 	set tags=./tags;,tags;
     " work with git hooks (so top level repo path applies)
     set notagrelative
-" }
-
-" cscope.vim {
-nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
-nnoremap <leader>l :call ToggleLocationList()<CR>
-" s: Find this C symbol
-nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
-" g: Find this definition
-nnoremap  <leader>fg :call CscopeFind('g', expand('<cword>'))<CR>
-" d: Find functions called by this function
-nnoremap  <leader>fd :call CscopeFind('d', expand('<cword>'))<CR>
-" c: Find functions calling this function
-nnoremap  <leader>fc :call CscopeFind('c', expand('<cword>'))<CR>
-" t: Find this text string
-nnoremap  <leader>ft :call CscopeFind('t', expand('<cword>'))<CR>
-" e: Find this egrep pattern
-nnoremap  <leader>fe :call CscopeFind('e', expand('<cword>'))<CR>
-" f: Find this file
-nnoremap  <leader>ff :call CscopeFind('f', expand('<cword>'))<CR>
-" i: Find files #including this file
-nnoremap  <leader>fi :call CscopeFind('i', expand('<cword>'))<CR>
 " }
 
 " F5 as running current file
