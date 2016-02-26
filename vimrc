@@ -68,7 +68,7 @@ endif
     Bundle "capslock.vim"
 
     " Non bloated, works on Windows cool statusline
-    Bundle 'bling/vim-airline'
+    Bundle 'vim-airline/vim-airline'
 
     " file browser
     Bundle 'scrooloose/nerdtree'
@@ -367,6 +367,21 @@ set scrolloff=2
     " fugitive
     let g:airline#extensions#branch#enabled = 1
     let g:airline#extensions#branch#empty_message = ''
+  " disable syntastic integration
+  let g:airline#extensions#syntastic#enabled = 0
+
+  let g:airline_left_sep = '»'
+  let g:airline_right_sep = '«'
+
+  " remove percentage
+  " let g:airline_section_x = (filetype, virtualenv)
+
+    function! g:MyFF()
+        return printf('%s%s', &fenc, strlen(&ff) > 0 ? '['.&ff[0].']' : '')
+    endfunction
+    call airline#parts#define_function('myff', 'MyFF')
+    let g:airline_section_y = airline#section#create_right(['myff'])
+    let g:airline_section_z = airline#section#create_right(['%2p%%'])
 " }
 
 " NERDTree plug-ing {
@@ -564,16 +579,26 @@ onoremap <C-PageUp> <C-C><C-W><C-W>
 
     " toggles the quickfix window.
     let g:jah_Quickfix_Win_Height=10
+    let g:restore_buf_num = 0
     function! s:qf_toggle()
         for i in range(1, winnr('$'))
             let bnum = winbufnr(i)
-            if getbufvar(bnum, '&buftype') == 'quickfix'
-                cclose
-                return
+            if getbufvar(bnum, '&buftype') != 'quickfix'
+                continue
             endif
+            cclose
+            if g:restore_buf_num && getbufvar(bnum, '&buftype') == 'quickfix'
+                if bufexists(g:restore_buf_num) && bnum == bufnr('%')
+                    execute ":buffer " . g:restore_buf_num
+                endif
+            endif
+            return
         endfor
+        let g:restore_buf_num = bufnr('%')
+        " g:restore_win_num = winbufnr(0) " -1 if none
         execute "botright copen " . g:jah_Quickfix_Win_Height
     endfunction
+    " autocmd winleave qf let g:restore_buf_num=0
 
     command! QFix call s:qf_toggle()
 
