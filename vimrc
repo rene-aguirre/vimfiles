@@ -484,13 +484,18 @@ let g:tagbar_type_c = {
             \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
             \ '\\)$"'
         " vim currently broken
+        if executable('ag')
+            let g:ctrlp_fast_search = 'ag %s -l --nocolor -g ""'
+        else
+            let g:ctrlp_fast_search = 'dir %s /-n /b /s /a-d'
+        endif
         let g:ctrlp_user_command = {
             \ 'types': {
                 \ 1: ['.git', 'cd %s && python %%userprofile%%\\vimfiles\\gitsub.py'],
                 \ 2: ['.hg', 'hg --cwd %s locate -I .'],
                 \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
                 \ },
-            \ 'fallback': 'dir %s /-n /b /s /a-d',
+            \ 'fallback': g:ctrlp_fast_search,
             \ }
     endif
 " }
