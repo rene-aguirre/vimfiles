@@ -741,6 +741,11 @@ endfunction
     set notagrelative
 " }
 
+
+"  UltiSnips {
+    let g:UltiSnipsSnippetsDir = '~/.vim/bundle/vim-personal/UltiSnips/'
+" }
+
 " F5 as running current file
 noremap <F5> :update<CR>:silent !%<CR>
 inoremap <F5> <ESC>:update<CR>:silent !%<CR>
