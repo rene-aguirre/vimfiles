@@ -107,6 +107,8 @@ endif
     " Completion and highlighting while on active substitution
     Plugin 'osyo-manga/vim-over'
 
+    " Rust programming language
+    Plugin 'rust-lang/rust.vim'
 call vundle#end()
 
     " Extended %
