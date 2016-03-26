@@ -20,92 +20,92 @@ call vundle#begin()
     " then refresh with ":BundlesInstall"
 
     " let Vundle manage Vundle
-    Bundle 'gmarik/Vundle.vim'
+    Plugin 'VundleVim/Vundle.vim'
 
     " My Bundles here:
 
-    "Bundle 'tomasr/molokai'
-    Bundle 'crusoexia/vim-monokai'
-    Bundle 'NLKNguyen/papercolor-theme'
+    "Plugin 'tomasr/molokai'
+    Plugin 'crusoexia/vim-monokai'
+    Plugin 'NLKNguyen/papercolor-theme'
 
     " original repos on github
     " handle brackets, quotes, etc. easier
-    Bundle 'tpope/vim-surround'
+    Plugin 'tpope/vim-surround'
 
-    Bundle 'gorkunov/smartpairs.vim'
+    Plugin 'gorkunov/smartpairs.vim'
 
     " better than taglist
-    Bundle 'majutsushi/tagbar'
+    Plugin 'majutsushi/tagbar'
 
     " my personal stuff
-    Bundle 'rene-aguirre/vim-personal.git'
+    Plugin 'rene-aguirre/vim-personal.git'
 
     " Tab helper
-    Bundle "godlygeek/tabular"
+    Plugin 'godlygeek/tabular'
 
 if has("win32") || has("win64")
     " Run shell commands in background
-    Bundle 'xolox/vim-shell'
-    Bundle 'xolox/vim-misc'
+    Plugin 'xolox/vim-shell'
+    Plugin 'xolox/vim-misc'
 endif
 
     " much better than snipMate
-    Bundle 'SirVer/ultisnips'
+    Plugin 'SirVer/ultisnips'
 
     " \bd buffer delete mapping
-    Bundle 'kwbdi.vim'
+    Plugin 'kwbdi.vim'
 
     " Ascii drawing helper
-    " Bundle 'DrawIt'
+    " Plugin 'DrawIt'
 
     " RST Markup helper
-    " Bundle 'VST'
+    " Plugin 'VST'
 
     " full reST support (complains on clicable.vim)
-    " Bundle "Rykka/riv.vim"
+    " Plugin 'Rykka/riv.vim'
 
     " software caps lock
-    Bundle "capslock.vim"
+    Plugin 'capslock.vim'
 
     " Non bloated, works on Windows cool statusline
-    Bundle 'vim-airline/vim-airline'
+    Plugin 'vim-airline/vim-airline'
 
     " file browser
-    Bundle 'scrooloose/nerdtree'
+    Plugin 'scrooloose/nerdtree'
 
     " syntax checker
-    Bundle 'scrooloose/syntastic'
+    Plugin 'scrooloose/syntastic'
 
     " git helpers
-    Bundle 'tpope/vim-fugitive.git'
-    Bundle 'airblade/vim-gitgutter'
+    Plugin 'tpope/vim-fugitive.git'
+    Plugin 'airblade/vim-gitgutter'
 
     " Extradite for fugitive
-    Bundle 'grota/vim-extradite'
+    Plugin 'grota/vim-extradite'
 
     " three file diffs
-    " Bundle 'sjl/splice.vim.git'
+    " Plugin 'sjl/splice.vim.git'
 
     " file manager
-    Bundle 'ctrlpvim/ctrlp.vim'
-    Bundle 'JazzCore/ctrlp-cmatcher'
+    Plugin 'ctrlpvim/ctrlp.vim'
+    Plugin 'JazzCore/ctrlp-cmatcher'
 
-    Bundle 'scrooloose/nerdcommenter'
+    Plugin 'scrooloose/nerdcommenter'
 
-    Bundle 'vimwiki'
+    Plugin 'vimwiki'
 
     " expand selection incrementally (removed: I'm not really using it)
-    " Bundle 'terryma/vim-expand-region'
+    " Plugin 'terryma/vim-expand-region'
 
     " Plant UML syntax and helper
-    Bundle 'aklt/plantuml-syntax'
+    Plugin 'aklt/plantuml-syntax'
 
-    Bundle 'ntpeters/vim-better-whitespace'
+    Plugin 'ntpeters/vim-better-whitespace'
 
-    Bundle 'octol/vim-cpp-enhanced-highlight'
+    Plugin 'octol/vim-cpp-enhanced-highlight'
 
     " Completion and highlighting while on active substitution
-    Bundle 'osyo-manga/vim-over'
+    Plugin 'osyo-manga/vim-over'
 
 call vundle#end()
 
