@@ -378,7 +378,7 @@ set scrolloff=2
   " remove percentage
   " let g:airline_section_x = (filetype, virtualenv)
 
-    function! g:MyFF()
+    function! MyFF()
         return printf('%s%s', &fenc, strlen(&ff) > 0 ? '['.&ff[0].']' : '')
     endfunction
     call airline#parts#define_function('myff', 'MyFF')
