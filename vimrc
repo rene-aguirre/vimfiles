@@ -471,7 +471,7 @@ let g:tagbar_type_c = {
     " let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
 
     " use ctrlp-cmatcher extension
-    " let g:ctrlp_match_func = {'match' : 'pymatcher#PyMatch'}
+    let g:ctrlp_match_func = {'match' : 'pymatcher#PyMatch'}
     "
     " keep current dir, avoid messin with submodules
     let g:ctrlp_working_path_mode = 'a'
