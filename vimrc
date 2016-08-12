@@ -11,105 +11,98 @@ filetype off
 set encoding=utf-8
 "
 " Pluggin management {
-set rtp+=~/.vim/bundle/Vundle.vim/
-call vundle#begin()
-
-    " Vim Vundle, https://github.com/gmarik/vundle
-    " First install Vundle:
-    " git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    " then refresh with ":BundlesInstall"
-
-    " let Vundle manage Vundle
-    Plugin 'VundleVim/Vundle.vim'
-
-    " My Bundles here:
-
-    "Plugin 'tomasr/molokai'
-    Plugin 'crusoexia/vim-monokai'
-    Plugin 'NLKNguyen/papercolor-theme'
+" plug.vim is in my vimfiles/autoload repo
+set rtp+=~/vimfiles
+call plug#begin('~/.vim/plugged')
+    " Make sure to use single quotes
+    "
+    "Plug 'tomasr/molokai'
+    Plug 'crusoexia/vim-monokai'
+    Plug 'NLKNguyen/papercolor-theme'
 
     " original repos on github
     " handle brackets, quotes, etc. easier
-    Plugin 'tpope/vim-surround'
+    Plug 'tpope/vim-surround'
 
-    Plugin 'gorkunov/smartpairs.vim'
+    Plug 'gorkunov/smartpairs.vim'
 
     " better than taglist
-    Plugin 'majutsushi/tagbar'
+    Plug 'majutsushi/tagbar'
 
     " my personal stuff
-    Plugin 'rene-aguirre/vim-personal.git'
+    Plug 'rene-aguirre/vim-personal'
 
     " Tab helper
-    Plugin 'godlygeek/tabular'
+    Plug 'godlygeek/tabular'
 
 if has("win32") || has("win64")
     " Run shell commands in background
-    Plugin 'xolox/vim-shell'
-    Plugin 'xolox/vim-misc'
+    Plug 'xolox/vim-shell'
+    Plug 'xolox/vim-misc'
 endif
 
     " much better than snipMate
-    Plugin 'SirVer/ultisnips'
+    Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 
     " \bd buffer delete mapping
-    Plugin 'kwbdi.vim'
+    Plug 'kwbdi.vim'
 
     " Ascii drawing helper
-    " Plugin 'DrawIt'
+    " Plug 'DrawIt'
 
     " RST Markup helper
-    " Plugin 'VST'
+    " Plug 'VST'
 
     " full reST support (complains on clicable.vim)
-    " Plugin 'Rykka/riv.vim'
+    " Plug 'Rykka/riv.vim'
 
     " software caps lock
-    Plugin 'capslock.vim'
+    Plug 'capslock.vim'
 
     " Non bloated, works on Windows cool statusline
-    Plugin 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline'
 
     " file browser
-    Plugin 'scrooloose/nerdtree'
+    Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle' }
 
     " syntax checker
-    Plugin 'scrooloose/syntastic'
+    Plug 'scrooloose/syntastic'
 
     " git helpers
-    Plugin 'tpope/vim-fugitive.git'
-    Plugin 'airblade/vim-gitgutter'
+    Plug 'tpope/vim-fugitive'
+    Plug 'airblade/vim-gitgutter'
 
     " Extradite for fugitive
-    Plugin 'grota/vim-extradite'
+    Plug 'grota/vim-extradite'
 
     " three file diffs
-    " Plugin 'sjl/splice.vim.git'
+    " Plug 'sjl/splice.vim.git'
 
     " file manager
-    Plugin 'ctrlpvim/ctrlp.vim'
-    Plugin 'JazzCore/ctrlp-cmatcher'
+    Plug 'ctrlpvim/ctrlp.vim'
+    " Plug 'JazzCore/ctrlp-cmatcher'
+    Plug 'FelikZ/ctrlp-py-matcher'
 
-    Plugin 'scrooloose/nerdcommenter'
+    Plug 'scrooloose/nerdcommenter'
 
-    Plugin 'vimwiki'
+    Plug 'vimwiki'
 
     " expand selection incrementally (removed: I'm not really using it)
-    " Plugin 'terryma/vim-expand-region'
+    " Plug 'terryma/vim-expand-region'
 
     " Plant UML syntax and helper
-    Plugin 'aklt/plantuml-syntax'
+    Plug 'aklt/plantuml-syntax'
 
-    Plugin 'ntpeters/vim-better-whitespace'
+    Plug 'ntpeters/vim-better-whitespace'
 
-    Plugin 'octol/vim-cpp-enhanced-highlight'
+    Plug 'octol/vim-cpp-enhanced-highlight'
 
     " Completion and highlighting while on active substitution
-    Plugin 'osyo-manga/vim-over'
+    Plug 'osyo-manga/vim-over'
 
     " Rust programming language
-    Plugin 'rust-lang/rust.vim'
-call vundle#end()
+    Plug 'rust-lang/rust.vim'
+call plug#end()
 
     " Extended %
     runtime macros/matchit.vim
@@ -462,7 +455,7 @@ let g:tagbar_type_c = {
 " }
 
 " ctrlp.vim plug-in {
-    " CtrlP browse buffers 
+    " CtrlP browse buffers
     nmap <leader>be :CtrlPBuffer<CR>
 
     " work on tags
@@ -475,8 +468,11 @@ let g:tagbar_type_c = {
     let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 
     " use ctrlp-cmatcher extension
-    let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
- 
+    " let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
+
+    " use ctrlp-cmatcher extension
+    " let g:ctrlp_match_func = {'match' : 'pymatcher#PyMatch'}
+    "
     " keep current dir, avoid messin with submodules
     let g:ctrlp_working_path_mode = 'a'
 
