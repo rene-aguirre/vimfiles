@@ -330,7 +330,9 @@ set vb
 "set fdm=marker
 "set nofen
 
-set background=dark
+if has("gui_running")
+    set background=dark
+endif
 " colorscheme desert_luna
 colorscheme monokai
 
@@ -619,15 +621,13 @@ noremap <C-Del> daw
 
 " CTRL-H does replace, normal mode only
 noremap <S-C-h> :%s#\<<c-r>=expand("<cword>")<CR>\>#
-" CTR-F
-noremap <S-C-f> /<c-r>=expand("<cword>")<CR>
 
 " search & replace {
 function! GetFtExtension(sFt, sFile, sRootPrefix, bIsUnix)
 " sFt, given filetype
 " sFile, reference filename
 " sRootPrefix, top level path
- 
+
 if a:sFile == ''
     return
 endif
@@ -689,41 +689,38 @@ endfunction
         let g:gitroot=system('git rev-parse --show-cdup')
         if v:shell_error
             if a:ignorecase
-                let g:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /i\\ /p"
+                let s:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /i\\ /p"
             else
-                let g:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /p"
+                let s:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /p"
             endif
-            let g:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))
+            let s:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))
 
         else
             if a:ignorecase
-                let g:mygrepprg="git\\ grep\\ -ni"
+                let s:mygrepprg="git\\ grep\\ -ni"
             else
-                let g:mygrepprg="git\\ grep\\ -n"
+                let s:mygrepprg="git\\ grep\\ -n"
             endif
-            let g:grepcmd="silent! grep " . a:args . " -- " . GetFtExtension(&filetype, bufname('%'), g:gitroot, has("unix"))
+            let s:grepcmd="silent! grep " . a:args . " -- " . GetFtExtension(&filetype, bufname('%'), g:gitroot, has("unix"))
         endif
-        exec "set grepprg=" . g:mygrepprg
-        execute g:grepcmd
+        exec "set grepprg=" . s:mygrepprg
+        execute s:grepcmd
         botright copen
         let &grepprg=grepprg_bak
         exec "redraw!"
     endfunction
 
-    command! -nargs=1 G call Grep( '<args>', 0)
-    command! -nargs=1 Gi call Grep( '<args>', 1)
+    command! -nargs=1 G call Grep('<args>', 0)
+    command! -nargs=1 Gi call Grep('<args>', 1)
 
     " find in git repo with fugitive
-    noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") . 
-        \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR> \| :botright copen
+    noremap <leader>gg :botright copen <bar> silent Ggrep! -n <c-r>=expand("<cword>") .
+        \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     if has("unix")
-        noremap <leader>ff :silent grep! -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
+        noremap <leader>ff :botright copen <bar> silent grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
     else
-        noremap <leader>ff :silent grep! /r /s /p <c-r>=expand("<cword>") . 
-            \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR> \| :botright copen
-        noremap <leader>fi :silent grep! /i /r /s /p <c-r>=expand("<cword>") . 
-            \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR> \| :botright copen
-        noremap <leader>fh :silent grep! /i /r /s /p <c-r>=expand("<cword>") . " *.h" <CR> \| :botright copen
+        noremap <leader>ff :botright copen <bar> silent grep! /r /s /p <c-r>=expand("<cword>") .
+            \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     endif
 " }
 
