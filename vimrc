@@ -168,6 +168,7 @@ if has("autocmd")
     " new syntax files
     autocmd bufreadpost,bufnewfile *.psr set filetype=psr
     autocmd bufreadpost,bufnewfile *.psq set filetype=psr
+    autocmd bufreadpost,bufnewfile *.jth set filetype=forth
     augroup end
 
 endif " has("autocmd")
