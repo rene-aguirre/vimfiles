@@ -609,6 +609,14 @@ onoremap <C-PageUp> <C-C><C-W><C-W>
     onoremap <F8> <C-C>:QFix<CR>
 " } Quicklist
 "
+
+" Delete window, keep split layout
+function! s:bd_split()
+    execute ":bp | bd #"
+endfunction
+
+command! Bd call s:bd_split()
+
 map <F1> <Esc>
 map! <F1> <Esc>
 
@@ -718,9 +726,9 @@ endfunction
     noremap <leader>gg :botright copen <bar> silent Ggrep! -n <c-r>=expand("<cword>") .
         \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     if has("unix")
-        noremap <leader>ff :botright copen <bar> silent grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
+        noremap <leader>ff :botright copen <bar> grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
     else
-        noremap <leader>ff :botright copen <bar> silent grep! /r /s /p <c-r>=expand("<cword>") .
+        noremap <leader>ff :botright copen <bar> grep! /r /s /p <c-r>=expand("<cword>") .
             \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     endif
 " }
@@ -732,7 +740,7 @@ endfunction
 	else
 		command! BuildTags execute '!' . "ctags -R --c++-kinds=+p --fields=+iaS --extra=+q ."
 	endif
-	set tags=./tags;,tags;
+	set tags=./tags;
     " work with git hooks (so top level repo path applies)
     set notagrelative
 " }
@@ -743,8 +751,8 @@ endfunction
 " }
 
 " F5 as running current file
-noremap <F5> :update<CR>:silent !%<CR>
-inoremap <F5> <ESC>:update<CR>:silent !%<CR>
+noremap <F5> :update<CR>:!%<CR>
+inoremap <F5> <ESC>:update<CR>:!%<CR>
 
 " alt+key to exit and move
 inoremap è <esc>gh
