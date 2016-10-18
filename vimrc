@@ -102,6 +102,10 @@ endif
 
     " Rust programming language
     Plug 'rust-lang/rust.vim'
+
+    " Julia support
+    Plug 'JuliaEditorSupport/julia-vim'
+
 call plug#end()
 
     " Extended %
