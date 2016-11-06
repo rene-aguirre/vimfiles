@@ -41,8 +41,8 @@ if has("win32") || has("win64")
     Plug 'xolox/vim-misc'
 endif
 
-    " much better than snipMate
-    Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+    " better than snipMate
+    Plug 'SirVer/ultisnips'
 
     " \bd buffer delete mapping
     Plug 'kwbdi.vim'
@@ -101,10 +101,13 @@ endif
     Plug 'osyo-manga/vim-over'
 
     " Rust programming language
-    Plug 'rust-lang/rust.vim'
+    Plug 'rust-lang/rust.vim' | Plug 'racer-rust/vim-racer'
 
     " Julia support
     Plug 'JuliaEditorSupport/julia-vim'
+
+    " vim-runners, enable :Run script (save and execute)
+    Plug 'urthbound/vim-runners'
 
 call plug#end()
 
@@ -173,6 +176,9 @@ if has("autocmd")
     autocmd bufreadpost,bufnewfile *.psr set filetype=psr
     autocmd bufreadpost,bufnewfile *.psq set filetype=psr
     autocmd bufreadpost,bufnewfile *.jth set filetype=forth
+
+    autocmd filetype rust compiler cargo
+
     augroup end
 
 endif " has("autocmd")
@@ -358,11 +364,6 @@ set number
 
 " visible lines above or below the cursor
 set scrolloff=2
-
-" Powerline plugin {
-    " set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
-    " let Powerline_symbols = 'fancy'
-" }
 
 " airline plugin {
     let g:airline#extensions#whitespace#enabled = 0
@@ -751,7 +752,7 @@ endfunction
 
 
 "  UltiSnips {
-    let g:UltiSnipsSnippetsDir = '~/.vim/bundle/vim-personal/UltiSnips/'
+    let g:UltiSnipsSnippetsDir = '~/.vim/plugged/vim-personal/UltiSnips/'
 " }
 
 " F5 as running current file
