@@ -10,7 +10,21 @@ set nocompatible
 filetype off
 set encoding=utf-8
 "
+
 " Pluggin management {
+"
+" YouCompleteMe {
+function! BuildYCM(info)
+  " info is a dictionary with 3 fields
+  " - name:   name of the plugin
+  " - status: 'installed', 'updated', or 'unchanged'
+  " - force:  set on PlugInstall! or PlugUpdate!
+  if a:info.status == 'installed' || a:info.force
+    !./install.py --racer-completer
+  endif
+endfunction
+" }
+"
 " plug.vim is in my vimfiles/autoload repo
 set rtp+=~/vimfiles
 call plug#begin('~/.vim/plugged')
@@ -101,13 +115,19 @@ endif
     Plug 'osyo-manga/vim-over'
 
     " Rust programming language
-    Plug 'rust-lang/rust.vim' | Plug 'racer-rust/vim-racer'
+    Plug 'rust-lang/rust.vim'
 
     " Julia support
     Plug 'JuliaEditorSupport/julia-vim'
 
     " vim-runners, enable :Run script (save and execute)
     Plug 'urthbound/vim-runners'
+
+    " You completeme
+    Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
+
+    " use supertab to work sith YCM and UltiSnips
+    Plug 'ervandew/supertab'
 
 call plug#end()
 
@@ -525,6 +545,17 @@ let g:tagbar_type_c = {
     let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/'}]
 " }
 
+" YouCompleteMe plug-in {
+    nnoremap <Leader>] :YcmCompleter GoTo<CR>
+    " let g:ycm_rust_src_path=expand("~/tools/rust/src")
+    " rustup 'rust-src' component installation path
+    let g:ycm_rust_src_path=substitute(system('echo `rustc --print sysroot`/lib/rustlib/src/rust/src'), "\n", "", "")
+    " make YCM compatible with UltiSnips (using supertab)
+    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+    let g:SuperTabDefaultCompletionType = '<C-n>'
+" }
+
 " gui options {
     if has("gui_running")
         " set guioptions+=e   " tab bar displayed
@@ -753,6 +784,10 @@ endfunction
 
 "  UltiSnips {
     let g:UltiSnipsSnippetsDir = '~/.vim/plugged/vim-personal/UltiSnips/'
+    " better key bindings for UltiSnipsExpandTrigger
+    let g:UltiSnipsExpandTrigger = "<tab>"
+    let g:UltiSnipsJumpForwardTrigger = "<tab>"
+    let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 " }
 
 " F5 as running current file
