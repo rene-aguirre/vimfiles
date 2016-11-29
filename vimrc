@@ -129,6 +129,8 @@ endif
     " use supertab to work sith YCM and UltiSnips
     Plug 'ervandew/supertab'
 
+    Plug 'keith/swift.vim'
+
 call plug#end()
 
     " Extended %
