@@ -201,6 +201,9 @@ if has("autocmd")
 
     autocmd filetype rust compiler cargo
 
+    autocmd filetype gitcommit setlocal spell spelllang=en_us
+    autocmd filetype markdown setlocal spell spelllang=en_us
+
     augroup end
 
 endif " has("autocmd")
