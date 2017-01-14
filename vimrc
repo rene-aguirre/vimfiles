@@ -95,7 +95,10 @@ endif
     " file manager
     Plug 'ctrlpvim/ctrlp.vim'
     " Plug 'JazzCore/ctrlp-cmatcher'
-    Plug 'FelikZ/ctrlp-py-matcher'
+    " pymatcher
+    " Plug 'FelikZ/ctrlp-py-matcher'
+    " cpsm
+    Plug 'nixprime/cpsm', { 'do': './install.sh' }
 
     Plug 'scrooloose/nerdcommenter'
 
@@ -208,6 +211,12 @@ if has("autocmd")
 
 endif " has("autocmd")
 " }
+
+if executable("rg")
+    " use ripgrep when available
+    set grepprg=rg\ --vimgrep\ --no-heading
+    set grepformat=%f:%l:%c:%m,%f:%l:%m
+endif
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
@@ -395,11 +404,17 @@ set scrolloff=2
     " fugitive
     let g:airline#extensions#branch#enabled = 1
     let g:airline#extensions#branch#empty_message = ''
+    " only branch name tail
+    let g:airline#extensions#branch#format = 1
+    let g:airline#extensions#branch#displayed_head_limit = 16
+    " don't show empty changes items
+    let g:airline#extensions#hunks#non_zero_only = 1
   " disable syntastic integration
   let g:airline#extensions#syntastic#enabled = 0
 
   let g:airline_left_sep = '»'
   let g:airline_right_sep = '«'
+  let g:airline_right_alt_sep = ''
 
   " remove percentage
   " let g:airline_section_x = (filetype, virtualenv)
@@ -409,7 +424,8 @@ set scrolloff=2
     endfunction
     call airline#parts#define_function('myff', 'MyFF')
     let g:airline_section_y = airline#section#create_right(['myff'])
-    let g:airline_section_z = airline#section#create_right(['%2p%%'])
+    " let g:airline_section_z = airline#section#create_right(['%2v', '%2p%%'])
+    let g:airline_section_z = airline#section#create_right(['%2v %2p%%'])
 " }
 
 " NERDTree plug-ing {
@@ -503,8 +519,10 @@ let g:tagbar_type_c = {
     " use ctrlp-cmatcher extension
     " let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
 
-    " use ctrlp-cmatcher extension
-    let g:ctrlp_match_func = {'match' : 'pymatcher#PyMatch'}
+    " use ctrlp-cmatcher extension, ctrlp-py-matcher
+    " let g:ctrlp_match_func = {'match' : 'pymatcher#PyMatch'}
+    let g:ctrlp_match_func = {'match' : 'cpsm#CtrlPMatch'}
+
     "
     " keep current dir, avoid messin with submodules
     let g:ctrlp_working_path_mode = 'a'
@@ -513,10 +531,16 @@ let g:tagbar_type_c = {
     let g:ctrlp_max_files = 100000
 
     " indexing speed up
+    if executable('rg')
+        let s:ctrlp_git_command = 'rg %s -r --files --color=never --glob ""'
+        let g:ctrlp_use_caching = 0
+    else
+        let s:ctrlp_git_command = 'cd %s && python ~/vimfiles/gitsub.py'
+    endif
     if has("unix")
         let g:ctrlp_user_command = {
             \ 'types': {
-                \ 1: ['.git', "cd %s && python ~/vimfiles/gitsub.py"],
+                \ 1: ['.git', s:ctrlp_git_command],
                 \ 2: ['.hg', 'hg --cwd %s locate -I .'],
                 \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
                 \ },
@@ -530,7 +554,9 @@ let g:tagbar_type_c = {
             \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
             \ '\\)$"'
         " vim currently broken
-        if executable('ag')
+        if executable('rg')
+            let g:ctrlp_fast_search = 'rg %s --files --color=never --glob ""'
+        elif executable('ag')
             let g:ctrlp_fast_search = 'ag %s -l --nocolor -g ""'
         else
             let g:ctrlp_fast_search = 'dir %s /-n /b /s /a-d'
