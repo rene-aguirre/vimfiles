@@ -11,6 +11,8 @@ filetype off
 set encoding=utf-8
 "
 
+let s:ycm_enabled = 0
+
 " Pluggin management {
 "
 " YouCompleteMe {
@@ -24,7 +26,18 @@ function! BuildYCM(info)
   endif
 endfunction
 " }
-"
+" cpsm {
+function! BuildCPSM(info)
+  " info is a dictionary with 3 fields
+  " - name:   name of the plugin
+  " - status: 'installed', 'updated', or 'unchanged'
+  " - force:  set on PlugInstall! or PlugUpdate!
+  if a:info.status == 'installed' || a:info.force
+    !PY3=OFF ./install.sh
+  endif
+endfunction
+" }
+
 " plug.vim is in my vimfiles/autoload repo
 set rtp+=~/vimfiles
 call plug#begin('~/.vim/plugged')
@@ -94,11 +107,8 @@ endif
 
     " file manager
     Plug 'ctrlpvim/ctrlp.vim'
-    " Plug 'JazzCore/ctrlp-cmatcher'
-    " pymatcher
-    " Plug 'FelikZ/ctrlp-py-matcher'
-    " cpsm
-    Plug 'nixprime/cpsm', { 'do': './install.sh' }
+    " cpsm, ctrlp matcher for paths
+    Plug 'nixprime/cpsm', { 'do': function('BuildCPSM') }
 
     Plug 'scrooloose/nerdcommenter'
 
@@ -127,12 +137,20 @@ endif
     Plug 'urthbound/vim-runners'
 
     " You completeme
-    Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
+if s:ycm_enabled
+    " Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
+endif
+    Plug 'ajh17/VimCompletesMe'
 
     " use supertab to work sith YCM and UltiSnips
     Plug 'ervandew/supertab'
 
     Plug 'keith/swift.vim'
+
+    " Convenient work motions
+    Plug 'kana/vim-smartword'
+
+    Plug 'Konfekt/FastFold'
 
 call plug#end()
 
@@ -577,6 +595,7 @@ let g:tagbar_type_c = {
 " }
 
 " YouCompleteMe plug-in {
+if s:ycm_enabled
     nnoremap <Leader>] :YcmCompleter GoTo<CR>
     " let g:ycm_rust_src_path=expand("~/tools/rust/src")
     " rustup 'rust-src' component installation path
@@ -585,7 +604,15 @@ let g:tagbar_type_c = {
     let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
     let g:SuperTabDefaultCompletionType = '<C-n>'
+endif
 " }
+
+" smartword {
+" Replace |w| and others with |smartword-mappings|:
+	map w  <Plug>(smartword-w)
+	map b  <Plug>(smartword-b)
+	map e  <Plug>(smartword-e)
+	map ge  <Plug>(smartword-ge)
 
 " gui options {
     if has("gui_running")
@@ -756,35 +783,61 @@ vim.command('return "{0}"'.format(result_str))
 endpython
 endfunction
 
-    " This opens the results of 'grep -r' in a bottom window
-    " and uses 'git grep' when in a git repo and regular grep otherwise.
-    " :G <word> runs grep 
-    " :Gi <word> runs grep as case-insensitive
-    function! Grep(args, ignorecase)
-        let grepprg_bak=&grepprg
-        let g:gitroot=system('git rev-parse --show-cdup')
-        if v:shell_error
-            if a:ignorecase
-                let s:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /i\\ /p"
-            else
-                let s:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /p"
-            endif
-            let s:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))
+function! GetRgExt(sFt, sFile)
+" sFt, given filetype
+" sFile, reference filename
 
+if a:sFile == ''
+    return
+endif
+
+python << endpython
+import vim
+import os.path
+ft_map = {
+    'c' :       'c',
+    'asm':      'asm',
+    'kalimba':  'asm',
+    'cpp':      'cpp',
+    'vim':      'vimscript',
+}
+
+rgtype = ft_map.get(vim.eval("a:sFt"), vim.eval("a:sFt"))
+
+vim.command('return "{0}"'.format(rgtype))
+
+endpython
+endfunction
+
+" This opens the results of 'grep -r' in a bottom window
+" and uses 'git grep' when in a git repo and regular grep otherwise.
+" :G <word> runs grep
+" :Gi <word> runs grep as case-insensitive
+function! Grep(args, ignorecase)
+    let grepprg_bak=&grepprg
+    let g:gitroot=system('git rev-parse --show-cdup')
+    if v:shell_error
+        if a:ignorecase
+            let s:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /i\\ /p"
         else
-            if a:ignorecase
-                let s:mygrepprg="git\\ grep\\ -ni"
-            else
-                let s:mygrepprg="git\\ grep\\ -n"
-            endif
-            let s:grepcmd="silent! grep " . a:args . " -- " . GetFtExtension(&filetype, bufname('%'), g:gitroot, has("unix"))
+            let s:mygrepprg="findstr\\ /n\\ /r\\ /s\\ /p"
         endif
-        exec "set grepprg=" . s:mygrepprg
-        execute s:grepcmd
-        botright copen
-        let &grepprg=grepprg_bak
-        exec "redraw!"
-    endfunction
+        let s:grepcmd="silent! grep " . a:args . " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))
+
+    else
+        if a:ignorecase
+            let s:mygrepprg="git\\ grep\\ -ni"
+        else
+            let s:mygrepprg="git\\ grep\\ -n"
+        endif
+        let s:grepcmd="silent! grep " . a:args . " -- " . GetFtExtension(&filetype, bufname('%'), g:gitroot, has("unix"))
+    endif
+    exec "set grepprg=" . s:mygrepprg
+    execute s:grepcmd
+    botright copen
+    let &grepprg=grepprg_bak
+    exec "redraw!"
+endfunction
 
     command! -nargs=1 G call Grep('<args>', 0)
     command! -nargs=1 Gi call Grep('<args>', 1)
@@ -792,11 +845,15 @@ endfunction
     " find in git repo with fugitive
     noremap <leader>gg :botright copen <bar> silent Ggrep! -n <c-r>=expand("<cword>") .
         \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
-    if has("unix")
-        noremap <leader>ff :botright copen <bar> grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
+    if executable("rg")
+            noremap <leader>ff :botright copen <bar> grep!  -t <c-r>=GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") . " ."<CR>
     else
-        noremap <leader>ff :botright copen <bar> grep! /r /s /p <c-r>=expand("<cword>") .
-            \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
+        if has("unix")
+            noremap <leader>ff :botright copen <bar> grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
+        else
+            noremap <leader>ff :botright copen <bar> grep! /r /s /p <c-r>=expand("<cword>") .
+                \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
+        endif
     endif
 " }
 
@@ -819,6 +876,14 @@ endfunction
     let g:UltiSnipsExpandTrigger = "<tab>"
     let g:UltiSnipsJumpForwardTrigger = "<tab>"
     let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+" }
+
+" Syntastic {
+" pylint slows down on write, I run it manually with :make
+let g:syntastic_mode_map = {
+    \ "mode": "active",
+    \ "passive_filetypes": ["python"] }
+" default all are active_filetypes
 " }
 
 " F5 as running current file
@@ -878,4 +943,23 @@ set viminfo='50,f1
 
 " start with folding disabled
 set nofoldenable
+
+" cmake project helper
+function! s:s_build(...)
+    if (! empty(glob('./CMakeLists.txt'))) && (! empty(glob('./build/Makefile')))
+        execute "make -C ./build " . join(a:000, ' ')
+    else
+        execute "make" . join(a:000, ' ')
+    endif
+endfunction
+command! -nargs=* Build call s:s_build(<f-args>)
+
+function! s:s_test()
+    if (! empty(glob('./CMakeLists.txt'))) && (! empty(glob('./build/Makefile')))
+        execute "make test ARGS=--output-on-failure -C ./build"
+    else
+        execute "make test" . join(a:000, ' ')
+    endif
+endfunction
+command! -nargs=* Test call s:s_test()
 
