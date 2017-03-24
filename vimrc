@@ -43,9 +43,11 @@ set rtp+=~/vimfiles
 call plug#begin('~/.vim/plugged')
     " Make sure to use single quotes
     "
-    "Plug 'tomasr/molokai'
+    " Popular color schems
     Plug 'crusoexia/vim-monokai'
     Plug 'NLKNguyen/papercolor-theme'
+    Plug 'altercation/vim-colors-solarized'
+    Plug 'junegunn/seoul256.vim'
 
     " original repos on github
     " handle brackets, quotes, etc. easier
@@ -97,7 +99,7 @@ endif
 
     " git helpers
     Plug 'tpope/vim-fugitive'
-    Plug 'airblade/vim-gitgutter'
+    " Plug 'airblade/vim-gitgutter'
 
     " Extradite for fugitive
     Plug 'grota/vim-extradite'
@@ -135,6 +137,11 @@ endif
 
     " vim-runners, enable :Run script (save and execute)
     Plug 'urthbound/vim-runners'
+
+    " tmux integration
+if !has("gui_running")
+    Plug 'tmux-plugins/vim-tmux-focus-events'
+endif
 
     " You completeme
 if s:ycm_enabled
@@ -268,15 +275,13 @@ vnoremap <S-Del> "+x
 " CTRL-C and CTRL-Insert are Copy (only visual mode)
 vnoremap <C-C>      "+y
 vnoremap <C-Insert> "+y
+" use system clipboard for yanks
+set clipboard^=unnamed
 
 " Ctrl-V and SHIFT-Insert are Paste
-vnoremap <C-V>  "+gP
+vnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
 inoremap <C-V>  <C-O>:set paste<CR><C-O>"+gP<C-O>:set nopaste<CR>
-cmap   <C-V>  <C-R>+
-
-vnoremap <S-Insert> "+gP
-inoremap <S-Insert> <C-O>:set paste<CR><C-O>"+gP<C-O>:set nopaste<CR>
-cmap   <S-Insert> <C-R>+
+cmap     <C-V>  <C-R>+
 
 if has("virtualedit") && has("gui")
     " Pasting blockwise and linewise selections is not possible in Insert and
@@ -395,9 +400,23 @@ set vb
 
 if has("gui_running")
     set background=dark
+    " colorscheme desert_luna
+    colorscheme monokai
+else
+    " seoul256 (dark):
+    " "   Range:   233 (darkest) ~ 239 (lightest)
+    " "   Default: 237
+    if has("gui_running")
+    let g:seoul256_background = 234
+    else
+    let g:seoul256_background = 235
+    endif
+    " " seoul256 (light):
+    " "   Range:   252 (darkest) ~ 256 (lightest)
+    " "   Default: 253
+    " let g:seoul256_background = 256
+    colorscheme seoul256
 endif
-" colorscheme desert_luna
-colorscheme monokai
 
 " set background=light
 " colorscheme PaperColor
@@ -543,7 +562,7 @@ let g:tagbar_type_c = {
 
     "
     " keep current dir, avoid messin with submodules
-    let g:ctrlp_working_path_mode = 'a'
+    let g:ctrlp_working_path_mode = 'wa'
 
     " limit max number of files
     let g:ctrlp_max_files = 100000
@@ -802,8 +821,9 @@ ft_map = {
     'vim':      'vimscript',
 }
 
-rgtype = ft_map.get(vim.eval("a:sFt"), vim.eval("a:sFt"))
-
+rgtype = ft_map.get(vim.eval("a:sFt"), '')
+if rgtype:
+    rgtype = '-t ' + rgtype
 vim.command('return "{0}"'.format(rgtype))
 
 endpython
@@ -846,7 +866,7 @@ endfunction
     noremap <leader>gg :botright copen <bar> silent Ggrep! -n <c-r>=expand("<cword>") .
         \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     if executable("rg")
-            noremap <leader>ff :botright copen <bar> grep!  -t <c-r>=GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") . " ."<CR>
+            noremap <leader>ff :botright copen <bar> grep! <c-r>=GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") . " ."<CR>
     else
         if has("unix")
             noremap <leader>ff :botright copen <bar> grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
@@ -934,6 +954,9 @@ set browsedir=buffer
 " It makes vim work like every other multiple-file editor on the planet
 set hidden
 
+" filename completion ignores case
+set wildignorecase
+
 " other options
 " default asm type to kalimba asm
 let asmsyntax = "kalimba"
@@ -946,6 +969,7 @@ set nofoldenable
 
 " cmake project helper
 function! s:s_build(...)
+	execute ":wall"
     if (! empty(glob('./CMakeLists.txt'))) && (! empty(glob('./build/Makefile')))
         execute "make -C ./build " . join(a:000, ' ')
     else
