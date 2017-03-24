@@ -140,6 +140,7 @@ endif
 
     " tmux integration
 if !has("gui_running")
+
     Plug 'tmux-plugins/vim-tmux-focus-events'
 endif
 
@@ -986,4 +987,14 @@ function! s:s_test()
     endif
 endfunction
 command! -nargs=* Test call s:s_test()
+
+" make sure arrow key mappings work properly
+" this fixes fugitive E349 on commit
+if &term =~ '^screen'
+    execute "set <xUp>=\e[1;*A"
+    execute "set <xDown>=\e[1;*B"
+    execute "set <xRight>=\e[1;*C"
+    execute "set <xLeft>=\e[1;*D"
+	map <Esc>[B <Down>
+endif
 
