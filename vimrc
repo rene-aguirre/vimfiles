@@ -1,8 +1,5 @@
 " My personal vimrc file.
-"
-" Author:	Rene F. Aguirre
-" Last change:	$date$
-"
+" Rene F. Aguirre
 "
 " Use Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
@@ -12,6 +9,7 @@ set encoding=utf-8
 "
 
 let s:ycm_enabled = 0
+let s:supertab_enabled = 1
 
 " Pluggin management {
 "
@@ -72,6 +70,7 @@ endif
 
     " better than snipMate
     Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
 
     " \bd buffer delete mapping
     Plug 'kwbdi.vim'
@@ -150,8 +149,10 @@ if s:ycm_enabled
 endif
     Plug 'ajh17/VimCompletesMe'
 
+if s:supertab_enabled
     " use supertab to work sith YCM and UltiSnips
     Plug 'ervandew/supertab'
+endif
 
     Plug 'keith/swift.vim'
 
@@ -160,6 +161,7 @@ endif
 
     Plug 'Konfekt/FastFold'
 
+    Plug 'mhinz/vim-startify'
 call plug#end()
 
     " Extended %
@@ -227,6 +229,7 @@ if has("autocmd")
     autocmd bufreadpost,bufnewfile *.psr set filetype=psr
     autocmd bufreadpost,bufnewfile *.psq set filetype=psr
     autocmd bufreadpost,bufnewfile *.jth set filetype=forth
+    autocmd bufreadpost,bufnewfile *.pycfg set filetype=python
 
     autocmd filetype rust compiler cargo
 
@@ -333,7 +336,7 @@ onoremap <C-Tab> <C-C><C-W>w
 " ****************
 "
 " global settings
-" let mapleader=","
+let mapleader=";"
 set title      " change terminal title
 
 set history=100	" keep 50 lines of command line history
@@ -620,10 +623,20 @@ if s:ycm_enabled
     " let g:ycm_rust_src_path=expand("~/tools/rust/src")
     " rustup 'rust-src' component installation path
     let g:ycm_rust_src_path=substitute(system('echo `rustc --print sysroot`/lib/rustlib/src/rust/src'), "\n", "", "")
-    " make YCM compatible with UltiSnips (using supertab)
     let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-    let g:SuperTabDefaultCompletionType = '<C-n>'
+    " make YCM compatible with UltiSnips (using supertab)
+endif
+" }
+
+" SuperTab plug-in {
+if s:supertab_enabled
+    " let g:SuperTabNoCompleteAfter =
+    let g:SuperTabDefaultCompletionType = 'context'
+    let g:SuperTabContextDefaultCompletionType = '\t'
+    if !has("gui_running")
+        let g:SuperTabMappingTabLiteral = '<leader><tab>'
+    endif
 endif
 " }
 
@@ -633,6 +646,7 @@ endif
 	map b  <Plug>(smartword-b)
 	map e  <Plug>(smartword-e)
 	map ge  <Plug>(smartword-ge)
+" }
 
 " gui options {
     if has("gui_running")
@@ -815,16 +829,17 @@ python << endpython
 import vim
 import os.path
 ft_map = {
-    'c' :       'c',
-    'asm':      'asm',
-    'kalimba':  'asm',
-    'cpp':      'cpp',
-    'vim':      'vimscript',
+    'asm':      '-t asm',
+    'c' :       '-t c -t cpp -t h',
+    'cpp':      '-t cpp -t c -t h',
+    'kalimba':  '-t asm',
+    'make':     '-t make',
+    'python':   '-t py --type-add py:*.pycfg',
+    'rust':     '-t rust',
+    'vim':      '-t vimscript',
 }
 
 rgtype = ft_map.get(vim.eval("a:sFt"), '')
-if rgtype:
-    rgtype = '-t ' + rgtype
 vim.command('return "{0}"'.format(rgtype))
 
 endpython
@@ -867,7 +882,7 @@ endfunction
     noremap <leader>gg :botright copen <bar> silent Ggrep! -n <c-r>=expand("<cword>") .
         \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     if executable("rg")
-            noremap <leader>ff :botright copen <bar> grep! <c-r>=GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") . " ."<CR>
+        noremap <leader>ff :botright copen <bar> grep! <c-r>=GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
     else
         if has("unix")
             noremap <leader>ff :botright copen <bar> grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
