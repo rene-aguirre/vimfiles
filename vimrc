@@ -221,10 +221,6 @@ if has("autocmd")
     " disabled, this has a conflict with 'fugitive.vim' plugin
     " autocmd bufwinenter,bufenter * lcd %:p:h
 
-    " single cursorline
-    autocmd winenter * setlocal cursorline
-    autocmd winleave * setlocal nocursorline
-
     " new syntax files
     autocmd bufreadpost,bufnewfile *.psr set filetype=psr
     autocmd bufreadpost,bufnewfile *.psq set filetype=psr
@@ -235,6 +231,12 @@ if has("autocmd")
 
     autocmd filetype gitcommit setlocal spell spelllang=en_us
     autocmd filetype markdown setlocal spell spelllang=en_us
+
+    " Change Color when entering Insert Mode
+    autocmd InsertEnter * set cursorline
+
+    " Revert Color to default when leaving Insert Mode
+    autocmd InsertLeave * set nocursorline
 
     augroup end
 
@@ -632,12 +634,31 @@ endif
 " SuperTab plug-in {
 if s:supertab_enabled
     " let g:SuperTabNoCompleteAfter =
-    let g:SuperTabDefaultCompletionType = 'context'
+    " let g:SuperTabDefaultCompletionType = 'context'
     let g:SuperTabContextDefaultCompletionType = '\t'
-    if !has("gui_running")
-        let g:SuperTabMappingTabLiteral = '<leader><tab>'
-    endif
+    " consolidate space-tab to bare tab (easy way to force tab too)
+    let g:SuperTabMappingTabLiteral = '<C-T>'
 endif
+" }
+
+" Startify plug-in {
+    let s:padding_left = repeat(' ', 3)
+    let g:startify_list_order = [
+        \ [s:padding_left .'MRU '. getcwd()], 'dir',
+        \ [s:padding_left .'MRU'],            'files',
+        \ [s:padding_left .'Sessions'],       'sessions',
+        \ [s:padding_left .'Bookmarks'],      'bookmarks',
+        \ [s:padding_left .'Commands'],       'commands',
+        \ ]
+
+    let g:ascii = [
+            \ '        __',
+            \ '.--.--.|==|.--------.',
+            \ '|  |  ||  ||  .  .  |',
+            \ ' \___/ |__|.__|__|__.',
+            \]
+
+    let g:startify_custom_header = g:ascii + startify#fortune#boxed()
 " }
 
 " smartword {
@@ -920,6 +941,8 @@ let g:syntastic_mode_map = {
     \ "mode": "active",
     \ "passive_filetypes": ["python"] }
 " default all are active_filetypes
+	" let g:syntastic_cpp_compiler = 'clang++'
+	let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
 " }
 
 " F5 as running current file
