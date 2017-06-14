@@ -10,6 +10,7 @@ set encoding=utf-8
 
 let s:ycm_enabled = 0
 let s:supertab_enabled = 1
+let s:vimairline_enabled = 0
 
 " Pluggin management {
 "
@@ -87,8 +88,11 @@ endif
     " software caps lock
     Plug 'capslock.vim'
 
-    " Non bloated, works on Windows cool statusline
+if s:vimairline_enabled
     Plug 'vim-airline/vim-airline'
+else
+    Plug 'itchyny/lightline.vim'
+endif
 
     " file browser
     Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle' }
@@ -442,6 +446,7 @@ set number
 " visible lines above or below the cursor
 set scrolloff=2
 
+if s:vimairline_enabled
 " airline plugin {
     let g:airline#extensions#whitespace#enabled = 0
     " fugitive
@@ -470,6 +475,7 @@ set scrolloff=2
     " let g:airline_section_z = airline#section#create_right(['%2v', '%2p%%'])
     let g:airline_section_z = airline#section#create_right(['%2v %2p%%'])
 " }
+endif
 
 " NERDTree plug-ing {
     nmap <F2> :NERDTreeToggle<CR>
@@ -1034,5 +1040,11 @@ if &term =~ '^screen'
     execute "set <xRight>=\e[1;*C"
     execute "set <xLeft>=\e[1;*D"
 	map <Esc>[B <Down>
+endif
+
+" NeoVim (nvim) settings
+if has('nvim')
+    " exit terminal mode (go back with 'i')
+    tnoremap <C-\><C-\> <C-\><C-N>
 endif
 
