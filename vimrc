@@ -74,19 +74,19 @@ endif
     Plug 'honza/vim-snippets'
 
     " \bd buffer delete mapping
-    Plug 'kwbdi.vim'
+    Plug 'vim-scripts/kwbdi.vim'
 
     " Ascii drawing helper
-    " Plug 'DrawIt'
+    " Plug 'vim-scripts/DrawIt'
 
     " RST Markup helper
-    " Plug 'VST'
+    " Plug 'vim-scripts/VST'
 
     " full reST support (complains on clicable.vim)
     " Plug 'Rykka/riv.vim'
 
     " software caps lock
-    Plug 'capslock.vim'
+    Plug 'tpope/vim-capslock'
 
 if s:vimairline_enabled
     Plug 'vim-airline/vim-airline'
@@ -117,7 +117,7 @@ endif
 
     Plug 'scrooloose/nerdcommenter'
 
-    Plug 'vimwiki'
+    Plug 'vimwiki/vimwiki'
 
     " expand selection incrementally (removed: I'm not really using it)
     " Plug 'terryma/vim-expand-region'
@@ -242,6 +242,10 @@ if has("autocmd")
     " Revert Color to default when leaving Insert Mode
     autocmd InsertLeave * set nocursorline
 
+    if version >= 700 
+        autocmd QuickFixCmdPre *grep* Gcd
+        autocmd QuickFixCmdPost * botright cwindow 5
+    endif
     augroup end
 
 endif " has("autocmd")
@@ -665,6 +669,8 @@ endif
             \]
 
     let g:startify_custom_header = g:ascii + startify#fortune#boxed()
+    " always keep my current dir
+    let g:startify_change_to_dir = 0
 " }
 
 " smartword {
@@ -787,6 +793,11 @@ noremap <C-Del> daw
 noremap <S-C-h> :%s#\<<c-r>=expand("<cword>")<CR>\>#
 
 " search & replace {
+
+" supress "Press Enter..." prompt
+set shortmess+=aT
+" set cmdheight=2
+
 function! GetFtExtension(sFt, sFile, sRootPrefix, bIsUnix)
 " sFt, given filetype
 " sFile, reference filename
@@ -897,7 +908,9 @@ function! Grep(args, ignorecase)
     endif
     exec "set grepprg=" . s:mygrepprg
     execute s:grepcmd
-    botright copen
+    if version < 700
+        botright copen
+    endif
     let &grepprg=grepprg_bak
     exec "redraw!"
 endfunction
@@ -905,6 +918,7 @@ endfunction
     command! -nargs=1 G call Grep('<args>', 0)
     command! -nargs=1 Gi call Grep('<args>', 1)
 
+if version < 700
     " find in git repo with fugitive
     noremap <leader>gg :botright copen <bar> silent Ggrep! -n <c-r>=expand("<cword>") .
         \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
@@ -918,6 +932,21 @@ endfunction
                 \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
         endif
     endif
+else
+    " find in git repo with fugitive
+    noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") .
+        \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
+    if executable("rg")
+        noremap <leader>ff :silent grep! <c-r>=GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
+    else
+        if has("unix")
+            noremap <leader>ff :silent grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
+        else
+            noremap <leader>ff :silent grep! /r /s /p <c-r>=expand("<cword>") .
+                \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
+        endif
+    endif
+endif
 " }
 
 "  tag helpers (ctags) {
@@ -948,7 +977,10 @@ let g:syntastic_mode_map = {
     \ "passive_filetypes": ["python"] }
 " default all are active_filetypes
 	" let g:syntastic_cpp_compiler = 'clang++'
-	let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
+	let g:syntastic_cpp_compiler = 'g++-7'
+	" let g:syntastic_cpp_compiler_options = ' -std=c++1z -stdlib=libc++ -Wall -Wextra'
+	" -stdlib=libc++ not supported on gcc (implicit?)
+	let g:syntastic_cpp_compiler_options = ' -std=c++1z -Wall -Wextra'
 " }
 
 " F5 as running current file
