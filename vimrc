@@ -166,6 +166,10 @@ endif
     Plug 'Konfekt/FastFold'
 
     Plug 'mhinz/vim-startify'
+
+    Plug 'neomake/neomake'
+
+    Plug 'ludovicchabant/vim-gutentags'
 call plug#end()
 
     " Extended %
@@ -795,7 +799,7 @@ noremap <S-C-h> :%s#\<<c-r>=expand("<cword>")<CR>\>#
 " search & replace {
 
 " supress "Press Enter..." prompt
-set shortmess+=aT
+" set shortmess+=a
 " set cmdheight=2
 
 function! GetFtExtension(sFt, sFile, sRootPrefix, bIsUnix)
