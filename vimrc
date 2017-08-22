@@ -9,7 +9,8 @@ set encoding=utf-8
 "
 
 let s:ycm_enabled = 0
-let s:supertab_enabled = 1
+let s:supertab_enabled = 0
+let s:mucomplete_enabled = 1
 let s:vimairline_enabled = 0
 
 " Pluggin management {
@@ -67,6 +68,10 @@ if has("win32") || has("win64")
     " Run shell commands in background
     Plug 'xolox/vim-shell'
     Plug 'xolox/vim-misc'
+endif
+
+if s:mucomplete_enabled
+    Plug 'lifepillar/vim-mucomplete'
 endif
 
     " better than snipMate
@@ -192,6 +197,8 @@ endif
 if &t_Co > 2 || has("gui_running")
   syntax on
 endif
+set synmaxcol=128
+syntax sync minlines=256
 
 " Only do this part when compiled with support for autocommands.
 " auto commands {
@@ -241,10 +248,10 @@ if has("autocmd")
     autocmd filetype markdown setlocal spell spelllang=en_us
 
     " Change Color when entering Insert Mode
-    autocmd InsertEnter * set cursorline
+    " autocmd InsertEnter * set cursorline
 
     " Revert Color to default when leaving Insert Mode
-    autocmd InsertLeave * set nocursorline
+    " autocmd InsertLeave * set nocursorline
 
     if version >= 700 
         autocmd QuickFixCmdPre *grep* Gcd
@@ -294,7 +301,7 @@ vnoremap <S-Del> "+x
 vnoremap <C-C>      "+y
 vnoremap <C-Insert> "+y
 " use system clipboard for yanks
-set clipboard^=unnamed
+" set clipboard^=unnamed
 
 " Ctrl-V and SHIFT-Insert are Paste
 vnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
@@ -613,7 +620,7 @@ let g:tagbar_type_c = {
         " vim currently broken
         if executable('rg')
             let g:ctrlp_fast_search = 'rg %s --files --color=never --glob ""'
-        elif executable('ag')
+        elseif executable('ag')
             let g:ctrlp_fast_search = 'ag %s -l --nocolor -g ""'
         else
             let g:ctrlp_fast_search = 'dir %s /-n /b /s /a-d'
@@ -655,6 +662,21 @@ if s:supertab_enabled
 endif
 " }
 
+" Mucomplete {
+if s:mucomplete_enabled
+    set completeopt+=menuone
+    " for auto completion
+    inoremap <expr> <c-e> mucomplete#popup_exit("\<c-e>")
+    inoremap <expr> <c-y> mucomplete#popup_exit("\<c-y>")
+    inoremap <expr>  <cr> mucomplete#popup_exit("\<cr>")
+    set completeopt+=noselect
+    set completeopt+=noinsert
+    set shortmess+=c   " Shut off completion messages
+    set belloff+=ctrlg " If Vim beeps during completion
+    let g:mucomplete#enable_auto_at_startup = 0
+
+endif
+" }
 " Startify plug-in {
     let s:padding_left = repeat(' ', 3)
     let g:startify_list_order = [
@@ -969,6 +991,7 @@ endif
 "  UltiSnips {
     let g:UltiSnipsSnippetsDir = '~/.vim/plugged/vim-personal/UltiSnips/'
     " better key bindings for UltiSnipsExpandTrigger
+    " let g:UltiSnipsListSnippets = "<c-tab>"
     let g:UltiSnipsExpandTrigger = "<tab>"
     let g:UltiSnipsJumpForwardTrigger = "<tab>"
     let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
@@ -979,12 +1002,18 @@ endif
 let g:syntastic_mode_map = {
     \ "mode": "active",
     \ "passive_filetypes": ["python"] }
-" default all are active_filetypes
-	" let g:syntastic_cpp_compiler = 'clang++'
-	let g:syntastic_cpp_compiler = 'g++-7'
-	" let g:syntastic_cpp_compiler_options = ' -std=c++1z -stdlib=libc++ -Wall -Wextra'
-	" -stdlib=libc++ not supported on gcc (implicit?)
-	let g:syntastic_cpp_compiler_options = ' -std=c++1z -Wall -Wextra'
+    " default all are active_filetypes
+    " let g:syntastic_cpp_compiler = 'clang++'
+    if executable('g++-7.1')
+        let g:syntastic_cpp_compiler = 'g++-7.1'
+    elseif executable('g++-7')
+        let g:syntastic_cpp_compiler = 'g++-7'
+    else
+        let g:syntastic_cpp_compiler = 'g++'
+    endif
+    " let g:syntastic_cpp_compiler_options = ' -std=c++1z -stdlib=libc++ -Wall -Wextra'
+    " -stdlib=libc++ not supported on gcc (implicit?)
+    let g:syntastic_cpp_compiler_options = ' -std=c++1z -Wall -Wextra'
 " }
 
 " F5 as running current file
