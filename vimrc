@@ -264,7 +264,7 @@ endif " has("autocmd")
 
 if executable("rg")
     " use ripgrep when available
-    set grepprg=rg\ --vimgrep\ --no-heading
+    set grepprg=rg\ --vimgrep\ --no-heading\ --no-messages
     set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 
@@ -596,7 +596,7 @@ let g:tagbar_type_c = {
 
     " indexing speed up
     if executable('rg')
-        let s:ctrlp_git_command = 'rg %s -r --files --color=never --glob ""'
+        let s:ctrlp_git_command = 'rg --color=never --no-messages --glob "" --files %s'
         let g:ctrlp_use_caching = 0
     else
         let s:ctrlp_git_command = 'cd %s && python ~/vimfiles/gitsub.py'
@@ -619,7 +619,7 @@ let g:tagbar_type_c = {
             \ '\\)$"'
         " vim currently broken
         if executable('rg')
-            let g:ctrlp_fast_search = 'rg %s --files --color=never --glob ""'
+            let g:ctrlp_fast_search = 'rg --color=never --no-messages --glob "" --files %s'
         elseif executable('ag')
             let g:ctrlp_fast_search = 'ag %s -l --nocolor -g ""'
         else
