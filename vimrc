@@ -12,6 +12,7 @@ let s:ycm_enabled = 0
 let s:supertab_enabled = 0
 let s:mucomplete_enabled = 1
 let s:vimairline_enabled = 0
+let s:clang_complete = 1
 
 " Pluggin management {
 "
@@ -34,6 +35,14 @@ function! BuildCPSM(info)
   " - force:  set on PlugInstall! or PlugUpdate!
   if a:info.status == 'installed' || a:info.force
     !PY3=OFF ./install.sh
+  endif
+endfunction
+" }
+
+" Clang_complete {
+function! BuildClangComp(info)
+  if a:info.status == 'installed' || a:info.force
+    !make install
   endif
 endfunction
 " }
@@ -156,7 +165,8 @@ endif
 if s:ycm_enabled
     " Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
 endif
-    Plug 'ajh17/VimCompletesMe'
+    " deprecated in favor of Mucomplete
+    " Plug 'ajh17/VimCompletesMe'
 
 if s:supertab_enabled
     " use supertab to work sith YCM and UltiSnips
@@ -175,6 +185,11 @@ endif
     Plug 'neomake/neomake'
 
     Plug 'ludovicchabant/vim-gutentags'
+
+if s:clang_complete
+    Plug 'Rip-Rip/clang_complete', { 'do': function('BuildClangComp') }
+endif
+
 call plug#end()
 
     " Extended %
@@ -402,6 +417,10 @@ nmap <leader>s :set list!<CR>
     " javascript size 2 tabstop
     autocmd filetype javascript setlocal ts=2 sw=2
 
+    autocmd filetype c,cpp map [[ ?{<CR>w99[{
+    autocmd filetype c,cpp map ][ /}<CR>b99]}
+    autocmd filetype c,cpp map ]] j0[[%/{<CR>
+    autocmd filetype c,cpp map [] k$][%?}<CR>
 " }
 
 set laststatus=2 " always show status window
@@ -664,19 +683,33 @@ endif
 
 " Mucomplete {
 if s:mucomplete_enabled
+    set noshowmode
+    set shortmess+=c   " Shut off completion messages
+    set noinfercase
+    set completeopt-=preview
     set completeopt+=menuone
+    set completeopt+=noselect
+    set completeopt+=noinsert
+    set belloff+=ctrlg " If Vim beeps during completion
+
     " for auto completion
     inoremap <expr> <c-e> mucomplete#popup_exit("\<c-e>")
     inoremap <expr> <c-y> mucomplete#popup_exit("\<c-y>")
     inoremap <expr>  <cr> mucomplete#popup_exit("\<cr>")
-    set completeopt+=noselect
-    set completeopt+=noinsert
-    set shortmess+=c   " Shut off completion messages
-    set belloff+=ctrlg " If Vim beeps during completion
-    let g:mucomplete#enable_auto_at_startup = 0
-
+    let g:mucomplete#enable_auto_at_startup = 1
 endif
 " }
+
+if s:clang_complete
+" clang_complete {
+if has("macunix")
+    let g:clang_library_path='/Applications/Xcode.app/Contents/Frameworks/libclang.dylib'
+    let g:clang_user_options = '-std=c++14'
+    let g:clang_complete_auto = 1
+endif
+" }
+endif
+
 " Startify plug-in {
     let s:padding_left = repeat(' ', 3)
     let g:startify_list_order = [
