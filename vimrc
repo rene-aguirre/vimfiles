@@ -79,10 +79,6 @@ if has("win32") || has("win64")
     Plug 'xolox/vim-misc'
 endif
 
-if s:mucomplete_enabled
-    Plug 'lifepillar/vim-mucomplete'
-endif
-
     " better than snipMate
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
@@ -171,6 +167,10 @@ endif
 if s:supertab_enabled
     " use supertab to work sith YCM and UltiSnips
     Plug 'ervandew/supertab'
+endif
+
+if s:mucomplete_enabled
+    Plug 'lifepillar/vim-mucomplete'
 endif
 
     Plug 'keith/swift.vim'
@@ -421,6 +421,7 @@ nmap <leader>s :set list!<CR>
     autocmd filetype c,cpp map ][ /}<CR>b99]}
     autocmd filetype c,cpp map ]] j0[[%/{<CR>
     autocmd filetype c,cpp map [] k$][%?}<CR>
+    " autocmd filetype c,cpp MUcompleteAutoOn
 " }
 
 set laststatus=2 " always show status window
@@ -683,8 +684,7 @@ endif
 
 " Mucomplete {
 if s:mucomplete_enabled
-    set noshowmode
-    set shortmess+=c   " Shut off completion messages
+    set noshowmode shortmess+=c   " Shut off completion messages
     set noinfercase
     set completeopt-=preview
     set completeopt+=menuone
@@ -697,6 +697,13 @@ if s:mucomplete_enabled
     inoremap <expr> <c-y> mucomplete#popup_exit("\<c-y>")
     inoremap <expr>  <cr> mucomplete#popup_exit("\<cr>")
     let g:mucomplete#enable_auto_at_startup = 1
+
+    imap <expr> <right> <plug>(MUcompleteCycFwd)
+
+    let g:mucomplete#chains = {
+      \ 'default' : ['path', 'omni', 'keyn', 'dict', 'uspl', 'ulti'],
+      \ 'vim'     : ['path', 'cmd', 'keyn', 'ulti']
+      \ }
 endif
 " }
 
@@ -1024,10 +1031,17 @@ endif
 "  UltiSnips {
     let g:UltiSnipsSnippetsDir = '~/.vim/plugged/vim-personal/UltiSnips/'
     " better key bindings for UltiSnipsExpandTrigger
+
+if s:mucomplete_enabled
+    let g:UltiSnipsExpandTrigger="<C-J>"
+    let g:UltiSnipsJumpForwardTrigger="<C-J>"
+    let g:UltiSnipsJumpBackwardTrigger="<C-K>"
+else
     " let g:UltiSnipsListSnippets = "<c-tab>"
     let g:UltiSnipsExpandTrigger = "<tab>"
     let g:UltiSnipsJumpForwardTrigger = "<tab>"
     let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+endif
 " }
 
 " Syntastic {
