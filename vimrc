@@ -984,21 +984,6 @@ endfunction
     command! -nargs=1 G call Grep('<args>', 0)
     command! -nargs=1 Gi call Grep('<args>', 1)
 
-if version < 700
-    " find in git repo with fugitive
-    noremap <leader>gg :botright copen <bar> silent Ggrep! -n <c-r>=expand("<cword>") .
-        \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
-    if executable("rg")
-        noremap <leader>ff :botright copen <bar> grep! <c-r>=GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
-    else
-        if has("unix")
-            noremap <leader>ff :botright copen <bar> grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
-        else
-            noremap <leader>ff :botright copen <bar> grep! /r /s /p <c-r>=expand("<cword>") .
-                \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
-        endif
-    endif
-else
     " find in git repo with fugitive
     noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") .
         \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
@@ -1012,7 +997,6 @@ else
                 \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
         endif
     endif
-endif
 " }
 
 "  tag helpers (ctags) {
@@ -1155,9 +1139,9 @@ if &term =~ '^screen'
 endif
 
 " NeoVim (nvim) settings
-if has('nvim')
+if has('nvim') || version >= 800
     " exit terminal mode (go back with 'i')
-    tnoremap <C-\><C-\> <C-\><C-N>
+    tnoremap <Esc> <C-\><C-N>
 
     let g:python_host_prog  = '/usr/local/bin/python2'
     let g:python3_host_prog = '/usr/local/bin/python3'
