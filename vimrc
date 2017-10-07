@@ -8,11 +8,20 @@ filetype off
 set encoding=utf-8
 "
 
-let s:ycm_enabled = 0
+" Tab managers
 let s:supertab_enabled = 0
-let s:mucomplete_enabled = 1
-let s:vimairline_enabled = 0
+let s:mucomplete_enabled = 0
+let s:clevertab_enabled = 1
+
+" Omni completion
 let s:clang_complete = 1
+let s:ycm_enabled = 0 " using clang_complete
+
+" Snippets
+let s:ultisnips_enabled = 1
+
+" Other
+let s:vimairline_enabled = 0 " or lightline
 
 " Pluggin management {
 "
@@ -79,9 +88,11 @@ if has("win32") || has("win64")
     Plug 'xolox/vim-misc'
 endif
 
+if s:ultisnips_enabled
     " better than snipMate
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
+endif
 
     " \bd buffer delete mapping
     Plug 'vim-scripts/kwbdi.vim'
@@ -167,10 +178,10 @@ endif
 if s:supertab_enabled
     " use supertab to work sith YCM and UltiSnips
     Plug 'ervandew/supertab'
-endif
-
-if s:mucomplete_enabled
+elseif s:mucomplete_enabled
     Plug 'lifepillar/vim-mucomplete'
+elseif s:clevertab_enabled
+    Plug 'neitanod/vim-clevertab'
 endif
 
     Plug 'keith/swift.vim'
@@ -315,8 +326,11 @@ vnoremap <S-Del> "+x
 " CTRL-C and CTRL-Insert are Copy (only visual mode)
 vnoremap <C-C>      "+y
 vnoremap <C-Insert> "+y
+
+if !has("win32unix")
 " use system clipboard for yanks
-" set clipboard^=unnamed
+set clipboard^=unnamed
+endif
 
 " Ctrl-V and SHIFT-Insert are Paste
 vnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
@@ -413,7 +427,7 @@ nmap <leader>s :set list!<CR>
 
     " makefiles retain tabs
     autocmd filetype make setlocal ts=4 sw=4 noexpandtab
-    
+
     " javascript size 2 tabstop
     autocmd filetype javascript setlocal ts=2 sw=2
 
@@ -685,8 +699,10 @@ endif
 " Mucomplete {
 if s:mucomplete_enabled
     set noshowmode shortmess+=c   " Shut off completion messages
+    " set showmode shortmess-=c   " Shut off completion messages
     set noinfercase
     set completeopt-=preview
+    set completeopt+=longest
     set completeopt+=menuone
     set completeopt+=noselect
     set completeopt+=noinsert
@@ -707,12 +723,30 @@ if s:mucomplete_enabled
 endif
 " }
 
+if s:clevertab_enabled 
+" Clevertab {
+    inoremap <silent><tab> <c-r>=CleverTab#Complete('start')<cr>
+                        \<c-r>=CleverTab#Complete('tab')<cr>
+                        \<c-r>=CleverTab#Complete('ultisnips')<cr>
+                        \<c-r>=CleverTab#Complete('keyword')<cr>
+                        \<c-r>=CleverTab#Complete('neocomplete')<cr>
+                        \<c-r>=CleverTab#Complete('omni')<cr>
+                        \<c-r>=CleverTab#Complete('stop')<cr>
+    inoremap <silent><s-tab> <c-r>=CleverTab#Complete('prev')<cr>
+" }
+endif
+
 if s:clang_complete
 " clang_complete {
 if has("macunix")
+    let g:clang_use_library = 1
     let g:clang_library_path='/Applications/Xcode.app/Contents/Frameworks/libclang.dylib'
     let g:clang_user_options = '-std=c++14'
     let g:clang_complete_auto = 1
+    if s:ultisnips_enabled
+        let g:clang_snippets = 1
+        let g:clang_snippets_engine = 'ultisnips'
+    endif
 endif
 " }
 endif
@@ -1013,10 +1047,14 @@ endfunction
 
 
 "  UltiSnips {
+if s:ultisnips_enabled
     let g:UltiSnipsSnippetsDir = '~/.vim/plugged/vim-personal/UltiSnips/'
     " better key bindings for UltiSnipsExpandTrigger
+endif
+" }
 
-if s:mucomplete_enabled
+if s:mucomplete_enabled || s:clevertab_enabled || s:supertab_enabled
+    " Keep <tab> for vim_mucomplete
     let g:UltiSnipsExpandTrigger="<C-J>"
     let g:UltiSnipsJumpForwardTrigger="<C-J>"
     let g:UltiSnipsJumpBackwardTrigger="<C-K>"
