@@ -181,7 +181,8 @@ if s:supertab_enabled
 elseif s:mucomplete_enabled
     Plug 'lifepillar/vim-mucomplete'
 elseif s:clevertab_enabled
-    Plug 'neitanod/vim-clevertab'
+    " Plug 'neitanod/vim-clevertab'
+    Plug 'rene-aguirre/vim-clevertab'
 endif
 
     Plug 'keith/swift.vim'
@@ -740,7 +741,8 @@ if s:clang_complete
 " clang_complete {
 if has("macunix")
     let g:clang_use_library = 1
-    let g:clang_library_path='/Applications/Xcode.app/Contents/Frameworks/libclang.dylib'
+    " let g:clang_library_path='/Applications/Xcode.app/Contents/Frameworks/libclang.dylib'
+    let g:clang_library_path='/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
     let g:clang_user_options = '-std=c++14'
     let g:clang_complete_auto = 1
     if s:ultisnips_enabled
@@ -1177,7 +1179,7 @@ if &term =~ '^screen'
 endif
 
 " NeoVim (nvim) settings
-if has('nvim') || version >= 800
+if has('nvim')
     " exit terminal mode (go back with 'i')
     tnoremap <Esc> <C-\><C-N>
 
