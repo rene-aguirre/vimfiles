@@ -91,7 +91,10 @@ endif
 if s:ultisnips_enabled
     " better than snipMate
     Plug 'SirVer/ultisnips'
+    " Snippet library
     Plug 'honza/vim-snippets'
+    " C++ Algorithms snippets (using mnemonics)
+    Plug 'dawikur/algorithm-mnemonics.vim'
 endif
 
     " \bd buffer delete mapping
@@ -160,7 +163,7 @@ endif
     Plug 'JuliaEditorSupport/julia-vim'
 
     " vim-runners, enable :Run script (save and execute)
-    Plug 'urthbound/vim-runners'
+    Plug 'jfo/vim-runners'
 
     " tmux integration
 if !has("gui_running")
@@ -328,7 +331,7 @@ vnoremap <S-Del> "+x
 vnoremap <C-C>      "+y
 vnoremap <C-Insert> "+y
 
-if !has("win32unix")
+if !has('win32unix') && !has('nvim')
 " use system clipboard for yanks
 set clipboard^=unnamed
 endif
@@ -599,7 +602,7 @@ let g:tagbar_type_c = {
 
     command! GSToggle call s:GS_toggle()
     nmap <F9> :GSToggle<CR>
-    autocmd Filetype gitcommit noremap <buffer> <ESC> <C-W>c
+    " autocmd Filetype gitcommit noremap <buffer> <ESC> <C-W>c
 " }
 
 " ctrlp.vim plug-in {
@@ -730,7 +733,6 @@ if s:clevertab_enabled
                         \<c-r>=CleverTab#Complete('tab')<cr>
                         \<c-r>=CleverTab#Complete('ultisnips')<cr>
                         \<c-r>=CleverTab#Complete('keyword')<cr>
-                        \<c-r>=CleverTab#Complete('neocomplete')<cr>
                         \<c-r>=CleverTab#Complete('omni')<cr>
                         \<c-r>=CleverTab#Complete('stop')<cr>
     inoremap <silent><s-tab> <c-r>=CleverTab#Complete('prev')<cr>
