@@ -151,8 +151,6 @@ endif
 
     Plug 'ntpeters/vim-better-whitespace'
 
-    Plug 'octol/vim-cpp-enhanced-highlight'
-
     " Completion and highlighting while on active substitution
     Plug 'osyo-manga/vim-over'
 
@@ -204,6 +202,9 @@ endif
 if s:clang_complete
     Plug 'Rip-Rip/clang_complete', { 'do': function('BuildClangComp') }
 endif
+    Plug 'rhysd/vim-clang-format'
+    Plug 'octol/vim-cpp-enhanced-highlight'
+
 
 call plug#end()
 
@@ -284,7 +285,8 @@ if has("autocmd")
     " autocmd InsertLeave * set nocursorline
 
     if version >= 700 
-        autocmd QuickFixCmdPre *grep* Gcd
+        " autocmd QuickFixCmdPre *grep* Gcd
+        autocmd QuickFixCmdPre *grep* call Tcd()
         autocmd QuickFixCmdPost * botright cwindow 5
     endif
     augroup end
@@ -435,11 +437,13 @@ nmap <leader>s :set list!<CR>
     " javascript size 2 tabstop
     autocmd filetype javascript setlocal ts=2 sw=2
 
+    " better jump for start/end of functions
     autocmd filetype c,cpp map [[ ?{<CR>w99[{
     autocmd filetype c,cpp map ][ /}<CR>b99]}
     autocmd filetype c,cpp map ]] j0[[%/{<CR>
     autocmd filetype c,cpp map [] k$][%?}<CR>
     " autocmd filetype c,cpp MUcompleteAutoOn
+    autocmd filetype cpp setlocal matchpairs+=<:>
 " }
 
 set laststatus=2 " always show status window
@@ -987,6 +991,20 @@ vim.command('return "{0}"'.format(rgtype))
 endpython
 endfunction
 
+" Change to top level git repo, works with nested git modules
+" (repo, sumboules, etc)
+function! Tcd()
+    exec 'Gcd'
+    let topgit=system('git rev-parse --show-toplevel')
+    while !v:shell_error
+        let g:gitroot=topgit
+        exec 'cd ' . topgit
+        exec 'cd ..'
+        let topgit=system('git rev-parse --show-toplevel')
+    endwhile
+    exec 'cd ' . g:gitroot
+endfunction
+
 " This opens the results of 'grep -r' in a bottom window
 " and uses 'git grep' when in a git repo and regular grep otherwise.
 " :G <word> runs grep
@@ -1071,22 +1089,28 @@ endif
 " }
 
 " Syntastic {
-" pylint slows down on write, I run it manually with :make
-let g:syntastic_mode_map = {
-    \ "mode": "active",
-    \ "passive_filetypes": ["python"] }
+    " pylint slows down on write, I run it manually with :make
+    let g:syntastic_mode_map = {
+        \ "mode": "active",
+        \ "passive_filetypes": ["python"]
+        \ }
     " default all are active_filetypes
-    " let g:syntastic_cpp_compiler = 'clang++'
-    if executable('g++-7.1')
+    if executable('clang-5.0')
+        let g:syntastic_cpp_compiler = 'clang-5.0'
+    elseif executable('g++-7.1')
         let g:syntastic_cpp_compiler = 'g++-7.1'
     elseif executable('g++-7')
         let g:syntastic_cpp_compiler = 'g++-7'
+    elseif executable('clang++')
+        let g:syntastic_cpp_compiler = 'clang++'
     else
         let g:syntastic_cpp_compiler = 'g++'
     endif
     " let g:syntastic_cpp_compiler_options = ' -std=c++1z -stdlib=libc++ -Wall -Wextra'
     " -stdlib=libc++ not supported on gcc (implicit?)
-    let g:syntastic_cpp_compiler_options = ' -std=c++1z -Wall -Wextra'
+    let g:syntastic_cpp_compiler_options = ' -std=c++14 -Wall -Wextra'
+    " Use compilation databases (generate with Cmake of Build EAR)
+    let g:syntastic_cpp_clang_tidy_post_args = ""
 " }
 
 " F5 as running current file
@@ -1153,11 +1177,26 @@ set nofoldenable
 " cmake project helper
 function! s:s_build(...)
 	execute ":wall"
-    if (! empty(glob('./CMakeLists.txt'))) && (! empty(glob('./build/Makefile')))
-        execute "make -C ./build " . join(a:000, ' ')
-    else
-        execute "make" . join(a:000, ' ')
-    endif
+	try
+	    let makeprg_bak = &g:makeprg
+        if (! empty(glob('./build.sh')))
+            execute ':set makeprg=source\ ./build.sh'
+        elseif (! empty(glob('./CMakeLists.txt')))
+            if (empty(glob('./build')))
+                execute "!mkdir ./build"
+            endif
+            if (empty(glob('./build/Makefile')))
+                execute "!cd ./build && cmake .. && cd .."
+            endif
+            execute ':set makeprg=make\ -C\ ./build'
+        else
+            " use default makeprg
+        endif
+        execute 'echo "using ' . &g:makeprg . '"'
+        execute "make " . join(a:000, ' ')
+    finally
+        let &g:makeprg = makeprg_bak
+    endtry
 endfunction
 command! -nargs=* Build call s:s_build(<f-args>)
 
@@ -1165,7 +1204,7 @@ function! s:s_test()
     if (! empty(glob('./CMakeLists.txt'))) && (! empty(glob('./build/Makefile')))
         execute "make test ARGS=--output-on-failure -C ./build"
     else
-        execute "make test" . join(a:000, ' ')
+        execute "make test " . join(a:000, ' ')
     endif
 endfunction
 command! -nargs=* Test call s:s_test()
