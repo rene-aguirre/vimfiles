@@ -637,11 +637,11 @@ let g:tagbar_type_c = {
     let g:ctrlp_max_files = 100000
 
     " indexing speed up
+    let s:ctrlp_git_command = 'cd %s && python ~/vimfiles/gitsub.py --rg'
     if executable('rg')
-        let s:ctrlp_git_command = 'rg --color=never --no-messages --glob "" --files %s'
+        " let s:ctrlp_git_command = 'rg --color=never --no-messages --glob "" --files %s'
+        let s:ctrlp_git_command = s:ctrlp_git_command . '--rg'
         let g:ctrlp_use_caching = 0
-    else
-        let s:ctrlp_git_command = 'cd %s && python ~/vimfiles/gitsub.py'
     endif
     if has("unix")
         let g:ctrlp_user_command = {
@@ -1005,6 +1005,15 @@ function! Tcd()
     exec 'cd ' . g:gitroot
 endfunction
 
+function! GetRepoGrep()
+    if (empty(glob('../.repo/')))
+        set grepprg=rg\ --vimgrep\ --no-heading\ --no-messages
+    else
+        set grepprg=repo\ forall\ -c\ 'echo\ ../$REPO_PATH'\ \\\|\ xargs\ rg\ --vimgrep\ --no-heading\ --no-messages
+    endif
+    return "grep! "
+endfunction
+
 " This opens the results of 'grep -r' in a bottom window
 " and uses 'git grep' when in a git repo and regular grep otherwise.
 " :G <word> runs grep
@@ -1044,7 +1053,7 @@ endfunction
     noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") .
         \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     if executable("rg")
-        noremap <leader>ff :silent grep! <c-r>=GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
+        noremap <leader>ff :silent  <c-r>=GetRepoGrep() . GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
     else
         if has("unix")
             noremap <leader>ff :silent grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
@@ -1174,6 +1183,21 @@ set viminfo='50,f1
 " start with folding disabled
 set nofoldenable
 
+function! s:ExecuteInShell(command)
+  let command = join(map(split(a:command), 'expand(v:val)'))
+  let winnr = bufwinnr('^' . command . '$')
+  silent! execute  winnr < 0 ? 'botright new ' . fnameescape(command) : winnr . 'wincmd w'
+  setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
+  echo 'Execute ' . command . '...'
+  silent! execute 'silent %!'. command
+  silent! execute 'resize ' . line('$')
+  silent! redraw
+  silent! execute 'au BufUnload <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
+  silent! execute 'nnoremap <silent> <buffer> <LocalLeader>r :call <SID>ExecuteInShell(''' . command . ''')<CR>'
+  echo 'Shell command ' . command . ' executed.'
+endfunction
+command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
+
 " cmake project helper
 function! s:s_build(...)
 	execute ":wall"
@@ -1227,4 +1251,9 @@ if has('nvim')
     let g:python_host_prog  = '/usr/local/bin/python2'
     let g:python3_host_prog = '/usr/local/bin/python3'
 endif
+
+" clang-format helper
+vnoremap <C-I> :pyfile ~/vimfiles/clang-format.py<cr>
+nnoremap <C-I> :pyfile ~/vimfiles/clang-format.py<cr>
+" use g:clang_format_path for custom tool path
 
