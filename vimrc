@@ -8,213 +8,6 @@ filetype off
 set encoding=utf-8
 "
 
-" Tab managers
-let s:supertab_enabled = 0
-let s:mucomplete_enabled = 0
-let s:clevertab_enabled = 1
-
-" Omni completion
-let s:clang_complete = 1
-let s:ycm_enabled = 0 " using clang_complete
-
-" Snippets
-let s:ultisnips_enabled = 1
-
-" Other
-let s:vimairline_enabled = 0 " or lightline
-
-" Pluggin management {
-"
-" YouCompleteMe {
-function! BuildYCM(info)
-  " info is a dictionary with 3 fields
-  " - name:   name of the plugin
-  " - status: 'installed', 'updated', or 'unchanged'
-  " - force:  set on PlugInstall! or PlugUpdate!
-  if a:info.status == 'installed' || a:info.force
-    !./install.py --racer-completer
-  endif
-endfunction
-" }
-" cpsm {
-function! BuildCPSM(info)
-  " info is a dictionary with 3 fields
-  " - name:   name of the plugin
-  " - status: 'installed', 'updated', or 'unchanged'
-  " - force:  set on PlugInstall! or PlugUpdate!
-  if a:info.status == 'installed' || a:info.force
-    !PY3=OFF ./install.sh
-  endif
-endfunction
-" }
-
-" Clang_complete {
-function! BuildClangComp(info)
-  if a:info.status == 'installed' || a:info.force
-    !make install
-  endif
-endfunction
-" }
-
-" plug.vim is in my vimfiles/autoload repo
-set rtp+=~/vimfiles
-call plug#begin('~/.vim/plugged')
-    " Make sure to use single quotes
-    "
-    " Popular color schems
-    Plug 'crusoexia/vim-monokai'
-    Plug 'NLKNguyen/papercolor-theme'
-    Plug 'altercation/vim-colors-solarized'
-    Plug 'junegunn/seoul256.vim'
-
-    " original repos on github
-    " handle brackets, quotes, etc. easier
-    Plug 'tpope/vim-surround'
-
-    Plug 'gorkunov/smartpairs.vim'
-
-    " better than taglist
-    Plug 'majutsushi/tagbar'
-
-    " my personal stuff
-    Plug 'rene-aguirre/vim-personal'
-
-    " Tab helper
-    Plug 'godlygeek/tabular'
-
-if has("win32") || has("win64")
-    " Run shell commands in background
-    Plug 'xolox/vim-shell'
-    Plug 'xolox/vim-misc'
-endif
-
-if s:ultisnips_enabled
-    " better than snipMate
-    Plug 'SirVer/ultisnips'
-    " Snippet library
-    Plug 'honza/vim-snippets'
-    " C++ Algorithms snippets (using mnemonics)
-    Plug 'dawikur/algorithm-mnemonics.vim'
-endif
-
-    " \bd buffer delete mapping
-    Plug 'vim-scripts/kwbdi.vim'
-
-    " Ascii drawing helper
-    " Plug 'vim-scripts/DrawIt'
-
-    " RST Markup helper
-    " Plug 'vim-scripts/VST'
-
-    " full reST support (complains on clicable.vim)
-    " Plug 'Rykka/riv.vim'
-
-    " software caps lock
-    Plug 'tpope/vim-capslock'
-
-if s:vimairline_enabled
-    Plug 'vim-airline/vim-airline'
-else
-    Plug 'itchyny/lightline.vim'
-endif
-
-    " file browser
-    Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle' }
-
-    " syntax checker
-    Plug 'scrooloose/syntastic'
-
-    " git helpers
-    Plug 'tpope/vim-fugitive'
-    " Plug 'airblade/vim-gitgutter'
-
-    " Extradite for fugitive
-    Plug 'grota/vim-extradite'
-
-    " three file diffs
-    " Plug 'sjl/splice.vim.git'
-
-    " file manager
-    Plug 'ctrlpvim/ctrlp.vim'
-    " cpsm, ctrlp matcher for paths
-    Plug 'nixprime/cpsm', { 'do': function('BuildCPSM') }
-
-    Plug 'scrooloose/nerdcommenter'
-
-    Plug 'vimwiki/vimwiki'
-
-    " expand selection incrementally (removed: I'm not really using it)
-    " Plug 'terryma/vim-expand-region'
-
-    " Plant UML syntax and helper
-    Plug 'aklt/plantuml-syntax'
-
-    Plug 'ntpeters/vim-better-whitespace'
-
-    " Completion and highlighting while on active substitution
-    Plug 'osyo-manga/vim-over'
-
-    " Rust programming language
-    Plug 'rust-lang/rust.vim'
-
-    " Julia support
-    Plug 'JuliaEditorSupport/julia-vim'
-
-    " vim-runners, enable :Run script (save and execute)
-    Plug 'jfo/vim-runners'
-
-    " tmux integration
-if !has("gui_running")
-
-    Plug 'tmux-plugins/vim-tmux-focus-events'
-endif
-
-    " You completeme
-if s:ycm_enabled
-    " Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
-endif
-    " deprecated in favor of Mucomplete
-    " Plug 'ajh17/VimCompletesMe'
-
-if s:supertab_enabled
-    " use supertab to work sith YCM and UltiSnips
-    Plug 'ervandew/supertab'
-elseif s:mucomplete_enabled
-    Plug 'lifepillar/vim-mucomplete'
-elseif s:clevertab_enabled
-    " Plug 'neitanod/vim-clevertab'
-    Plug 'rene-aguirre/vim-clevertab'
-endif
-
-    Plug 'keith/swift.vim'
-
-    " Convenient work motions
-    Plug 'kana/vim-smartword'
-
-    Plug 'Konfekt/FastFold'
-
-    Plug 'mhinz/vim-startify'
-
-    Plug 'neomake/neomake'
-
-    Plug 'ludovicchabant/vim-gutentags'
-
-if s:clang_complete
-    Plug 'Rip-Rip/clang_complete', { 'do': function('BuildClangComp') }
-endif
-    Plug 'rhysd/vim-clang-format'
-    Plug 'octol/vim-cpp-enhanced-highlight'
-
-
-call plug#end()
-
-    " Extended %
-    runtime macros/matchit.vim
-
-    filetype plugin on
-    filetype plugin indent on " allow plug-ins to detect filetypes
-" }
-
 " Don't use Ex mode, use Q for formatting
 nnoremap Q gq
 
@@ -272,6 +65,7 @@ if has("autocmd")
     autocmd bufreadpost,bufnewfile *.psq set filetype=psr
     autocmd bufreadpost,bufnewfile *.jth set filetype=forth
     autocmd bufreadpost,bufnewfile *.pycfg set filetype=python
+    autocmd bufreadpost,bufnewfile *.swift set filetype=swift
 
     autocmd filetype rust compiler cargo
 
@@ -283,8 +77,7 @@ if has("autocmd")
 
     " Revert Color to default when leaving Insert Mode
     " autocmd InsertLeave * set nocursorline
-
-    if version >= 700 
+    if version >= 700
         " autocmd QuickFixCmdPre *grep* Gcd
         autocmd QuickFixCmdPre *grep* call Tcd()
         autocmd QuickFixCmdPost * botright cwindow 5
@@ -352,16 +145,7 @@ if has("virtualedit") && has("gui")
     exe 'vnoremap <script> <S-Insert>' paste#paste_cmd['v']
 endif
 
-" Don't use CTRL-Q to do what CTRL-V used to do
-" noremap <C-Q>		<C-V>
-
-" Use CTRL-S for saving, also in Insert mode
-noremap <C-S>		:update<CR>
-vnoremap <C-S>		<C-C>:update<CR>
-inoremap <C-S>		<C-O>:update<CR>
-
-" CTRL-Z is Undo; not in cmdline though
-noremap <C-Z> u
+" CTRL-Z is Undo, insert only
 inoremap <C-Z> <C-O>u
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
@@ -404,7 +188,7 @@ set autoread    " load file on changes, automatically
 " wrapping
 set wrap        " wrap lines
 set linebreak   " wrap on full words
-set showbreak=↪\ 
+set showbreak=↪\
 
 " show whitespace
 set listchars=tab:▶–,trail:·,precedes:«,extends:»,eol:¶
@@ -417,6 +201,9 @@ nmap <leader>s :set list!<CR>
     set hlsearch    " highlight searches
     set ignorecase  " Do case insensitive matching
     set smartcase
+if has("autocmd")
+    autocmd filetype cpp setlocal matchpairs+=<:>
+endif
 " }
 
 " tabs and indentation {
@@ -431,25 +218,20 @@ nmap <leader>s :set list!<CR>
     set copyindent
     set preserveindent
 
+if has("autocmd")
     " makefiles retain tabs
     autocmd filetype make setlocal ts=4 sw=4 noexpandtab
 
     " javascript size 2 tabstop
     autocmd filetype javascript setlocal ts=2 sw=2
 
-    " better jump for start/end of functions
-    autocmd filetype c,cpp map [[ ?{<CR>w99[{
-    autocmd filetype c,cpp map ][ /}<CR>b99]}
-    autocmd filetype c,cpp map ]] j0[[%/{<CR>
-    autocmd filetype c,cpp map [] k$][%?}<CR>
-    " autocmd filetype c,cpp MUcompleteAutoOn
-    autocmd filetype cpp setlocal matchpairs+=<:>
+endif
 " }
 
 set laststatus=2 " always show status window
 
 set statusline=
-set statusline +=%*\ %n%*            "buffer number
+set statusline +=%*\ %n%*              "buffer number
 set statusline +=%*\ %{fugitive#statusline()}%*
 set statusline +=%*\ %<%F%*            "full path
 set statusline +=%*%m%*                "modified flag
@@ -465,36 +247,17 @@ set vb
 "set fdm=marker
 "set nofen
 
-if has("gui_running")
-    set background=dark
-    " colorscheme desert_luna
-    colorscheme monokai
-else
-    " seoul256 (dark):
-    " "   Range:   233 (darkest) ~ 239 (lightest)
-    " "   Default: 237
-    if has("gui_running")
-    let g:seoul256_background = 234
-    else
-    let g:seoul256_background = 235
-    endif
-    " " seoul256 (light):
-    " "   Range:   252 (darkest) ~ 256 (lightest)
-    " "   Default: 253
-    " let g:seoul256_background = 256
-    colorscheme seoul256
-endif
-
 " set background=light
 " colorscheme PaperColor
 
 " Fonts {
-    if has("gui_gtk2")
-        set guifont=DejaVu\ Sans\ Mono\ 10,Fixed\ 12
-        " set guifontwide=Microsoft\ Yahei\ 12,WenQuanYi\ Zen\ Hei\ 12
-    else
-        set guifont=Mononoki:h14,Monaco:h13,DejaVu\ Sans\ Mono:h9,Consolas:h10
-    endif
+if has("gui_gtk2")
+    set guifont=DejaVu\ Sans\ Mono\ 10,Fixed\ 12
+    " set guifontwide=Microsoft\ Yahei\ 12,WenQuanYi\ Zen\ Hei\ 12
+else
+    set guifont=FuraCode\ Nerd\ Font\ Mono:h14,mononoki\ Nerd\ Font\ Mono:h14,
+                \Mononoki:h14,Monaco:h13,DejaVu\ Sans\ Mono:h9,Consolas:h10
+endif
 " }
 
 "display line numbers on left of window
@@ -503,329 +266,43 @@ set number
 " visible lines above or below the cursor
 set scrolloff=2
 
-if s:vimairline_enabled
-" airline plugin {
-    let g:airline#extensions#whitespace#enabled = 0
-    " fugitive
-    let g:airline#extensions#branch#enabled = 1
-    let g:airline#extensions#branch#empty_message = ''
-    " only branch name tail
-    let g:airline#extensions#branch#format = 1
-    let g:airline#extensions#branch#displayed_head_limit = 16
-    " don't show empty changes items
-    let g:airline#extensions#hunks#non_zero_only = 1
-  " disable syntastic integration
-  let g:airline#extensions#syntastic#enabled = 0
-
-  let g:airline_left_sep = '»'
-  let g:airline_right_sep = '«'
-  let g:airline_right_alt_sep = ''
-
-  " remove percentage
-  " let g:airline_section_x = (filetype, virtualenv)
-
-    function! MyFF()
-        return printf('%s%s', &fenc, strlen(&ff) > 0 ? '['.&ff[0].']' : '')
-    endfunction
-    call airline#parts#define_function('myff', 'MyFF')
-    let g:airline_section_y = airline#section#create_right(['myff'])
-    " let g:airline_section_z = airline#section#create_right(['%2v', '%2p%%'])
-    let g:airline_section_z = airline#section#create_right(['%2v %2p%%'])
-" }
-endif
-
-" NERDTree plug-ing {
-    nmap <F2> :NERDTreeToggle<CR>
-    imap <F2> <C-O>:NERDTreeToggle<CR>
-    omap <F2> <C-C>:NERDTreeToggle<CR>
-" }
-
-" Tagbar plug-in {
-    if has("win32") || has("win64")
-        let g:tagbar_ctags_bin = '~/vimfiles/ctags.exe'
-    endif
-
-let g:tagbar_type_cpp = {
-    \ 'kinds' : [
-        \ 'd:macros:1:0',
-        \ 'g:enums:1:0',
-        \ 'e:enumerators:1:0',
-        \ 't:typedefs:1:0',
-        \ 's:structs:1:0',
-        \ 'u:unions:1:0',
-        \ 'v:variables:1:0',
-        \ 'm:members:0:0',
-        \ 'p:prototypes',
-        \ 'f:functions',
-        \ 'n:namespaces',
-        \ 'c:classes',
-    \ ],
-\ }
-
-let g:tagbar_type_c = {
-    \ 'kinds' : [
-        \ 'd:macros:1:0',
-        \ 'g:enums:1:0',
-        \ 'e:enumerators:1:0',
-        \ 't:typedefs:1:0',
-        \ 's:structs:1:0',
-        \ 'u:unions:1:0',
-        \ 'v:variables:1:0',
-        \ 'm:members:0:0',
-        \ 'p:prototypes',
-        \ 'f:functions',
-    \ ],
-\ }
-    " Sort by file order
-    let g:tagbar_sort = 0
-    nmap <F3> :TagbarToggle<CR>
-    imap <F3> <C-O>:TagbarToggle<CR>
-    omap <F3> <C-C>:TagbarToggle<CR>
-" }
-
-" Fugitive plug-in {
-    " toggles the Fugitive status window.
-    function! s:GS_toggle()
-        for i in range(1, winnr('$'))
-            let bnum = winbufnr(i)
-            if getbufvar(bnum, '&filetype') == 'gitcommit'
-                execute "bdelete".bnum
-                return
-            endif
-        endfor
-        execute "topleft Gstatus"
-    endfunction
-
-    nnoremap <Leader>gb :Gblame -w<cr>
-    nnoremap <Leader>gc :Gcommit<cr>
-    nnoremap <Leader>gd :Gdiff<cr>
-    nnoremap <Leader>gs :Gstatus<cr>
-    " nnoremap <Leader>gp :Git push<cr>
-    " nnoremap <Leader>gr :Gremove<cr>
-    " nnoremap <Leader>gw :Gwrite<cr>
-
-    command! GSToggle call s:GS_toggle()
-    nmap <F9> :GSToggle<CR>
-    " autocmd Filetype gitcommit noremap <buffer> <ESC> <C-W>c
-" }
-
-" ctrlp.vim plug-in {
-    " CtrlP browse buffers
-    nmap <leader>be :CtrlPBuffer<CR>
-
-    " work on tags
-    let g:ctrlp_extensions = ['tag']
-
-    " open files extra files in hidden buffers
-    let g:ctrlp_open_multiple_files = '1jr'
-
-    " special wildignore
-    let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
-
-    " use ctrlp-cmatcher extension
-    " let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
-
-    " use ctrlp-cmatcher extension, ctrlp-py-matcher
-    " let g:ctrlp_match_func = {'match' : 'pymatcher#PyMatch'}
-    let g:ctrlp_match_func = {'match' : 'cpsm#CtrlPMatch'}
-
-    "
-    " keep current dir, avoid messin with submodules
-    let g:ctrlp_working_path_mode = 'wa'
-
-    " limit max number of files
-    let g:ctrlp_max_files = 100000
-
-    " indexing speed up
-    let s:ctrlp_git_command = 'cd %s && python ~/vimfiles/gitsub.py --rg'
-    if executable('rg')
-        " let s:ctrlp_git_command = 'rg --color=never --no-messages --glob "" --files %s'
-        let s:ctrlp_git_command = s:ctrlp_git_command . '--rg'
-        let g:ctrlp_use_caching = 0
-    endif
-    if has("unix")
-        let g:ctrlp_user_command = {
-            \ 'types': {
-                \ 1: ['.git', s:ctrlp_git_command],
-                \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-                \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
-                \ },
-            \ 'fallback': 'find %s -not -path "*/\.*" -type f \( ! -iname ".*" \)| head -50000'
-            \ }
-    else
-        " windows
-        let ctrlp_filter_greps = "".
-            \ 'grep -iv "\\.\\(' .
-            \ 'exe\|jar\|class\|swp\|swo\|log\|so\|o\|pyc\|jpe?g\|png\|gif\|mo\|po' .
-            \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
-            \ '\\)$"'
-        " vim currently broken
-        if executable('rg')
-            let g:ctrlp_fast_search = 'rg --color=never --no-messages --glob "" --files %s'
-        elseif executable('ag')
-            let g:ctrlp_fast_search = 'ag %s -l --nocolor -g ""'
-        else
-            let g:ctrlp_fast_search = 'dir %s /-n /b /s /a-d'
-        endif
-        let g:ctrlp_user_command = {
-            \ 'types': {
-                \ 1: ['.git', 'cd %s && python %%userprofile%%\\vimfiles\\gitsub.py'],
-                \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-                \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
-                \ },
-            \ 'fallback': g:ctrlp_fast_search,
-            \ }
-    endif
-" }
-
-" vimwiki plug-in {
-    let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/'}]
-" }
-
-" YouCompleteMe plug-in {
-if s:ycm_enabled
-    nnoremap <Leader>] :YcmCompleter GoTo<CR>
-    " let g:ycm_rust_src_path=expand("~/tools/rust/src")
-    " rustup 'rust-src' component installation path
-    let g:ycm_rust_src_path=substitute(system('echo `rustc --print sysroot`/lib/rustlib/src/rust/src'), "\n", "", "")
-    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-    " make YCM compatible with UltiSnips (using supertab)
-endif
-" }
-
-" SuperTab plug-in {
-if s:supertab_enabled
-    " let g:SuperTabNoCompleteAfter =
-    " let g:SuperTabDefaultCompletionType = 'context'
-    let g:SuperTabContextDefaultCompletionType = '\t'
-    " consolidate space-tab to bare tab (easy way to force tab too)
-    let g:SuperTabMappingTabLiteral = '<C-T>'
-endif
-" }
-
-" Mucomplete {
-if s:mucomplete_enabled
-    set noshowmode shortmess+=c   " Shut off completion messages
-    " set showmode shortmess-=c   " Shut off completion messages
-    set noinfercase
-    set completeopt-=preview
-    set completeopt+=longest
-    set completeopt+=menuone
-    set completeopt+=noselect
-    set completeopt+=noinsert
-    set belloff+=ctrlg " If Vim beeps during completion
-
-    " for auto completion
-    inoremap <expr> <c-e> mucomplete#popup_exit("\<c-e>")
-    inoremap <expr> <c-y> mucomplete#popup_exit("\<c-y>")
-    inoremap <expr>  <cr> mucomplete#popup_exit("\<cr>")
-    let g:mucomplete#enable_auto_at_startup = 1
-
-    imap <expr> <right> <plug>(MUcompleteCycFwd)
-
-    let g:mucomplete#chains = {
-      \ 'default' : ['path', 'omni', 'keyn', 'dict', 'uspl', 'ulti'],
-      \ 'vim'     : ['path', 'cmd', 'keyn', 'ulti']
-      \ }
-endif
-" }
-
-if s:clevertab_enabled 
-" Clevertab {
-    inoremap <silent><tab> <c-r>=CleverTab#Complete('start')<cr>
-                        \<c-r>=CleverTab#Complete('tab')<cr>
-                        \<c-r>=CleverTab#Complete('ultisnips')<cr>
-                        \<c-r>=CleverTab#Complete('keyword')<cr>
-                        \<c-r>=CleverTab#Complete('omni')<cr>
-                        \<c-r>=CleverTab#Complete('stop')<cr>
-    inoremap <silent><s-tab> <c-r>=CleverTab#Complete('prev')<cr>
-" }
-endif
-
-if s:clang_complete
-" clang_complete {
-if has("macunix")
-    let g:clang_use_library = 1
-    " let g:clang_library_path='/Applications/Xcode.app/Contents/Frameworks/libclang.dylib'
-    let g:clang_library_path='/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
-    let g:clang_user_options = '-std=c++14'
-    let g:clang_complete_auto = 1
-    if s:ultisnips_enabled
-        let g:clang_snippets = 1
-        let g:clang_snippets_engine = 'ultisnips'
-    endif
-endif
-" }
-endif
-
-" Startify plug-in {
-    let s:padding_left = repeat(' ', 3)
-    let g:startify_list_order = [
-        \ [s:padding_left .'MRU '. getcwd()], 'dir',
-        \ [s:padding_left .'MRU'],            'files',
-        \ [s:padding_left .'Sessions'],       'sessions',
-        \ [s:padding_left .'Bookmarks'],      'bookmarks',
-        \ [s:padding_left .'Commands'],       'commands',
-        \ ]
-
-    let g:ascii = [
-            \ '        __',
-            \ '.--.--.|==|.--------.',
-            \ '|  |  ||  ||  .  .  |',
-            \ ' \___/ |__|.__|__|__.',
-            \]
-
-    let g:startify_custom_header = g:ascii + startify#fortune#boxed()
-    " always keep my current dir
-    let g:startify_change_to_dir = 0
-" }
-
-" smartword {
-" Replace |w| and others with |smartword-mappings|:
-	map w  <Plug>(smartword-w)
-	map b  <Plug>(smartword-b)
-	map e  <Plug>(smartword-e)
-	map ge  <Plug>(smartword-ge)
-" }
-
 " gui options {
-    if has("gui_running")
-        " set guioptions+=e   " tab bar displayed
-        set guioptions-=m     " menu bar displayed
-        set guioptions-=T     " disable toolbar
-        " set showtabline=2
-        set cursorline        " highlight current line
-        set columns=99
-        nmap <F10> :if &guioptions=~'m' \| set guioptions-=m \| else \| set guioptions+=m \| endif<cr>
+if has("gui_running")
+    " set guioptions+=e   " tab bar displayed
+    set guioptions-=m     " menu bar displayed
+    set guioptions-=T     " disable toolbar
+    " set showtabline=2
+    set cursorline        " highlight current line
+    set columns=99
+    nmap <F10> :if &guioptions=~'m' \| set guioptions-=m \| else \| set guioptions+=m \| endif<cr>
 
-        " set the cursor to a vertical line in insert mode and a solid block
-        " in command mode
-        let &t_SI = "\<Esc>]50;CursorShape=1\x7" " Vertical bar in insert mode
-        let &t_EI = "\<Esc>]50;CursorShape=0\x7" " Block in normal mode
-        inoremap <special> <Esc> <Esc>hl
+    " set the cursor to a vertical line in insert mode and a solid block
+    " in command mode
+    let &t_SI = "\<Esc>]50;CursorShape=1\x7" " Vertical bar in insert mode
+    let &t_EI = "\<Esc>]50;CursorShape=0\x7" " Block in normal mode
+    inoremap <special> <Esc> <Esc>hl
 
-        highlight Cursor guifg=black guibg=cyan
-        highlight iCursor guifg=black guibg=red
-        set guicursor=i:ver30-iCursor
-        set guicursor=n-v-c:block-Cursor
-        set guicursor+=n-v-c:blinkon0
+    highlight Cursor guifg=black guibg=cyan
+    highlight iCursor guifg=black guibg=red
+    set guicursor=i:ver30-iCursor
+    set guicursor=n-v-c:block-Cursor
+    set guicursor+=n-v-c:blinkon0
 
-    endif
-    " For CTRL-V to work autoselect must be off.
-    " On Unix we have two selections, autoselect can be used.
-    set guioptions-=a
-    if has("win32") || has("win64")
-        " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-        " let &guioptions = substitute(&guioptions, "t", "", "g")
-        set backupdir=$TMP
-        set directory=$TMP
-    else
-        silent execute '!mkdir ~/.vim/backup > /dev/null 2>&1'
-        silent execute '!mkdir ~/.vim/swap > /dev/null 2>&1'
-        set backupdir=$HOME/.vim/backup//
-        set directory=$HOME/.vim/swap//
-    endif
+endif
+" For CTRL-V to work autoselect must be off.
+" On Unix we have two selections, autoselect can be used.
+set guioptions-=a
+if has("win32") || has("win64")
+    " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+    " let &guioptions = substitute(&guioptions, "t", "", "g")
+    set backupdir=$TMP
+    set directory=$TMP
+else
+    silent execute '!mkdir ~/.vim/backup > /dev/null 2>&1'
+    silent execute '!mkdir ~/.vim/swap > /dev/null 2>&1'
+    set backupdir=$HOME/.vim/backup//
+    set directory=$HOME/.vim/swap//
+endif
 " }
 
 " change windows inside tabs
@@ -868,7 +345,6 @@ onoremap <C-PageUp> <C-C><C-W><C-W>
         " g:restore_win_num = winbufnr(0) " -1 if none
         execute "botright copen " . g:jah_Quickfix_Win_Height
     endfunction
-    " autocmd winleave qf let g:restore_buf_num=0
 
     command! QFix call s:qf_toggle()
 
@@ -885,6 +361,7 @@ function! s:bd_split()
 endfunction
 
 command! Bd call s:bd_split()
+set splitright
 
 map <F1> <Esc>
 map! <F1> <Esc>
@@ -933,7 +410,7 @@ if default_ext and default_ext.startswith('.'):
 all_ext = ft_map.get(vim.eval("a:sFt"), [default_ext,])
 
 if default_ext and default_ext not in all_ext:
-    # desirable to include current file ext
+# desirable to include current file ext
     all_ext.insert(0, default_ext)
 
 if vim.eval("a:sRootPrefix").strip():
@@ -1053,23 +530,26 @@ endfunction
     noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") .
         \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     if executable("rg")
-        noremap <leader>ff :silent  <c-r>=GetRepoGrep() . GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
+        noremap <leader>ff :silent  <c-r>=GetRepoGrep() .
+            \ GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
+    elseif has("unix")
+        noremap <leader>ff :silent grep! -s -r --include
+            \ =<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) .
+            \ " " . expand("<cword>") . " ."<CR>
     else
-        if has("unix")
-            noremap <leader>ff :silent grep! -s -r --include=<c-r>=GetFtExtension(&filetype, bufname('%'), '', has('unix')) . " " . expand("<cword>") . " ."<CR>
-        else
-            noremap <leader>ff :silent grep! /r /s /p <c-r>=expand("<cword>") .
-                \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
-        endif
+        noremap <leader>ff :silent grep! /r /s /p <c-r>=expand("<cword>") .
+            \ " " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
     endif
 " }
 
 "  tag helpers (ctags) {
     " run ctags in the current folder
     if has("win32") || has("win64")
-		command! BuildTags execute '!' . expand('~') . "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+		command! BuildTags execute '!' . expand('~') .
+		    \ "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
 	else
-		command! BuildTags execute '!' . "ctags -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+		command! BuildTags execute '!' .
+		    \ "ctags -R --c++-kinds=+p --fields=+iaS --extra=+q ."
 	endif
 	set tags=./tags;
     " work with git hooks (so top level repo path applies)
@@ -1077,27 +557,7 @@ endfunction
 " }
 
 
-"  UltiSnips {
-if s:ultisnips_enabled
-    let g:UltiSnipsSnippetsDir = '~/.vim/plugged/vim-personal/UltiSnips/'
-    " better key bindings for UltiSnipsExpandTrigger
-endif
-" }
-
-if s:mucomplete_enabled || s:clevertab_enabled || s:supertab_enabled
-    " Keep <tab> for vim_mucomplete
-    let g:UltiSnipsExpandTrigger="<C-J>"
-    let g:UltiSnipsJumpForwardTrigger="<C-J>"
-    let g:UltiSnipsJumpBackwardTrigger="<C-K>"
-else
-    " let g:UltiSnipsListSnippets = "<c-tab>"
-    let g:UltiSnipsExpandTrigger = "<tab>"
-    let g:UltiSnipsJumpForwardTrigger = "<tab>"
-    let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
-endif
-" }
-
-" Syntastic {
+" Syntastic plug-in {
     " pylint slows down on write, I run it manually with :make
     let g:syntastic_mode_map = {
         \ "mode": "active",
@@ -1180,9 +640,6 @@ let asmsyntax = "kalimba"
 " save bookmarks
 set viminfo='50,f1
 
-" start with folding disabled
-set nofoldenable
-
 function! s:ExecuteInShell(command)
   let command = join(map(split(a:command), 'expand(v:val)'))
   let winnr = bufwinnr('^' . command . '$')
@@ -1248,12 +705,522 @@ if has('nvim')
     " exit terminal mode (go back with 'i')
     tnoremap <Esc> <C-\><C-N>
 
-    let g:python_host_prog  = '/usr/local/bin/python2'
-    let g:python3_host_prog = '/usr/local/bin/python3'
+    let g:python_host_prog  = 'python2'
+    let g:python3_host_prog = 'python3'
 endif
 
 " clang-format helper
 vnoremap <C-I> :pyfile ~/vimfiles/clang-format.py<cr>
 nnoremap <C-I> :pyfile ~/vimfiles/clang-format.py<cr>
 " use g:clang_format_path for custom tool path
+
+
+" Pluggin management {
+"
+" plug.vim is in my vimfiles/autoload repo
+set rtp+=~/vimfiles
+call plug#begin('~/.vim/plugged')
+    " Make sure to use single quotes
+    "
+    " Popular color schems
+    Plug 'crusoexia/vim-monokai'
+    Plug 'NLKNguyen/papercolor-theme'
+    Plug 'altercation/vim-colors-solarized'
+    Plug 'junegunn/seoul256.vim'
+
+    " original repos on github
+    " handle brackets, quotes, etc. easier
+    Plug 'tpope/vim-surround'
+
+    Plug 'gorkunov/smartpairs.vim'
+
+" Tagbar plug-in {
+    " better than taglist
+    Plug 'majutsushi/tagbar'
+
+    if has("win32") || has("win64")
+        let g:tagbar_ctags_bin = '~/vimfiles/ctags.exe'
+    endif
+
+    let g:tagbar_type_cpp = {
+        \ 'kinds' : [
+            \ 'd:macros:1:0',
+            \ 'g:enums:1:0',
+            \ 'e:enumerators:1:0',
+            \ 't:typedefs:1:0',
+            \ 's:structs:1:0',
+            \ 'u:unions:1:0',
+            \ 'v:variables:1:0',
+            \ 'm:members:0:0',
+            \ 'p:prototypes',
+            \ 'f:functions',
+            \ 'n:namespaces',
+            \ 'c:classes',
+        \ ],
+    \ }
+
+    let g:tagbar_type_c = {
+        \ 'kinds' : [
+            \ 'd:macros:1:0',
+            \ 'g:enums:1:0',
+            \ 'e:enumerators:1:0',
+            \ 't:typedefs:1:0',
+            \ 's:structs:1:0',
+            \ 'u:unions:1:0',
+            \ 'v:variables:1:0',
+            \ 'm:members:0:0',
+            \ 'p:prototypes',
+            \ 'f:functions',
+        \ ],
+    \ }
+
+    " Sort by file order
+    let g:tagbar_sort = 0
+    nmap <F3> :TagbarToggle<CR>
+    imap <F3> <C-O>:TagbarToggle<CR>
+    omap <F3> <C-C>:TagbarToggle<CR>
+" }
+
+
+    " my personal stuff
+    Plug 'rene-aguirre/vim-personal'
+
+    " Tab helper
+    Plug 'godlygeek/tabular'
+
+if has("win32") || has("win64")
+    " Run shell commands in background
+    Plug 'xolox/vim-shell'
+    Plug 'xolox/vim-misc'
+endif
+
+    " Snippets
+    let s:ultisnips_enabled = 1
+
+if s:ultisnips_enabled
+"  UltiSnips plug-in {
+    let g:UltiSnipsSnippetsDir = '~/.vim/plugged/vim-personal/UltiSnips/'
+
+    " better than snipMate
+    Plug 'SirVer/ultisnips'
+    " Snippet library
+    Plug 'honza/vim-snippets'
+    " C++ Algorithms snippets (using mnemonics)
+    Plug 'dawikur/algorithm-mnemonics.vim'
+endif
+
+    " <leader>bd buffer delete & keep layout
+    Plug 'vim-scripts/kwbdi.vim'
+
+    " Ascii drawing helper
+    " Plug 'vim-scripts/DrawIt'
+
+    " RST Markup helper
+    " Plug 'vim-scripts/VST'
+
+    " full reST support (complains on clicable.vim)
+    " Plug 'Rykka/riv.vim'
+
+    " software caps lock
+    Plug 'tpope/vim-capslock'
+
+    let s:vimairline_enabled = 0 " or lightline
+if s:vimairline_enabled
+" airline plugin {
+    Plug 'vim-airline/vim-airline'
+    let g:airline#extensions#whitespace#enabled = 0
+    " fugitive
+    let g:airline#extensions#branch#enabled = 1
+    let g:airline#extensions#branch#empty_message = ''
+    " only branch name tail
+    let g:airline#extensions#branch#format = 1
+    let g:airline#extensions#branch#displayed_head_limit = 16
+    " don't show empty changes items
+    let g:airline#extensions#hunks#non_zero_only = 1
+  " disable syntastic integration
+  let g:airline#extensions#syntastic#enabled = 0
+
+  let g:airline_left_sep = '»'
+  let g:airline_right_sep = '«'
+  let g:airline_right_alt_sep = ''
+
+  " remove percentage
+  " let g:airline_section_x = (filetype, virtualenv)
+
+    function! MyFF()
+        return printf('%s%s', &fenc, strlen(&ff) > 0 ? '['.&ff[0].']' : '')
+    endfunction
+    call airline#parts#define_function('myff', 'MyFF')
+    let g:airline_section_y = airline#section#create_right(['myff'])
+    " let g:airline_section_z = airline#section#create_right(['%2v', '%2p%%'])
+    let g:airline_section_z = airline#section#create_right(['%2v %2p%%'])
+" }
+else
+    Plug 'itchyny/lightline.vim'
+endif
+
+" NERDTree file browser plug-ing {
+    Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle' }
+    nmap <F2> :NERDTreeToggle<CR>
+    imap <F2> <C-O>:NERDTreeToggle<CR>
+    omap <F2> <C-C>:NERDTreeToggle<CR>
+" }
+
+    " syntax checker
+    Plug 'scrooloose/syntastic'
+
+" Fugitive plug-in {
+    " git helpers
+    Plug 'tpope/vim-fugitive'
+    " Plug 'airblade/vim-gitgutter'
+    " Extradite for fugitive
+    " Plug 'grota/vim-extradite'
+
+    " toggles the Fugitive status window.
+    function! s:GS_toggle()
+        for i in range(1, winnr('$'))
+            let bnum = winbufnr(i)
+            if getbufvar(bnum, '&filetype') == 'gitcommit'
+                execute "bdelete".bnum
+                return
+            endif
+        endfor
+        execute "topleft Gstatus"
+    endfunction
+
+    nnoremap <Leader>gb :Gblame -w<cr>
+    nnoremap <Leader>gc :Gcommit<cr>
+    nnoremap <Leader>gd :Gdiff<cr>
+    nnoremap <Leader>gs :Gstatus<cr>
+    " nnoremap <Leader>gp :Git push<cr>
+    " nnoremap <Leader>gr :Gremove<cr>
+    " nnoremap <Leader>gw :Gwrite<cr>
+
+    command! GSToggle call s:GS_toggle()
+    nmap <F9> :GSToggle<CR>
+    " autocmd Filetype gitcommit noremap <buffer> <ESC> <C-W>c
+" }
+
+    " three file diffs
+    " Plug 'sjl/splice.vim.git'
+
+" ctrlp.vim plug-in {
+    " fuzy file browser
+    Plug 'ctrlpvim/ctrlp.vim'
+    let s:cpsm_enabled = 1
+    let s:pymatcher_enabled = 0
+
+    " CtrlP browse buffers
+    nmap <leader>be :CtrlPBuffer<CR>
+
+    " work on tags
+    let g:ctrlp_extensions = ['tag']
+
+    " open files extra files in hidden buffers
+    let g:ctrlp_open_multiple_files = '1jr'
+
+    " special wildignore
+    let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+
+    " use ctrlp-cmatcher extension
+    " let g:ctrlp_match_func = {'match' : 'matcher#cmatch'}
+if s:cpsm_enabled
+    function! BuildCPSM(info)
+        " info is a dictionary with 3 fields
+        " - name:   name of the plugin
+        " - status: 'installed', 'updated', or 'unchanged'
+        " - force:  set on PlugInstall! or PlugUpdate!
+        if a:info.status == 'installed' || a:info.force
+            !PY3=ON ./install.sh
+        endif
+    endfunction
+
+    " cpsm, ctrlp matcher for paths
+    Plug 'nixprime/cpsm', { 'do': function('BuildCPSM') }
+
+    let g:ctrlp_match_func = {'match' : 'cpsm#CtrlPMatch'}
+elseif s:pymatcher_enabled
+    " use ctrlp-cmatcher extension, ctrlp-py-matcher
+    let g:ctrlp_match_func = {'match' : 'pymatcher#PyMatch'}
+endif
+
+    " keep current dir, avoid messin with submodules
+    let g:ctrlp_working_path_mode = 'wa'
+
+    " limit max number of files
+    let g:ctrlp_max_files = 100000
+
+    " indexing speed up
+    let s:ctrlp_git_command = 'cd %s && python ~/vimfiles/gitsub.py --rg'
+    if executable('rg')
+        " let s:ctrlp_git_command = 'rg --color=never --no-messages --glob "" --files %s'
+        let s:ctrlp_git_command = s:ctrlp_git_command . '--rg'
+        let g:ctrlp_use_caching = 0
+    endif
+    if has("unix")
+        let g:ctrlp_user_command = {
+            \ 'types': {
+                \ 1: ['.git', s:ctrlp_git_command],
+                \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+                \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
+                \ },
+            \ 'fallback': 'find %s -not -path "*/\.*" -type f \( ! -iname ".*" \)| head -50000'
+            \ }
+    else
+        " windows
+        let ctrlp_filter_greps = "".
+            \ 'grep -iv "\\.\\(' .
+            \ 'exe\|jar\|class\|swp\|swo\|log\|so\|o\|pyc\|jpe?g\|png\|gif\|mo\|po' .
+            \ 'o\|a\|obj\|com\|dll\|exe\|tmp\|docx\|pdf\|jpg\|png\|vsd\|zip' .
+            \ '\\)$"'
+        " vim currently broken
+        if executable('rg')
+            let g:ctrlp_fast_search = 'rg --color=never --no-messages --glob "" --files %s'
+        elseif executable('ag')
+            let g:ctrlp_fast_search = 'ag %s -l --nocolor -g ""'
+        else
+            let g:ctrlp_fast_search = 'dir %s /-n /b /s /a-d'
+        endif
+        let g:ctrlp_user_command = {
+            \ 'types': {
+                \ 1: ['.git', 'cd %s && python %%userprofile%%\\vimfiles\\gitsub.py'],
+                \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+                \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
+                \ },
+            \ 'fallback': g:ctrlp_fast_search,
+            \ }
+    endif
+" }
+
+
+    Plug 'scrooloose/nerdcommenter'
+
+" vimwiki plug-in {
+    let s:vimwiki_enabled = 0
+    if !empty(glob('~/Dropbox/vimwiki/'))
+        let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/'}]
+        let s:vimwiki_enabled = 1
+    elseif !empty(glob('~/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/vimwiki/'))
+        let g:vimwiki_list = [{'path': '~/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/vimwiki/'}]
+        let s:vimwiki_enabled = 1
+    endif
+    if s:vimwiki_enabled
+        Plug 'vimwiki/vimwiki'
+    endif
+" }
+
+
+    " expand selection incrementally (removed: not using it)
+    " Plug 'terryma/vim-expand-region'
+
+    " Plant UML syntax and helper
+    " Plug 'aklt/plantuml-syntax'
+
+    Plug 'ntpeters/vim-better-whitespace'
+
+    " Completion and highlighting while on active substitution
+    Plug 'osyo-manga/vim-over'
+
+    " Rust programming language
+    Plug 'rust-lang/rust.vim'
+
+    " Julia support
+    Plug 'JuliaEditorSupport/julia-vim'
+
+    " vim-runners, enable :Run script (save and execute)
+    Plug 'jfo/vim-runners'
+
+    " tmux integration
+if !has("gui_running")
+    Plug 'tmux-plugins/vim-tmux-focus-events'
+endif
+
+    " completion
+    let s:ycm_enabled    = 0
+    let s:clang_complete = 1
+
+if s:ycm_enabled
+" YouCompleteMe plug-in {
+    function! BuildYCM(info)
+        " info is a dictionary with 3 fields
+        " - name:   name of the plugin
+        " - status: 'installed', 'updated', or 'unchanged'
+        " - force:  set on PlugInstall! or PlugUpdate!
+        if a:info.status == 'installed' || a:info.force
+            !./install.py --racer-completer
+        endif
+    endfunction
+    Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
+    nnoremap <Leader>] :YcmCompleter GoTo<CR>
+    " let g:ycm_rust_src_path=expand("~/tools/rust/src")
+    " rustup 'rust-src' component installation path
+    let g:ycm_rust_src_path=substitute(system('echo `rustc --print sysroot`/lib/rustlib/src/rust/src'), "\n", "", "")
+    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+" }
+elseif s:clang_complete
+" Clang_complete {
+    function! BuildClangComp(info)
+        if a:info.status == 'installed' || a:info.force
+            !make install
+        endif
+    endfunction
+    Plug 'Rip-Rip/clang_complete', { 'do': function('BuildClangComp') }
+  if has("macunix")
+    let g:clang_use_library = 1
+    " let g:clang_library_path='/Applications/Xcode.app/Contents/Frameworks/libclang.dylib'
+    let g:clang_library_path='/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+    let g:clang_user_options = '-std=c++14'
+    let g:clang_complete_auto = 1
+    if s:ultisnips_enabled
+        let g:clang_snippets = 1
+        let g:clang_snippets_engine = 'ultisnips'
+    endif
+  endif
+" }
+endif
+
+    " Tab managers
+    let s:supertab_enabled   = 0
+    let s:mucomplete_enabled = 0
+    let s:clevertab_enabled  = 1
+
+if s:mucomplete_enabled || s:clevertab_enabled || s:supertab_enabled
+    " Keep <tab> for vim_mucomplete
+    let g:UltiSnipsExpandTrigger="<C-J>"
+    let g:UltiSnipsJumpForwardTrigger="<C-J>"
+    let g:UltiSnipsJumpBackwardTrigger="<C-K>"
+else
+    " let g:UltiSnipsListSnippets = "<c-tab>"
+    let g:UltiSnipsExpandTrigger = "<tab>"
+    let g:UltiSnipsJumpForwardTrigger = "<tab>"
+    let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+endif
+
+if s:supertab_enabled
+" SuperTab plug-in {
+    " use supertab to work sith YCM and UltiSnips
+    Plug 'ervandew/supertab'
+    " let g:SuperTabNoCompleteAfter =
+    " let g:SuperTabDefaultCompletionType = 'context'
+    let g:SuperTabContextDefaultCompletionType = '\t'
+    " consolidate space-tab to bare tab (easy way to force tab too)
+    let g:SuperTabMappingTabLiteral = '<C-T>'
+" }
+elseif s:mucomplete_enabled
+" Mucomplete plug-in {
+    Plug 'lifepillar/vim-mucomplete'
+    set noshowmode shortmess+=c   " Shut off completion messages
+    " set showmode shortmess-=c   " Shut off completion messages
+    set noinfercase
+    set completeopt-=preview
+    set completeopt+=longest
+    set completeopt+=menuone
+    set completeopt+=noselect
+    set completeopt+=noinsert
+    set belloff+=ctrlg " If Vim beeps during completion
+
+    " for auto completion
+    inoremap <expr> <c-e> mucomplete#popup_exit("\<c-e>")
+    inoremap <expr> <c-y> mucomplete#popup_exit("\<c-y>")
+    inoremap <expr>  <cr> mucomplete#popup_exit("\<cr>")
+    let g:mucomplete#enable_auto_at_startup = 1
+
+    imap <expr> <right> <plug>(MUcompleteCycFwd)
+
+    let g:mucomplete#chains = {
+      \ 'default' : ['path', 'omni', 'keyn', 'dict', 'uspl', 'ulti'],
+      \ 'vim'     : ['path', 'cmd', 'keyn', 'ulti']
+      \ }
+    autocmd filetype c,cpp MUcompleteAutoOn
+" }
+elseif s:clevertab_enabled
+" Clevertab {
+    " Forked 'neitanod/vim-clevertab'
+    Plug 'rene-aguirre/vim-clevertab'
+    inoremap <silent><tab> <c-r>=CleverTab#Complete('start')<cr>
+                        \<c-r>=CleverTab#Complete('tab')<cr>
+                        \<c-r>=CleverTab#Complete('ultisnips')<cr>
+                        \<c-r>=CleverTab#Complete('keyword')<cr>
+                        \<c-r>=CleverTab#Complete('omni')<cr>
+                        \<c-r>=CleverTab#Complete('stop')<cr>
+    inoremap <silent><s-tab> <c-r>=CleverTab#Complete('prev')<cr>
+" }
+else
+    Plug 'ajh17/VimCompletesMe'
+endif
+
+    Plug 'keith/swift.vim', { 'for': 'swift' }
+
+" smartword plug-in {
+    " Convenient work motions
+    Plug 'kana/vim-smartword'
+    " Replace |w| and others with |smartword-mappings|:
+	map w  <Plug>(smartword-w)
+	map b  <Plug>(smartword-b)
+	map e  <Plug>(smartword-e)
+	map ge  <Plug>(smartword-ge)
+" }
+
+" FastFold plug-in {
+    " start with folding disabled
+    set nofoldenable
+    set foldmethod=syntax
+    Plug 'Konfekt/FastFold'
+" }
+
+" Startify plug-in {
+    Plug 'mhinz/vim-startify'
+    let s:padding_left = repeat(' ', 3)
+    let g:startify_list_order = [
+        \ [s:padding_left .'MRU '. getcwd()], 'dir',
+        \ [s:padding_left .'MRU'],            'files',
+        \ [s:padding_left .'Sessions'],       'sessions',
+        \ [s:padding_left .'Bookmarks'],      'bookmarks',
+        \ [s:padding_left .'Commands'],       'commands',
+        \ ]
+
+    let g:ascii = [
+            \ '        __',
+            \ '.--.--.|==|.--------.',
+            \ '|  |  ||  ||  .  .  |',
+            \ ' \___/ |__|.__|__|__.',
+            \]
+
+    " always keep my current dir
+    let g:startify_change_to_dir = 0
+" }
+
+    Plug 'neomake/neomake'
+
+    Plug 'ludovicchabant/vim-gutentags'
+
+    Plug 'octol/vim-cpp-enhanced-highlight'
+
+    Plug 'ryanoasis/vim-devicons'
+    let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+    let g:DevIconsEnableFoldersOpenClose = 1
+
+    Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+call plug#end()
+
+let g:startify_custom_header = g:ascii + startify#fortune#boxed()
+
+    " Extended %
+    runtime macros/matchit.vim
+
+    filetype plugin on
+    filetype plugin indent on " allow plug-ins to detect filetypes
+" }
+
+
+" seoul256 (dark):
+" "   Range:   233 (darkest) ~ 239 (lightest)
+" "   Default: 237
+let g:seoul256_background = 236
+" " seoul256 (light):
+" "   Range:   252 (darkest) ~ 256 (lightest)
+" "   Default: 253
+" let g:seoul256_background = 256
+colorscheme seoul256
 
