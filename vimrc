@@ -864,6 +864,10 @@ endif
     nmap <F2> :NERDTreeToggle<CR>
     imap <F2> <C-O>:NERDTreeToggle<CR>
     omap <F2> <C-C>:NERDTreeToggle<CR>
+
+    let g:NERDTreeLimitedSyntax = 1
+    " let g:NERDTreeHighlightCursorline = 0
+    Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 " }
 
     " syntax checker
@@ -1195,13 +1199,13 @@ endif
 
     Plug 'ludovicchabant/vim-gutentags'
 
-    Plug 'octol/vim-cpp-enhanced-highlight'
+    let c_no_curly_error = 1
+    Plug 'bfrg/vim-cpp-modern'
 
     Plug 'ryanoasis/vim-devicons'
     let g:WebDevIconsUnicodeDecorateFolderNodes = 1
     let g:DevIconsEnableFoldersOpenClose = 1
 
-    Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 call plug#end()
 
 let g:startify_custom_header = g:ascii + startify#fortune#boxed()
@@ -1217,7 +1221,7 @@ let g:startify_custom_header = g:ascii + startify#fortune#boxed()
 " seoul256 (dark):
 " "   Range:   233 (darkest) ~ 239 (lightest)
 " "   Default: 237
-let g:seoul256_background = 236
+let g:seoul256_background = 237
 " " seoul256 (light):
 " "   Range:   252 (darkest) ~ 256 (lightest)
 " "   Default: 253
