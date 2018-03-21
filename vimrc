@@ -382,6 +382,8 @@ noremap <S-C-h> :%s#\<<c-r>=expand("<cword>")<CR>\>#
 " supress "Press Enter..." prompt
 " set shortmess+=a
 " set cmdheight=2
+set equalalways
+set eadirection=ver
 
 function! GetFtExtension(sFt, sFile, sRootPrefix, bIsUnix)
 " sFt, given filetype
@@ -523,8 +525,8 @@ function! Grep(args, ignorecase)
     exec "redraw!"
 endfunction
 
-    command! -nargs=1 G call Grep('<args>', 0)
-    command! -nargs=1 Gi call Grep('<args>', 1)
+    command! -complete=tag -nargs=1 G call Grep('<args>', 0)
+    command! -complete=tag -nargs=1 Gi call Grep('<args>', 1)
 
     " find in git repo with fugitive
     noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") .
@@ -642,12 +644,12 @@ set viminfo='50,f1
 
 function! s:ExecuteInShell(command)
   let command = join(map(split(a:command), 'expand(v:val)'))
-  let winnr = bufwinnr('^' . command . '$')
-  silent! execute  winnr < 0 ? 'botright new ' . fnameescape(command) : winnr . 'wincmd w'
+  let winnr = bufwinnr('^' . fnameescape('sh_out') . '$')
+  silent! execute  winnr < 0 ? 'botright new ' . fnameescape('sh_out') : winnr . 'wincmd w'
   setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
   echo 'Execute ' . command . '...'
   silent! execute 'silent %!'. command
-  silent! execute 'resize ' . line('$')
+  silent! execute winnr < 0 ? 'resize ' . min([6, line('$')]) : ''
   silent! redraw
   silent! execute 'au BufUnload <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
   silent! execute 'nnoremap <silent> <buffer> <LocalLeader>r :call <SID>ExecuteInShell(''' . command . ''')<CR>'
