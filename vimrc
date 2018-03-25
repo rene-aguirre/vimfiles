@@ -69,7 +69,6 @@ if has("autocmd")
 
     autocmd filetype rust compiler cargo
 
-    autocmd filetype gitcommit setlocal spell spelllang=en_us
     autocmd filetype markdown setlocal spell spelllang=en_us
 
     " Change Color when entering Insert Mode
@@ -82,6 +81,10 @@ if has("autocmd")
         autocmd QuickFixCmdPre *grep* call Tcd()
         autocmd QuickFixCmdPost * botright cwindow 5
     endif
+
+    " resize windows when vim changes size
+    autocmd VimResized * wincmd =
+
     augroup end
 
 endif " has("autocmd")
@@ -362,6 +365,7 @@ endfunction
 
 command! Bd call s:bd_split()
 set splitright
+set splitbelow
 
 map <F1> <Esc>
 map! <F1> <Esc>
@@ -888,10 +892,12 @@ endif
             let bnum = winbufnr(i)
             if getbufvar(bnum, '&filetype') == 'gitcommit'
                 execute "bdelete".bnum
+                execute "normal \<C-W>="
                 return
             endif
         endfor
-        execute "topleft Gstatus"
+        execute "Gstatus"
+        execute "normal \<C-W>K"
     endfunction
 
     nnoremap <Leader>gb :Gblame -w<cr>
@@ -904,7 +910,8 @@ endif
 
     command! GSToggle call s:GS_toggle()
     nmap <F9> :GSToggle<CR>
-    " autocmd Filetype gitcommit noremap <buffer> <ESC> <C-W>c
+    autocmd filetype gitcommit setlocal spell spelllang=en_us
+    " autocmd filetype gitcommit noremap <buffer> <ESC> <C-W>c
 " }
 
     " three file diffs
@@ -1074,8 +1081,10 @@ elseif s:clang_complete
     Plug 'Rip-Rip/clang_complete', { 'do': function('BuildClangComp') }
   if has("macunix")
     let g:clang_use_library = 1
-    " let g:clang_library_path='/Applications/Xcode.app/Contents/Frameworks/libclang.dylib'
     let g:clang_library_path='/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+    if (empty(glob(g:clang_library_path)))
+        let g:clang_library_path='/Applications/Xcode.app/Contents/Frameworks/libclang.dylib'
+    endif
     let g:clang_user_options = '-std=c++14'
     let g:clang_complete_auto = 1
     if s:ultisnips_enabled
