@@ -364,8 +364,9 @@ function! s:bd_split()
 endfunction
 
 command! Bd call s:bd_split()
-set splitright
-set splitbelow
+
+" set splitright
+"set splitbelow
 
 map <F1> <Esc>
 map! <F1> <Esc>
@@ -716,10 +717,9 @@ if has('nvim')
 endif
 
 " clang-format helper
-vnoremap <C-I> :pyfile ~/vimfiles/clang-format.py<cr>
-nnoremap <C-I> :pyfile ~/vimfiles/clang-format.py<cr>
+vnoremap <Leader>c :pyfile ~/vimfiles/clang-format.py<cr>
+nnoremap <Leader>c :pyfile ~/vimfiles/clang-format.py<cr>
 " use g:clang_format_path for custom tool path
-
 
 " Pluggin management {
 "
@@ -870,10 +870,12 @@ endif
     nmap <F2> :NERDTreeToggle<CR>
     imap <F2> <C-O>:NERDTreeToggle<CR>
     omap <F2> <C-C>:NERDTreeToggle<CR>
+    nmap <leader>r :NERDTreeFind<cr>
 
     let g:NERDTreeLimitedSyntax = 1
     " let g:NERDTreeHighlightCursorline = 0
     Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+
 " }
 
     " syntax checker
@@ -1073,12 +1075,7 @@ if s:ycm_enabled
 " }
 elseif s:clang_complete
 " Clang_complete {
-    function! BuildClangComp(info)
-        if a:info.status == 'installed' || a:info.force
-            !make install
-        endif
-    endfunction
-    Plug 'Rip-Rip/clang_complete', { 'do': function('BuildClangComp') }
+    Plug 'Rip-Rip/clang_complete'
   if has("macunix")
     let g:clang_use_library = 1
     let g:clang_library_path='/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
