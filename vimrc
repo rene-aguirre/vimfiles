@@ -225,8 +225,8 @@ if has("autocmd")
     " makefiles retain tabs
     autocmd filetype make setlocal ts=4 sw=4 noexpandtab
 
-    " javascript size 2 tabstop
-    autocmd filetype javascript setlocal ts=2 sw=2
+    " webi tems size 2 tabstop
+    autocmd filetype html,json,javascript,xml,cmake setlocal ts=2 sw=2
 
 endif
 " }
@@ -563,7 +563,6 @@ endfunction
     set notagrelative
 " }
 
-
 " Syntastic plug-in {
     " pylint slows down on write, I run it manually with :make
     let g:syntastic_mode_map = {
@@ -571,22 +570,18 @@ endfunction
         \ "passive_filetypes": ["python"]
         \ }
     " default all are active_filetypes
-    if executable('clang-5.0')
-        let g:syntastic_cpp_compiler = 'clang-5.0'
-    elseif executable('g++-7.1')
-        let g:syntastic_cpp_compiler = 'g++-7.1'
-    elseif executable('g++-7')
-        let g:syntastic_cpp_compiler = 'g++-7'
-    elseif executable('clang++')
+    if executable('clang++')
         let g:syntastic_cpp_compiler = 'clang++'
+        let g:syntastic_cpp_compiler_options = ' -std=c++14 -Weverything -Wno-c++98-compat'
     else
         let g:syntastic_cpp_compiler = 'g++'
+        let g:syntastic_cpp_compiler_options = ' -std=c++14 -Wall -Wextra'
     endif
     " let g:syntastic_cpp_compiler_options = ' -std=c++1z -stdlib=libc++ -Wall -Wextra'
     " -stdlib=libc++ not supported on gcc (implicit?)
-    let g:syntastic_cpp_compiler_options = ' -std=c++14 -Wall -Wextra'
     " Use compilation databases (generate with Cmake of Build EAR)
     let g:syntastic_cpp_clang_tidy_post_args = ""
+    let g:syntastic_c_clang_tidy_post_args = ""
 " }
 
 " F5 as running current file
@@ -667,8 +662,8 @@ function! s:s_build(...)
 	execute ":wall"
 	try
 	    let makeprg_bak = &g:makeprg
-        if (! empty(glob('./build.sh')))
-            execute ':set makeprg=source\ ./build.sh'
+        if (! empty(glob('./build.sh~')))
+            execute ':set makeprg=source\ ./build.sh~'
         elseif (! empty(glob('./CMakeLists.txt')))
             if (empty(glob('./build')))
                 execute "!mkdir ./build"
@@ -739,6 +734,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-surround'
 
     Plug 'gorkunov/smartpairs.vim'
+
+    Plug 'Vimjas/vim-python-pep8-indent'
 
 " Tagbar plug-in {
     " better than taglist
@@ -1042,9 +1039,6 @@ endif
     " Julia support
     Plug 'JuliaEditorSupport/julia-vim'
 
-    " vim-runners, enable :Run script (save and execute)
-    Plug 'jfo/vim-runners'
-
     " tmux integration
 if !has("gui_running")
     Plug 'tmux-plugins/vim-tmux-focus-events'
@@ -1214,6 +1208,12 @@ endif
     let g:WebDevIconsUnicodeDecorateFolderNodes = 1
     let g:DevIconsEnableFoldersOpenClose = 1
 
+" Emmet plug-in {
+    Plug 'mattn/emmet-vim'
+    let g:user_emmet_install_global = 0
+    autocmd FileType html,css,xml EmmetInstall
+" }
+
 call plug#end()
 
 let g:startify_custom_header = g:ascii + startify#fortune#boxed()
@@ -1225,6 +1225,41 @@ let g:startify_custom_header = g:ascii + startify#fortune#boxed()
     filetype plugin indent on " allow plug-ins to detect filetypes
 " }
 
+command! -nargs=? -range Dec2hex call s:Dec2hex(<line1>, <line2>, '<args>')
+function! s:Dec2hex(line1, line2, arg) range
+  if empty(a:arg)
+    if histget(':', -1) =~# "^'<,'>" && visualmode() !=# 'V'
+      let cmd = 's/\%V\<\d\+\>/\=printf("0x%x",submatch(0)+0)/g'
+    else
+      let cmd = 's/\<\d\+\>/\=printf("0x%x",submatch(0)+0)/g'
+    endif
+    try
+      execute a:line1 . ',' . a:line2 . cmd
+    catch
+      echo 'Error: No decimal number found'
+    endtry
+  else
+    echo printf('%x', a:arg + 0)
+  endif
+endfunction
+
+command! -nargs=? -range Hex2dec call s:Hex2dec(<line1>, <line2>, '<args>')
+function! s:Hex2dec(line1, line2, arg) range
+  if empty(a:arg)
+    if histget(':', -1) =~# "^'<,'>" && visualmode() !=# 'V'
+      let cmd = 's/\%V0x\x\+/\=submatch(0)+0/g'
+    else
+      let cmd = 's/0x\x\+/\=submatch(0)+0/g'
+    endif
+    try
+      execute a:line1 . ',' . a:line2 . cmd
+    catch
+      echo 'Error: No hex number starting "0x" found'
+    endtry
+  else
+    echo (a:arg =~? '^0x') ? a:arg + 0 : ('0x'.a:arg) + 0
+  endif
+endfunction
 
 " seoul256 (dark):
 " "   Range:   233 (darkest) ~ 239 (lightest)
@@ -1235,4 +1270,12 @@ let g:seoul256_background = 237
 " "   Default: 253
 " let g:seoul256_background = 256
 colorscheme seoul256
+
+set errorformat^=%-G%f:%l:\ WARNING\ %m
+" cmocka
+set errorformat^=\[\ \ \ LINE\ \ \ \]\ ---\ %f:%l:\ %m
+
+if (!empty(glob('.vimrc~')))
+    source .vimrc~
+endif
 
