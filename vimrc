@@ -6,7 +6,9 @@
 set nocompatible
 filetype off
 set encoding=utf-8
-"
+
+filetype plugin on
+filetype plugin indent on " allow plug-ins to detect filetypes
 
 " Don't use Ex mode, use Q for formatting
 nnoremap Q gq
@@ -249,9 +251,6 @@ set statusline +=%*0x%04B\ %*          "character under cursor
 set vb
 "set fdm=marker
 "set nofen
-
-" set background=light
-" colorscheme PaperColor
 
 " Fonts {
 if has("gui_gtk2")
@@ -716,6 +715,7 @@ vnoremap <Leader>c :pyfile ~/vimfiles/clang-format.py<cr>
 nnoremap <Leader>c :pyfile ~/vimfiles/clang-format.py<cr>
 " use g:clang_format_path for custom tool path
 
+" ------------------
 " Pluggin management {
 "
 " plug.vim is in my vimfiles/autoload repo
@@ -723,19 +723,23 @@ set rtp+=~/vimfiles
 call plug#begin('~/.vim/plugged')
     " Make sure to use single quotes
     "
-    " Popular color schems
+" Popular color schemes {
     Plug 'crusoexia/vim-monokai'
     Plug 'NLKNguyen/papercolor-theme'
     Plug 'altercation/vim-colors-solarized'
     Plug 'junegunn/seoul256.vim'
+" }
 
-    " original repos on github
+"text object, motion plug-ins {
+    " delimited-object-deletions
+    Plug 'machakann/vim-textobj-delimited'
+
     " handle brackets, quotes, etc. easier
     Plug 'tpope/vim-surround'
 
     Plug 'gorkunov/smartpairs.vim'
+" }
 
-    Plug 'Vimjas/vim-python-pep8-indent'
 
 " Tagbar plug-in {
     " better than taglist
@@ -810,6 +814,7 @@ if s:ultisnips_enabled
     Plug 'honza/vim-snippets'
     " C++ Algorithms snippets (using mnemonics)
     Plug 'dawikur/algorithm-mnemonics.vim'
+" }
 endif
 
     " <leader>bd buffer delete & keep layout
@@ -875,6 +880,7 @@ endif
 
 " }
 
+    " tags: syntax
     " syntax checker
     Plug 'scrooloose/syntastic'
 
@@ -1004,7 +1010,6 @@ endif
     endif
 " }
 
-
     Plug 'scrooloose/nerdcommenter'
 
 " vimwiki plug-in {
@@ -1021,7 +1026,6 @@ endif
     endif
 " }
 
-
     " expand selection incrementally (removed: not using it)
     " Plug 'terryma/vim-expand-region'
 
@@ -1033,23 +1037,39 @@ endif
     " Completion and highlighting while on active substitution
     Plug 'osyo-manga/vim-over'
 
+" programming languages {
     " Rust programming language
-    Plug 'rust-lang/rust.vim'
+    Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 
     " Julia support
-    Plug 'JuliaEditorSupport/julia-vim'
+    Plug 'JuliaEditorSupport/julia-vim', { 'for': 'julia' }
+
+    " tags: python, pep8, syntax
+    Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
+
+    " swift
+    Plug 'keith/swift.vim', { 'for': 'swift' }
+
+    let c_no_curly_error = 1
+    Plug 'bfrg/vim-cpp-modern', { 'for': 'cpp' }
+
+    " C, C++, python, gdb, lldb, pdb, debug
+    Plug 'sakhnik/nvim-gdb', { 'for': ['python', 'c', 'cpp'] }
+
+
+" }
 
     " tmux integration
 if !has("gui_running")
     Plug 'tmux-plugins/vim-tmux-focus-events'
 endif
 
-    " completion
+" tags: completion {
     let s:ycm_enabled    = 0
     let s:clang_complete = 1
 
 if s:ycm_enabled
-" YouCompleteMe plug-in {
+  " YouCompleteMe plug-in {
     function! BuildYCM(info)
         " info is a dictionary with 3 fields
         " - name:   name of the plugin
@@ -1066,9 +1086,9 @@ if s:ycm_enabled
     let g:ycm_rust_src_path=substitute(system('echo `rustc --print sysroot`/lib/rustlib/src/rust/src'), "\n", "", "")
     let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-" }
+  " }
 elseif s:clang_complete
-" Clang_complete {
+  " Clang_complete {
     Plug 'Rip-Rip/clang_complete'
   if has("macunix")
     let g:clang_use_library = 1
@@ -1083,10 +1103,11 @@ elseif s:clang_complete
         let g:clang_snippets_engine = 'ultisnips'
     endif
   endif
-" }
+  " }
 endif
+" } tags: completion
 
-    " Tab managers
+" Tab ("\t") managers {
     let s:supertab_enabled   = 0
     let s:mucomplete_enabled = 0
     let s:clevertab_enabled  = 1
@@ -1155,8 +1176,7 @@ elseif s:clevertab_enabled
 else
     Plug 'ajh17/VimCompletesMe'
 endif
-
-    Plug 'keith/swift.vim', { 'for': 'swift' }
+" } Tab managers
 
 " smartword plug-in {
     " Convenient work motions
@@ -1197,16 +1217,17 @@ endif
     let g:startify_change_to_dir = 0
 " }
 
+if has('nvim')
     Plug 'neomake/neomake'
+endif
 
+" UI customization {
     Plug 'ludovicchabant/vim-gutentags'
-
-    let c_no_curly_error = 1
-    Plug 'bfrg/vim-cpp-modern'
 
     Plug 'ryanoasis/vim-devicons'
     let g:WebDevIconsUnicodeDecorateFolderNodes = 1
     let g:DevIconsEnableFoldersOpenClose = 1
+" }  UI customization
 
 " Emmet plug-in {
     Plug 'mattn/emmet-vim'
@@ -1216,16 +1237,13 @@ endif
 
 call plug#end()
 
-let g:startify_custom_header = g:ascii + startify#fortune#boxed()
-
-    " Extended %
-    runtime macros/matchit.vim
-
-    filetype plugin on
-    filetype plugin indent on " allow plug-ins to detect filetypes
 " }
 
-command! -nargs=? -range Dec2hex call s:Dec2hex(<line1>, <line2>, '<args>')
+let g:startify_custom_header = g:ascii + startify#fortune#boxed()
+
+" tags: textobj, motion, Extended %
+runtime macros/matchit.vim
+
 function! s:Dec2hex(line1, line2, arg) range
   if empty(a:arg)
     if histget(':', -1) =~# "^'<,'>" && visualmode() !=# 'V'
@@ -1243,7 +1261,6 @@ function! s:Dec2hex(line1, line2, arg) range
   endif
 endfunction
 
-command! -nargs=? -range Hex2dec call s:Hex2dec(<line1>, <line2>, '<args>')
 function! s:Hex2dec(line1, line2, arg) range
   if empty(a:arg)
     if histget(':', -1) =~# "^'<,'>" && visualmode() !=# 'V'
@@ -1261,6 +1278,9 @@ function! s:Hex2dec(line1, line2, arg) range
   endif
 endfunction
 
+command! -nargs=? -range Hex2dec call s:Hex2dec(<line1>, <line2>, '<args>')
+command! -nargs=? -range Dec2hex call s:Dec2hex(<line1>, <line2>, '<args>')
+
 " seoul256 (dark):
 " "   Range:   233 (darkest) ~ 239 (lightest)
 " "   Default: 237
@@ -1268,13 +1288,13 @@ let g:seoul256_background = 237
 " " seoul256 (light):
 " "   Range:   252 (darkest) ~ 256 (lightest)
 " "   Default: 253
-" let g:seoul256_background = 256
 colorscheme seoul256
 
 set errorformat^=%-G%f:%l:\ WARNING\ %m
 " cmocka
 set errorformat^=\[\ \ \ LINE\ \ \ \]\ ---\ %f:%l:\ %m
 
+" source any local project config
 if (!empty(glob('.vimrc~')))
     source .vimrc~
 endif
