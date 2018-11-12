@@ -521,12 +521,12 @@ endif
     " Completion and highlighting while on active substitution
     Plug 'osyo-manga/vim-over'
 
-" programming languages {
+" programming languages, syntax addition {
     " Rust programming language
     Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 
-    " Julia support
-    Plug 'JuliaEditorSupport/julia-vim', { 'for': 'julia' }
+    " Julia support, broken with 'for':'julia setting
+    Plug 'JuliaEditorSupport/julia-vim'
 
     " tags: python, pep8, syntax
     Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
@@ -546,9 +546,7 @@ endif
 
 " }
 
-if has("gui_running")
-    exec 'source' s:cfg_path .'/utils/gui.vim
-else
+if !has("gui_running")
     " tmux integration
     Plug 'tmux-plugins/vim-tmux-focus-events'
 endif
@@ -600,7 +598,7 @@ call plug#end()
 let g:startify_custom_header = g:ascii + startify#fortune#boxed()
 
 " tags: textobj, motion, Extended %
-runtime macros/matchit.vim
+"runtime macros/matchit.vim
 
 " seoul256 (dark):
 " "   Range:   233 (darkest) ~ 239 (lightest)
@@ -614,6 +612,18 @@ colorscheme seoul256
 set errorformat^=%-G%f:%l:\ WARNING\ %m
 " cmocka
 set errorformat^=\[\ \ \ LINE\ \ \ \]\ ---\ %f:%l:\ %m
+
+if has("gui_running")
+    exec 'source' s:cfg_path .'/utils/gui.vim'
+endif
+exec 'source' s:cfg_path .'/utils/grep.vim'
+exec 'source' s:cfg_path .'/utils/build.vim'
+exec 'source' s:cfg_path .'/utils/hex2dec.vim'
+exec 'source' s:cfg_path .'/utils/indent.vim'
+exec 'source' s:cfg_path .'/utils/shell.vim'
+
+" this improves XML syntax highlighting with huge files
+let g:xml_namespace_transparent=1
 
 " source any local project config
 if (!empty(glob('.vimrc~')))
