@@ -213,7 +213,8 @@ if has("gui_gtk2")
     set guifont=DejaVu\ Sans\ Mono\ 10,Fixed\ 12
     " set guifontwide=Microsoft\ Yahei\ 12,WenQuanYi\ Zen\ Hei\ 12
 else
-    set guifont=FuraCode\ Nerd\ Font\ Mono:h14,mononoki\ Nerd\ Font\ Mono:h14,
+    "https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/Hack/Regular/complete
+    set guifont=Hack\ Nerd\ Font\ Mono:h13,mononoki\ Nerd\ Font\ Mono:h14,
                 \Mononoki:h14,Monaco:h13,DejaVu\ Sans\ Mono:h9,Consolas:h10
 endif
 " }
@@ -342,8 +343,10 @@ endfunction
 		command! BuildTags execute '!' . expand('~') .
 		    \ "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
 	else
+	    " brew install universal-ctags
+	    " brew install --HEAD universal-ctags/universal-ctags/universal-ctags
 		command! BuildTags execute '!' .
-		    \ "ctags -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+		    \ "ctags -R --c++-kinds=+p --ObjectiveC-kinds=+p --fields=+iaS --extras=+q ."
 	endif
 	set tags=./tags;
     " work with git hooks (so top level repo path applies)
@@ -541,7 +544,12 @@ endif
     Plug 'sakhnik/nvim-gdb', { 'for': ['python', 'c', 'cpp'] }
 
 if has("autocmd")
-    autocmd filetype cpp setlocal matchpairs+=<:>
+    autocmd filetype cpp,objcpp setlocal matchpairs+=<:>
+    autocmd filetype objcpp setlocal synmaxcol=512
+    autocmd filetype objc setlocal synmaxcol=512
+    " refresh ObjC++ on read (some detection issues)
+    autocmd bufreadpost,bufnewfile *.mm set filetype=objcpp
+    autocmd bufreadpost,bufnewfile *.m set filetype=objc
 endif
 
 " }
