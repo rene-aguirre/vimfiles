@@ -1,10 +1,9 @@
-if executable("rg")
-    " use ripgrep when available
-    let s:rg_grepprg="rg --vimgrep --no-heading --no-messages "
-    let s:rg_grepformat="%f:%l:%c:%m,%f:%l:%m"
-    " default
-    let &grepprg=s:rg_grepprg
-    let &grepformat=s:rg_grepformat
+
+" use ripgrep as default 'grep' if available
+if executable("/usr/local/bin/rg")
+    let s:rg_path="/usr/local/bin/rg""
+else
+    let s:rg_path="rg"
 endif
 
 function! GetRgRepoGrep()
@@ -18,10 +17,9 @@ function! GetRgRepoGrep()
     return "grep! "
 endfunction
 
-function! GetFtExtension(sFt, sFile, sRootPrefix, bIsUnix)
+function! GetFtExtension(sFt, sFile, bIsUnix)
 " sFt, given filetype
 " sFile, reference filename
-" sRootPrefix, top level path
 
 if a:sFile == ''
     return
@@ -47,21 +45,10 @@ if default_ext and default_ext.startswith('.'):
 all_ext = ft_map.get(vim.eval("a:sFt"), [default_ext,])
 
 if default_ext and default_ext not in all_ext:
-# desirable to include current file ext
+    # desirable to include current file ext too
     all_ext.insert(0, default_ext)
 
-if vim.eval("a:sRootPrefix").strip():
-    if default_ext:
-        if vim.eval("a:bIsUnix") == '1':
-            if len(all_ext) == 1:
-                result_str = os.path.join(vim.eval("a:sRootPrefix").strip(), "'*." + all_ext[0].strip()) + "'"
-            else:
-                result_str = os.path.join(vim.eval("a:sRootPrefix").strip(), "'*.{" + ",".join([the_file.strip() for the_file in all_ext]) + "}'")
-        else:
-            result_str = " ".join([os.path.join(vim.eval("a:sRootPrefix").strip(), '*.'+the_file.strip()) for the_file in all_ext])
-    else:
-        result_str = os.path.split( vim.eval("a:sFile") )[1]
-elif default_ext:
+if default_ext:
     if vim.eval("a:bIsUnix") == '1':
         if len(all_ext) == 1:
             result_str = "'*." + all_ext[0].strip() + "'"
@@ -110,7 +97,13 @@ endfunction
 " find in git repo with fugitive
 noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") .
     \ " -- " . GetFtExtension(&filetype, bufname('%'), '', has("unix"))<CR>
-if executable("rg")
+
+" ff: find in filetype grep helper
+if executable(s:rg_path)
+    " as default grep
+    let s:rg_grepprg=s:rg_path . " --vimgrep --no-heading --no-messages "
+    let s:rg_grepformat="%f:%l:%c:%m,%f:%l:%m"
+
     noremap <leader>ff :silent  <c-r>=GetRgRepoGrep() .
         \ GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
 elseif has("unix")
