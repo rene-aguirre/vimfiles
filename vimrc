@@ -451,13 +451,14 @@ call plug#begin('~/.vim/plugged')
 " }
 
 "text object, motion plug-ins {
-    " delimited-object-deletions
-    Plug 'machakann/vim-textobj-delimited'
 
     " handle brackets, quotes, etc. easier
     Plug 'tpope/vim-surround'
 
     Plug 'gorkunov/smartpairs.vim'
+
+    " more object motions, tweaks default ones too
+    Plug 'wellle/targets.vim'
 " }
 
     " my personal stuff

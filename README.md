@@ -2,6 +2,7 @@
 
 If you run into any issue: GIYF ;-)
 
+Feel free to clone this repo and tune to your taste.
 
 ## Requirements
 
@@ -11,7 +12,7 @@ If you run into any issue: GIYF ;-)
 
  * git, cmake, ripgrep
 
- * (Hack Nerd font)[https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/Hack/Regular/complete]
+ * [Hack Nerd font](https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/Hack/Regular/complete)
 
  * cmake
 
@@ -54,6 +55,17 @@ show in `:version` or checking the output of `:set runtimepath` command from nvi
 
 ## Plugins
 
-This configuration uses (vim-plug)[https://github.com/junegunn/vim-plug] to manage plug-ins
+This configuration uses [vim-plug](https://github.com/junegunn/vim-plug) to manage plug-ins
 installations and upgrades.
+
+Included:
+
+## Text manipulation
+
+ - [vim-surround](https://github.com/tpope/vim-surround) `cs` _change surround_ +  _motion_
+
+ - [targets.vim](https://github.com/wellle/targets.vim) more motion objects
+
+ - [smartpairs.vim](https://github.com/gorkunov/smartpairs.vim) select inside extended text blocks
+
 
