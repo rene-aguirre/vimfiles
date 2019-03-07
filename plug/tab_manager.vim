@@ -5,10 +5,10 @@
     let s:clevertab_enabled  = 1
 
 if s:mucomplete_enabled || s:clevertab_enabled || s:supertab_enabled
-    " Keep <tab> for vim_mucomplete
-    let g:UltiSnipsExpandTrigger="<C-J>"
-    let g:UltiSnipsJumpForwardTrigger="<C-J>"
-    let g:UltiSnipsJumpBackwardTrigger="<C-K>"
+    " Neither Tab nor <C-J> / <C-K> 
+    let g:UltiSnipsExpandTrigger="∆" " <Option-j>
+    let g:UltiSnipsJumpForwardTrigger="∆"
+    let g:UltiSnipsJumpBackwardTrigger="˚" " <Option-k>
 else
     " let g:UltiSnipsListSnippets = "<c-tab>"
     let g:UltiSnipsExpandTrigger = "<tab>"
@@ -60,12 +60,23 @@ elseif s:clevertab_enabled
     inoremap <silent><tab> <c-r>=CleverTab#Complete('start')<cr>
                         \<c-r>=CleverTab#Complete('tab')<cr>
                         \<c-r>=CleverTab#Complete('ultisnips')<cr>
-                        \<c-r>=CleverTab#Complete('keyword')<cr>
                         \<c-r>=CleverTab#Complete('omni')<cr>
+                        \<c-r>=CleverTab#Complete('keyword')<cr>
+                        \<c-r>=CleverTab#Complete('file')<cr>
+                        \<c-r>=CleverTab#Complete('nopumtab')<cr>
                         \<c-r>=CleverTab#Complete('stop')<cr>
     inoremap <silent><s-tab> <c-r>=CleverTab#Complete('prev')<cr>
 " }
 else
     Plug 'ajh17/VimCompletesMe'
 endif
+
+" enter to accept choice, <Esc> to cancel completions (keeps insert mode)
+inoremap <expr> <CR>  pumvisible() ? "\<C-y>" : "\<CR>"
+inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
+
+" Ctrl-P like mappings
+inoremap <expr> <C-j> pumvisible() ?  "\<Down>" : "\<C-j>"
+inoremap <expr> <C-k> pumvisible() ?  "\<Up>"   : "\<C-k>"
+
 " } Tab managers
