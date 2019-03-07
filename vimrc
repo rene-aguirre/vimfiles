@@ -136,7 +136,7 @@ endif
 " Ctrl-V and SHIFT-Insert are Paste
 vnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
 inoremap <C-V>  <C-O>:set paste<CR><C-O>"+gP<C-O>:set nopaste<CR>
-cmap     <C-V>  <C-R>+
+cnoremap <C-V>  <C-R>+
 
 " CTRL-Z is Undo, insert only
 inoremap <C-Z> <C-O>u
@@ -519,10 +519,7 @@ endif
 
     " Plant UML syntax and helper
     " Plug 'aklt/plantuml-syntax'
-
-    Plug 'ntpeters/vim-better-whitespace'
-
-    " Completion and highlighting while on active substitution
+    " :OverCommandLine for completion/highlight %s commands
     Plug 'osyo-manga/vim-over'
 
 " programming languages, syntax addition {
