@@ -536,7 +536,7 @@ endif
     Plug 'keith/swift.vim', { 'for': 'swift' }
 
     let c_no_curly_error = 1
-    Plug 'bfrg/vim-cpp-modern', { 'for': 'cpp' }
+    Plug 'bfrg/vim-cpp-modern', { 'for': ['cpp', 'objcpp'] }
 
     " C, C++, python, gdb, lldb, pdb, debug
     Plug 'sakhnik/nvim-gdb', { 'for': ['python', 'c', 'cpp'] }
