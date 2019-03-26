@@ -4,6 +4,8 @@ If you run into any issue: GIYF ;-)
 
 Feel free to clone this repo and tune to your taste.
 
+For macOS quick installation: `./install_macos.sh`
+
 ## Requirements
 
  * NoeVim or Vim with working Python2/Python3 (use `:checkhealth` on NeoVim to validate).
@@ -17,9 +19,11 @@ Feel free to clone this repo and tune to your taste.
  * cmake
 
  * ripgrep
+ 
+ * ctags, universal-ctags prefered.
 
 
-## Mac OS X installation
+## Manual macOS  installation
 
  * Install XCode command line tools (if you can compile and run C/C++ you might be fine).
 
@@ -27,6 +31,8 @@ Feel free to clone this repo and tune to your taste.
    fix your path (`/usr/local/bin` in front of current python path).
 
  * Homebrew install git, cmake, ripgrep and neovim/vim (or both).
+
+  * Universal-ctags: `brew install --HEAD universal-ctags/universal-ctags/universal-ctags`
 
  * Download and install Hack Nerd font (link above)
 

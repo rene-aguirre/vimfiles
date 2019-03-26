@@ -100,7 +100,7 @@ endif " has("autocmd")
 " Only define it when not defined already.
 if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
+          \ | wincmd p | diffthis
 endif
 set diffopt+=vertical
 
@@ -166,8 +166,8 @@ onoremap <C-Tab> <C-C><C-W>w
 let mapleader=";"
 set title      " change terminal title
 
-set history=100	" keep 50 lines of command line history
-set ruler		" show the cursor position all the time
+set history=100    " keep 50 lines of command line history
+set ruler        " show the cursor position all the time
 
 " general buffer options
 set autoread    " load file on changes, automatically
@@ -184,7 +184,7 @@ nmap <leader>s :set list!<CR>
 " searching and matching {
     set showcmd     " Show partial command in status line
     set showmatch   " Show matching brackets
-    set incsearch	" do incremental searching
+    set incsearch    " do incremental searching
     set hlsearch    " highlight searches
     set ignorecase  " Do case insensitive matching
     set smartcase
@@ -340,15 +340,19 @@ endfunction
 "  tag helpers (ctags) {
     " run ctags in the current folder
     if has("win32") || has("win64")
-		command! BuildTags execute '!' . expand('~') .
-		    \ "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
-	else
-	    " brew install universal-ctags
-	    " brew install --HEAD universal-ctags/universal-ctags/universal-ctags
-		command! BuildTags execute '!' .
-		    \ "ctags -R --c++-kinds=+p --ObjectiveC-kinds=+p --fields=+iaS --extras=+q ."
-	endif
-	set tags=./tags;
+        command! BuildTags execute '!' . expand('~') .
+            \ "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+    else
+        if (!empty(glob('/usr/local/opt/universal-ctags/bin/ctags')))
+            " brew install --HEAD universal-ctags/universal-ctags/universal-ctags
+            let s:ctags = "/usr/local/opt/universal-ctags/bin/ctags"
+        else
+            let s:ctags = "ctags"
+        endif
+        command! BuildTags execute '!' . s:ctags
+            \ " -R --c++-kinds=+p --ObjectiveC-kinds=+p --fields=+iaS --extras=+q ."
+    endif
+    set tags=./tags;
     " work with git hooks (so top level repo path applies)
     set notagrelative
 " }
@@ -418,7 +422,7 @@ if &term =~ '^screen'
     execute "set <xDown>=\e[1;*B"
     execute "set <xRight>=\e[1;*C"
     execute "set <xLeft>=\e[1;*D"
-	map <Esc>[B <Down>
+    map <Esc>[B <Down>
 endif
 
 " NeoVim (nvim) settings

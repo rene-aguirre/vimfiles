@@ -2,7 +2,11 @@
     " better than taglist
     Plug 'majutsushi/tagbar'
 
-    if has("win32") || has("win64")
+	if (!empty(glob('/usr/local/opt/universal-ctags/bin/ctags')))
+	    " brew install universal-ctags
+	    " brew install --HEAD universal-ctags/universal-ctags/universal-ctags
+	    let g:tagbar_ctags_bin = "/usr/local/opt/universal-ctags/bin/ctags"
+	elseif has("win32") || has("win64")
         let g:tagbar_ctags_bin = '~/vimfiles/ctags.exe'
     endif
 
