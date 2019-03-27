@@ -17,10 +17,19 @@ which rg \
 which git \
     || brew install git --force-bottle || exit 1
 
+echo "Boost libraries..."
+brew list boost &>/dev/null || brew install boost || exit 1
+
 echo "Nerd Font..."
-ls ~/Library/Fonts/Hack\ Regular\ Nerd\ Font\ Complete\ Mono.ttf &>/dev/null || curl https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Hack/Regular/complete/Hack%20Regular%20Nerd%20Font%20Complete%20Mono.ttf -o ~/Library/Fonts/Hack\ Regular\ Nerd\ Font\ Complete\ Mono.ttf
+ls ~/Library/Fonts/Hack\ Regular\ Nerd\ Font\ Complete\ Mono.ttf &>/dev/null || curl https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Hack/Regular/complete/Hack%20Regular%20Nerd%20Font%20Complete%20Mono.ttf -o ~/Library/Fonts/Hack\ Regular\ Nerd\ Font\ Complete\ Mono.ttf || exit 1
+
+echo "Python2 pynvim package"
+pip2 show pynvim &>/dev/null || pip2 install pynvim || exit 1
+
+echo "Python3 pynvim package"
+pip3 show pynvim &>/dev/null || pip3 install pynvim || exit 1
 
 echo "NeoVim PlugInstall..."
-nvim --headless +PlugInstall +qa
+nvim --headless +PlugInstall! +qa
 ls /usr/local/opt/universal-ctags/bin/ctags &>/dev/null || { echo "Optional: brew install --HEAD universal-ctags/universal-ctags/universal-ctags"; }
 echo "Done."
