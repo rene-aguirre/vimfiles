@@ -15,7 +15,7 @@ if has("autocmd")
     autocmd filetype make setlocal ts=4 sw=4 noexpandtab
 
     " webi tems size 2 tabstop
-    autocmd filetype html,json,javascript,xml,cmake setlocal ts=2 sw=2
+    autocmd filetype html,json,javascript,xml,cmake,yaml setlocal ts=2 sw=2
 
 endif
 " }

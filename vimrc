@@ -588,7 +588,7 @@ if has('nvim')
 endif
 
 " UI customization {
-    Plug 'ludovicchabant/vim-gutentags'
+    Plug 'ludovicchabant/vim-gutentags', { 'for': ['python', 'c', 'cpp', 'objc', 'objcpp', 'vim', 'rust'] }
 
     Plug 'ryanoasis/vim-devicons'
     let g:WebDevIconsUnicodeDecorateFolderNodes = 1
@@ -622,6 +622,8 @@ colorscheme seoul256
 set errorformat^=%-G%f:%l:\ WARNING\ %m
 " cmocka
 set errorformat^=\[\ \ \ LINE\ \ \ \]\ ---\ %f:%l:\ %m
+" clang
+set errorformat^=%f:%l:%c:\ %trror:\ %m
 
 if has("gui_running")
     exec 'source' s:cfg_path .'/utils/gui.vim'
