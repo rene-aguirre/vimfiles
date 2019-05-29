@@ -624,6 +624,11 @@ set errorformat^=%-G%f:%l:\ WARNING\ %m
 set errorformat^=\[\ \ \ LINE\ \ \ \]\ ---\ %f:%l:\ %m
 " clang
 set errorformat^=%f:%l:%c:\ %trror:\ %m
+set errorformat^=%f:%l:%c:\ %tarning:\ %m
+set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wunguarded-availability-new]
+" usually false positives (e.g. dates + time)
+set errorformat-=%f:%l:%c:%m
+set errorformat-=%f:%l:%m
 
 if has("gui_running")
     exec 'source' s:cfg_path .'/utils/gui.vim'

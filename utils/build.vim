@@ -17,7 +17,8 @@ function! s:s_build(...)
             " use default makeprg
         endif
         execute 'echo "using ' . &g:makeprg . '"'
-        execute "make " . join(a:000, ' ')
+        " [!] doesn't jump to first error
+        execute "make! " . join(a:000, ' ')
     finally
         let &g:makeprg = makeprg_bak
     endtry
