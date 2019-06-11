@@ -13,9 +13,6 @@ import subprocess as subp
 __version__ = "0.0.1"
 __author__ = "Rene Aguirre"
 
-DEBUG_DIRS = False
-DIRECT_ACCESS = True
-
 CMD_RG_LS_FILES = ['rg', '--color=never', '--no-messages', '--files']
 
 CMD_GIT_LS_FILES = ['git', 'ls-files', '-oc', '--exclude-standard', '--directory', '--no-empty-directory']
@@ -30,18 +27,21 @@ def list_files(prefix, start_dir, cmd_ls_files, cmd_subs):
 
     full_prefix = os.path.join(prefix, start_dir)
     # first print local files
-    if not DEBUG_DIRS:
+    try:
         for item in subp.check_output(cmd_ls_files, universal_newlines=True).split('\n'):
             if item:
                 print(os.path.normpath(os.path.join(full_prefix, item)))
-    else:
-        print(full_prefix)
+    except subp.CalledProcessError as e:
+        pass
 
     if cmd_subs and os.path.exists('.gitmodules'):
-        for key_value in subp.check_output(cmd_subs, universal_newlines=True).split('\n'):
-            dir_item = " ".join(key_value.split(' ')[1:])
-            if dir_item:
-                list_files(full_prefix, dir_item, cmd_ls_files, cmd_subs)
+        try:
+            for key_value in subp.check_output(cmd_subs, universal_newlines=True).split('\n'):
+                dir_item = " ".join(key_value.split(' ')[1:])
+                if dir_item:
+                    list_files(full_prefix, dir_item, cmd_ls_files, cmd_subs)
+        except subp.CalledProcessError as e:
+            pass
 
     if os.path.exists('../.repo/project.list'):
         # assumption: single top level nested repo
@@ -54,8 +54,6 @@ def list_files(prefix, start_dir, cmd_ls_files, cmd_subs):
                 if not os.path.exists(dir_name):
                     continue
                 dir_name = os.path.relpath(dir_name, this_dir)
-                if DEBUG_DIRS:
-                    print(dir_name)
                 list_files(prefix, dir_name, cmd_ls_files, cmd_subs)
 
 

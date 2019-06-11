@@ -522,7 +522,13 @@ endif
     exec 'source' s:cfg_path .'/plug/vimwiki.vim'
 
     " Plant UML syntax and helper
-    " Plug 'aklt/plantuml-syntax'
+    Plug 'aklt/plantuml-syntax'
+
+if executable("yarn")
+    " Markdown preview, if you have nodejs and yarn
+    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+endif
+
     " :OverCommandLine for completion/highlight %s commands
     Plug 'osyo-manga/vim-over'
 
