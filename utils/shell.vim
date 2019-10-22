@@ -4,7 +4,7 @@ function! s:ExecuteInShell(command)
   let winnr = bufwinnr('^' . fnameescape('sh_out') . '$')
   silent! execute  winnr < 0 ? 'botright new ' . fnameescape('sh_out') : winnr . 'wincmd w'
   setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
-  echo 'Execute ' . command . '...'
+  echom 'Execute: ' . command
   silent! execute 'silent %!'. command
   silent! execute winnr < 0 ? 'resize ' . min([6, line('$')]) : ''
   silent! redraw
