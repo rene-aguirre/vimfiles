@@ -22,9 +22,17 @@ endif
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
   syntax on
+  set termguicolors
+  set synmaxcol=128
+  syntax sync minlines=256
+  syntax sync maxlines=512
+  set nocursorline
+  set nocursorcolumn
+  set redrawtime=10000
+  if has('nvim')
+    set lazyredraw
+  endif
 endif
-set synmaxcol=128
-syntax sync minlines=256
 
 " current file path, follow symlinks and get only directory
 let s:cfg_path=fnamemodify(resolve(expand("<sfile>:p")), ":h")
@@ -555,12 +563,34 @@ if has("autocmd")
     autocmd filetype cpp,objcpp setlocal matchpairs+=<:>
     autocmd filetype objcpp setlocal synmaxcol=512
     autocmd filetype objc setlocal synmaxcol=512
-    " refresh ObjC++ on read (some detection issues)
+    " refresh ObjC++ on read (avoid some detection issues)
     autocmd bufreadpost,bufnewfile *.mm set filetype=objcpp
     autocmd bufreadpost,bufnewfile *.m set filetype=objc
 endif
 
 " }
+
+" https://vim.fandom.com/wiki/Faster_loading_of_large_files
+" file is large from 10mb
+let g:LargeFile = 1024 * 1024 * 10
+augroup LargeFile 
+  au!
+  autocmd BufReadPre * let f=getfsize(expand("<afile>")) | if f > g:LargeFile || f == -2 | call LargeFile() | endif
+  autocmd BufWinEnter * if line2byte(line("$") + 1) > 1000000 | syntax clear | endif
+augroup END
+
+function! LargeFile()
+ " no syntax highlighting etc
+ set eventignore+=FileType
+ " save memory when other file is viewed
+ setlocal bufhidden=unload
+ " is read-only (write with :w new_filename)
+ setlocal buftype=nowrite
+ " no undo possible
+ setlocal undolevels=-1
+ " display message
+ autocmd VimEnter *  echo "The file is larger than " . (g:LargeFile / 1024 / 1024) . " MB, so some options are changed (see .vimrc for details)."
+endfunction
 
 if !has("gui_running")
     " tmux integration
