@@ -25,6 +25,20 @@ function! s:s_build(...)
 endfunction
 command! -nargs=* Build call s:s_build(<f-args>)
 
+function! s:s_build_edit(...)
+	execute ":wall"
+    if (! empty(glob('./build.sh~')))
+        execute ':edit ./build.sh~'
+    elseif (! empty(glob('./CMakeLists.txt')))
+        execute ':edit ./CMakeLists.txt'
+    elseif (! empty(glob('./Makefile')))
+        execute ':edit ./Makefile'
+    else
+        execute ':edit ./build.sh~'
+    endif
+endfunction
+command! -nargs=* BuildEdit call s:s_build_edit(<f-args>)
+
 function! s:s_test()
     if (! empty(glob('./CMakeLists.txt'))) && (! empty(glob('./build/Makefile')))
         execute "make test ARGS=--output-on-failure -C ./build"
