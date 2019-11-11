@@ -7,10 +7,10 @@
     " default all are active_filetypes
     if executable('clang++')
         let g:syntastic_cpp_compiler = 'clang++'
-        let g:syntastic_cpp_compiler_options = ' -std=c++14 -Weverything -Wno-c++98-compat'
+        let g:syntastic_cpp_compiler_options = ' -std=c++17 -Wall -Wextra -Wno-c++98-compat'
     else
         let g:syntastic_cpp_compiler = 'g++'
-        let g:syntastic_cpp_compiler_options = ' -std=c++14 -Wall -Wextra'
+        let g:syntastic_cpp_compiler_options = ' -std=c++17 -Wall -Wextra'
     endif
     " let g:syntastic_cpp_compiler_options = ' -std=c++1z -stdlib=libc++ -Wall -Wextra'
     " -stdlib=libc++ not supported on gcc (implicit?)
