@@ -22,7 +22,9 @@ endif
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
   syntax on
-  set termguicolors
+  if $COLORTERM == 'truecolor'
+    set termguicolors
+  endif
   set synmaxcol=128
   syntax sync minlines=256
   syntax sync maxlines=512
@@ -110,7 +112,9 @@ if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
           \ | wincmd p | diffthis
 endif
-set diffopt+=vertical
+
+" stock vim Catalina shows error
+execute 'silent! set diffopt+=vertical'
 
 " source $VIMRUNTIME/mswin.vim
 " set 'selection', 'selectmode', 'mousemodel' and 'keymodel' for MS-Windows
@@ -488,7 +492,7 @@ endif
     exec 'source' s:cfg_path .'/plug/tagbar.vim'
 
     " Snippets
-    let g:ultisnips_enabled = 1
+    let g:ultisnips_enabled = has("python3")
 if g:ultisnips_enabled
     exec 'source' s:cfg_path .'/plug/ultisnips.vim'
 endif
