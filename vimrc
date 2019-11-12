@@ -39,6 +39,18 @@ endif
 " current file path, follow symlinks and get only directory
 let s:cfg_path=fnamemodify(resolve(expand("<sfile>:p")), ":h")
 
+function s:load_config(from_path)
+    exec 'source ' . s:cfg_path . a:from_path
+endfunction
+
+function s:load_plug(plug_file)
+    exec 'source ' . s:cfg_path . '/plug/' . a:plug_file . '.vim'
+endfunction
+
+function s:load_utility(utility_file)
+    exec 'source ' . s:cfg_path . '/utils/' . a:utility_file . '.vim'
+endfunction
+
 " Only do this part when compiled with support for autocommands.
 " auto commands {
 if has("autocmd")
@@ -489,12 +501,12 @@ if has("win32") || has("win64")
     Plug 'xolox/vim-misc'
 endif
 
-    exec 'source' s:cfg_path .'/plug/tagbar.vim'
+    call s:load_plug('tagbar')
 
     " Snippets
     let g:ultisnips_enabled = has("python3")
 if g:ultisnips_enabled
-    exec 'source' s:cfg_path .'/plug/ultisnips.vim'
+    call s:load_plug('ultisnips')
 endif
 
     " <leader>bd buffer delete & keep layout
@@ -516,27 +528,27 @@ endif
 
     let s:vimairline_enabled = 0 " or lightline
 if s:vimairline_enabled
-    exec 'source' s:cfg_path .'/plug/vim-airline'
+    exec 'source ' . s:cfg_path . '/plug/vim-airline'
 else
     Plug 'itchyny/lightline.vim'
 endif
 
-    exec 'source' s:cfg_path .'/plug/nerdtree.vim'
+    call s:load_plug('nerdtree')
 
     " tags: syntax checks
-    exec 'source' s:cfg_path .'/plug/syntastic.vim'
+    call s:load_plug('syntastic')
 
-    exec 'source' s:cfg_path .'/plug/fugitive.vim'
+    call s:load_plug('fugitive')
 
     " tag: ctrlp, fuzzy
-    exec 'source' s:cfg_path .'/plug/ctrlp.vim'
+    call s:load_plug('ctrlp')
 
-    exec 'source' s:cfg_path .'/plug/vimwiki.vim'
+    call s:load_plug('vimwiki')
 
     " Plant UML syntax and helper
     Plug 'aklt/plantuml-syntax'
 
-if executable("yarn")
+if has('nvim') && executable("yarn")
     " Markdown preview, if you have nodejs and yarn
     Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 endif
@@ -560,8 +572,10 @@ endif
     let c_no_curly_error = 1
     Plug 'bfrg/vim-cpp-modern', { 'for': ['cpp', 'objcpp'] }
 
+if has('nvim')
     " C, C++, python, gdb, lldb, pdb, debug
     Plug 'sakhnik/nvim-gdb', { 'for': ['python', 'c', 'cpp'] }
+endif
 
 if has("autocmd")
     autocmd filetype cpp,objcpp setlocal matchpairs+=<:>
@@ -603,16 +617,20 @@ endif
 
 " tags: completion {
     let g:ycm_enabled    = 0
+    let g:tab_manager_enabled = 1
     let g:clang_complete = 1
 
 if g:ycm_enabled
-    exec 'source' s:cfg_path .'/plug/ycm.vim'
+    call s:load_plug('ycm')
 elseif g:clang_complete
-    exec 'source' s:cfg_path .'/plug/clang_complete.vim'
+    call s:load_plug('clang_complete')
+endif
+if g:tab_manager_enabled
+    call s:load_plug('tab_manager')
 endif
 " }
-    exec 'source' s:cfg_path .'/plug/tab_manager.vim'
-    exec 'source' s:cfg_path .'/plug/smartword.vim'
+
+    call s:load_plug('smartword')
 
 " FastFold plug-in {
     " start with folding disabled
@@ -621,7 +639,7 @@ endif
     Plug 'Konfekt/FastFold'
 " }
 
-    exec 'source' s:cfg_path .'/plug/startify.vim'
+    call s:load_plug('startify')
 
 if has('nvim')
     Plug 'neomake/neomake'
@@ -674,13 +692,13 @@ set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wdeprecated-declarations]
 " set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wunguarded-availability-new]
 
 if has("gui_running")
-    exec 'source' s:cfg_path .'/utils/gui.vim'
+    call s:load_utility('gui')
 endif
-exec 'source' s:cfg_path .'/utils/grep.vim'
-exec 'source' s:cfg_path .'/utils/build.vim'
+call s:load_utility('grep')
+call s:load_utility('build')
 exec 'source' s:cfg_path .'/utils/hex2dec.vim'
-exec 'source' s:cfg_path .'/utils/indent.vim'
-exec 'source' s:cfg_path .'/utils/shell.vim'
+call s:load_utility('indent')
+call s:load_utility('shell')
 
 " this improves XML syntax highlighting with huge files
 let g:xml_namespace_transparent=1

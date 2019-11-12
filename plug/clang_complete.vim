@@ -7,7 +7,7 @@ if has("macunix")
     endif
     let g:clang_user_options = '-std=c++17'
     let g:clang_complete_auto = 1
-    if g:ultisnips_enabled
+    if g:ultisnips_enabled && !g:tab_manager_enabled
         let g:clang_snippets = 1
         let g:clang_snippets_engine = 'ultisnips'
     endif
