@@ -659,16 +659,19 @@ let g:seoul256_background = 237
 " "   Default: 253
 colorscheme seoul256
 
-set errorformat^=%-G%f:%l:\ WARNING\ %m
 " cmocka
 set errorformat^=\[\ \ \ LINE\ \ \ \]\ ---\ %f:%l:\ %m
 " clang
 set errorformat^=%f:%l:%c:\ %trror:\ %m
 set errorformat^=%f:%l:%c:\ %tarning:\ %m
-set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wunguarded-availability-new]
 " usually false positives (e.g. dates + time)
 set errorformat-=%f:%l:%c:%m
 set errorformat-=%f:%l:%m
+
+" ignores, last items for prepend to be effective
+set errorformat^=%-G%f:%l:\ WARNING\ %m
+set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wdeprecated-declarations]
+" set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wunguarded-availability-new]
 
 if has("gui_running")
     exec 'source' s:cfg_path .'/utils/gui.vim'
