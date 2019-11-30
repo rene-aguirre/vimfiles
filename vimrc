@@ -454,8 +454,13 @@ if has('nvim')
     " exit terminal mode (go back with 'i')
     tnoremap <Esc> <C-\><C-N>
 
-    let g:python_host_prog  = '/usr/local/bin/python2'
-    let g:python3_host_prog = '/usr/local/bin/python3'
+    if (!empty(glob('/usr/local/bin/python2')))
+        let g:python_host_prog  = '/usr/local/bin/python2'
+    endif
+
+    if (!empty(glob('/usr/local/bin/python3')))
+        let g:python3_host_prog = '/usr/local/bin/python3'
+    endif
 endif
 
 " clang-format helper
