@@ -83,7 +83,7 @@ ft_map = {
     'objcpp':   '-t c -t cpp -t h -t objc -t objcpp',
     'kalimba':  '-t asm',
     'make':     '-t make',
-    'python':   '--type-add "py:*.pycfg" -t py ',
+    'python':   '-t py',
     'rust':     '-t rust',
     'vim':      '-t vimscript',
 }
