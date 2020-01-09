@@ -88,11 +88,11 @@ if has("autocmd")
     " autocmd bufwinenter,bufenter * lcd %:p:h
 
     " new syntax files
-    autocmd bufreadpost,bufnewfile *.psr set filetype=psr
-    autocmd bufreadpost,bufnewfile *.psq set filetype=psr
-    autocmd bufreadpost,bufnewfile *.jth set filetype=forth
-    autocmd bufreadpost,bufnewfile *.pycfg set filetype=python
-    autocmd bufreadpost,bufnewfile *.swift set filetype=swift
+    autocmd bufreadpost,bufnewfile *.psr setlocal filetype=psr
+    autocmd bufreadpost,bufnewfile *.psq setlocal filetype=psr
+    autocmd bufreadpost,bufnewfile *.jth setlocal filetype=forth
+    autocmd bufreadpost,bufnewfile *.pycfg setlocal filetype=python
+    autocmd bufreadpost,bufnewfile *.swift setlocal filetype=swift
 
     autocmd filetype rust compiler cargo
 
@@ -587,8 +587,8 @@ if has("autocmd")
     autocmd filetype objcpp setlocal synmaxcol=512
     autocmd filetype objc setlocal synmaxcol=512
     " refresh ObjC++ on read (avoid some detection issues)
-    autocmd bufreadpost,bufnewfile *.mm set filetype=objcpp
-    autocmd bufreadpost,bufnewfile *.m set filetype=objc
+    autocmd bufreadpost,bufnewfile *.mm setlocal filetype=objcpp
+    autocmd bufreadpost,bufnewfile *.m setlocal filetype=objc
 endif
 
 " }
@@ -603,8 +603,7 @@ augroup LargeFile
 augroup END
 
 function! LargeFile()
- " no syntax highlighting etc
- set eventignore+=FileType
+" don't change eventignore, this needs window enter/exit helpers
  " save memory when other file is viewed
  setlocal bufhidden=unload
  " is read-only (write with :w new_filename)
@@ -694,7 +693,7 @@ set errorformat-=%f:%l:%m
 " ignores, last items for prepend to be effective
 set errorformat^=%-G%f:%l:\ WARNING\ %m
 set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wdeprecated-declarations]
-" set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wunguarded-availability-new]
+set errorformat^=%-G%f:%l:%c:\ %tarning:\ %m[-Wunguarded-availability-new]
 
 if has("gui_running")
     call s:load_utility('gui')
