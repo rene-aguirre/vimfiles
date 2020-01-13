@@ -19,7 +19,7 @@ brew update && brew cleanup \
     || brew update && brew cleanup \
     || exit 1
 
-BREW_PKGS=( neovim ripgrep boost shellcheck )
+BREW_PKGS=( neovim ripgrep boost shellcheck fzy )
 
 echo "Homebrew packages, check & install..."
 for PKG_NAME in "${BREW_PKGS[@]}"; do

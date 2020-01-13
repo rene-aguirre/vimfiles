@@ -361,6 +361,26 @@ function! Tcd()
     exec 'cd ' . g:gitroot
 endfunction
 
+" helper for fast list of files
+function! s:GetFileList()
+    call Tcd()
+    if has("unix") && !empty(glob('.git')) && executable('python')
+        if executable('rg')
+            return 'python ' . s:cfg_path  . '/gitsub.py --rg'
+        else
+            return 'python ' . s:cfg_path  . '/gitsub.py'
+        endif
+    elseif executable('rg')
+        return 'rg --color=never --no-messages --glob "" --files .'
+    elseif executable('ag')
+        return 'ag . -l --nocolor -g ""'
+    elseif has("unix")
+        return 'find . -not -path "*/\.*" -type f \( ! -iname ".*" \)| head -50000'
+    else
+        return 'dir . /-n /b /s /a-d'
+    endif
+endfunction
+
 "  tag helpers (ctags) {
     " run ctags in the current folder
     if has("win32") || has("win64")
@@ -546,7 +566,12 @@ endif
     call s:load_plug('fugitive')
 
     " tag: ctrlp, fuzzy
+if executable('fzy')
+    Plug 'cloudhead/neovim-fuzzy'
+    nnoremap <C-p> :FuzzyOpen<CR>
+else
     call s:load_plug('ctrlp')
+endif
 
     call s:load_plug('vimwiki')
 
@@ -703,6 +728,39 @@ call s:load_utility('build')
 exec 'source' s:cfg_path .'/utils/hex2dec.vim'
 call s:load_utility('indent')
 call s:load_utility('shell')
+
+" Fuzzy finder helper
+if executable('fzy')
+function! FzyCommand(vim_command) abort
+    let l:callback = {
+                \ 'window_id': win_getid(),
+                \ 'filename': tempname(),
+                \  'vim_command':  a:vim_command
+                \ }
+
+    function! l:callback.on_exit(job_id, data, event) abort
+        bdelete!
+        call win_gotoid(self.window_id)
+        if filereadable(self.filename)
+            try
+                let l:selected_filename = readfile(self.filename)[0]
+                exec self.vim_command . l:selected_filename
+            catch /E684/
+            endtry
+        endif
+        call delete(self.filename)
+    endfunction
+
+    botright 10 new
+    let l:choice_command = s:GetFileList()
+    let l:term_command = l:choice_command . ' | fzy > ' .  l:callback.filename
+    silent call termopen(l:term_command, l:callback)
+    setlocal nonumber norelativenumber
+    startinsert
+endfunction
+
+nnoremap <leader>e :call FzyCommand(":e")<cr>
+endif
 
 " this improves XML syntax highlighting with huge files
 let g:xml_namespace_transparent=1
