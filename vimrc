@@ -526,7 +526,15 @@ if has("win32") || has("win64")
     Plug 'xolox/vim-misc'
 endif
 
+    let s:tagbar_enabled = 0
+if s:tagbar_enabled
     call s:load_plug('tagbar')
+else
+    Plug 'liuchengxu/vista.vim'
+    nmap <F3> :Vista!!<CR>
+    imap <F3> <C-O>:Vista!!<CR>
+    omap <F3> <C-C>:Vista!!<CR>
+endif
 
     " Snippets
     let g:ultisnips_enabled = has("python3")
@@ -551,8 +559,8 @@ endif
 
     Plug 'scrooloose/nerdcommenter'
 
-    let s:vimairline_enabled = 0 " or lightline
-if s:vimairline_enabled
+    let s:vim_airline_enabled = 0 " or lightline
+if s:vim_airline_enabled
     exec 'source ' . s:cfg_path . '/plug/vim-airline'
 else
     Plug 'itchyny/lightline.vim'
@@ -605,17 +613,6 @@ endif
 if has('nvim')
     " C, C++, python, gdb, lldb, pdb, debug
     Plug 'sakhnik/nvim-gdb', { 'for': ['python', 'c', 'cpp'] }
-
-    " Floating preview helper
-    Plug 'ncm2/float-preview.nvim'
-
-    function! DisableExtras()
-        call nvim_win_set_option(g:float_preview#win, 'number', v:false)
-        call nvim_win_set_option(g:float_preview#win, 'relativenumber', v:false)
-        call nvim_win_set_option(g:float_preview#win, 'cursorline', v:false)
-    endfunction
-
-    autocmd User FloatPreviewWinOpen call DisableExtras()
 endif
 
 if has("autocmd")
@@ -698,6 +695,21 @@ endif
     let g:user_emmet_install_global = 0
     autocmd FileType html,css,xml EmmetInstall
 " }
+
+
+if has('nvim')
+" Floating preview helper {
+    Plug 'ncm2/float-preview.nvim'
+
+    function! DisableExtras()
+        call nvim_win_set_option(g:float_preview#win, 'number', v:false)
+        call nvim_win_set_option(g:float_preview#win, 'relativenumber', v:false)
+        call nvim_win_set_option(g:float_preview#win, 'cursorline', v:false)
+    endfunction
+
+    autocmd User FloatPreviewWinOpen call DisableExtras()
+" }
+endif
 
 call plug#end()
 
