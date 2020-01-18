@@ -19,7 +19,7 @@ brew update && brew cleanup \
     || brew update && brew cleanup \
     || exit 1
 
-BREW_PKGS=( neovim ripgrep boost shellcheck fzy )
+BREW_PKGS=( neovim ripgrep boost shellcheck fzy llvm )
 
 echo "Homebrew packages, check & install..."
 for PKG_NAME in "${BREW_PKGS[@]}"; do
@@ -50,22 +50,13 @@ brew list python2 &>/dev/null \
     || brew install python2 \
     || { echo "Couldn't install homebrew's python2"; exit 1; }
 
-ln -sf "$(brew --prefix python2)/bin/python2" /usr/local/bin/python2 \
-    || { echo "Couldn't link python2!"; exit 1; }
-
-ln -sf "$(brew --prefix python2)/bin/pip2" /usr/local/bin/pip2 \
-    || { echo "Couldn't link pip2!"; exit 1; }
-
 echo "Checking python3 (homebrew)"
 brew list python3 &>/dev/null \
     || brew install python3 \
     || { echo "Couldn't install homebrew's python3"; exit 1; }
 
-ln -sf "$(brew --prefix python3)/bin/python3" /usr/local/bin/python3 \
-    || { echo "Couldn't link python3!"; exit 1; }
-
-ln -sf "$(brew --prefix python3)/bin/pip3" /usr/local/bin/pip3 \
-    || { echo "Couldn't link pip3!"; exit 1; }
+brew link --overwrite python2
+brew link --overwrite python3
 
 command -v pip2 &>/dev/null || \
     { echo "Can't find pip2 command, check pip version and link it"; exit 1; }
@@ -81,6 +72,7 @@ echo "Python helper packages"
 pip2 install -U --user pynvim || exit 1
 pip3 install -U --user pynvim || exit 1
 pip3 install -U --user pylint || exit 1
+pip3 install -U --user python-language-server || exit 1
 
 echo "NeoVim PlugInstall."
 if [ -f ~/.vim/plugged/cpsm/bin/cpsm_cli ]; then

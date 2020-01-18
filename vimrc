@@ -653,17 +653,44 @@ if !has("gui_running")
 endif
 
 " tags: completion {
+    " omni
     let g:ycm_enabled    = 0
+    let g:clang_complete = !executable('ccls') && !executable('clangd')
+    " use tab manager
     let g:tab_manager_enabled = 1
-    let g:clang_complete = 1
 
 if g:ycm_enabled
     call s:load_plug('ycm')
 elseif g:clang_complete
     call s:load_plug('clang_complete')
+elseif !executable('clangd') && executable('ccls')
+" Register ccls C++ lanuage server.
+   au User lsp_setup call lsp#register_server({
+      \ 'name': 'ccls',
+      \ 'cmd': {server_info->['ccls']},
+      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+      \ 'initialization_options': {'cache': {'directory': '/tmp/ccls/cache' }},
+      \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+      \ })
 endif
 if g:tab_manager_enabled
     call s:load_plug('tab_manager')
+endif
+
+    " LSP
+    Plug 'prabirshrestha/async.vim'
+    Plug 'prabirshrestha/vim-lsp'
+    Plug 'prabirshrestha/asyncomplete.vim'
+    Plug 'prabirshrestha/asyncomplete-lsp.vim'
+    Plug 'mattn/vim-lsp-settings'
+    " ccls: https://github.com/MaskRay/ccls/wiki/Project-Setup
+if executable('svls')
+    " system verilog
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'svls',
+        \ 'cmd': {server_info->['svls']},
+        \ 'whitelist': ['systemverilog'],
+        \ })
 endif
 " }
 
