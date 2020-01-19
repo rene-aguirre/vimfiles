@@ -381,6 +381,24 @@ function! s:GetFileList()
     endif
 endfunction
 
+" tries to find utility executable if not in system path
+" args:
+"   cmd_str     plain command, e.g. 'clang-format'
+"   formula     homebrew's package 'formula' (optional)
+function! s:FindExecutable(cmd_str, formula)
+    let l:path_prefix = [
+        \ '',
+        \ '/usr/local/bin/',
+        \ '/usr/local/opt/' . a:formula . '/bin/',
+        \ '/usr/bin/'
+        \ ]
+    for prefix in l:path_prefix
+        if executable(prefix . a:cmd_str)
+            return prefix . a:cmd_str
+        endif
+    endfor
+endfunction
+
 "  tag helpers (ctags) {
     " run ctags in the current folder
     if has("win32") || has("win64")
@@ -653,30 +671,43 @@ if !has("gui_running")
 endif
 
 " tags: completion {
+    let s:cmd_clangd = s:FindExecutable('clangd', 'llvm')
+    let s:cmd_ccls = s:FindExecutable('ccls', 'ccls')
     " omni
     let g:ycm_enabled    = 0
-    let g:clang_complete = !executable('ccls') && !executable('clangd')
+    let g:clang_complete = !executable(s:cmd_clangd) && !executable(s:cmd_ccls)
     " use tab manager
     let g:tab_manager_enabled = 1
-
 if g:ycm_enabled
     call s:load_plug('ycm')
 elseif g:clang_complete
     call s:load_plug('clang_complete')
-elseif !executable('clangd') && executable('ccls')
-" Register ccls C++ lanuage server.
-   au User lsp_setup call lsp#register_server({
-      \ 'name': 'ccls',
-      \ 'cmd': {server_info->['ccls']},
-      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-      \ 'initialization_options': {'cache': {'directory': '/tmp/ccls/cache' }},
-      \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-      \ })
+else
+    " LSP
+    let g:lsp_settings = { }
+    if executable(s:cmd_clangd)
+        if s:cmd_clangd != 'clangd'
+            " clangd specific settings only, no extra compiler flags (use
+            " compile_flags.txt
+            let g:lsp_settings['clangd'] = { 'cmd': [s:cmd_clangd] }
+        endif
+    elseif executable(s:cmd_ccls)
+        " Register ccls C++ lanuage server.
+        au User lsp_setup call lsp#register_server({
+            \ 'name': 'ccls',
+            \ 'cmd': {server_info->[s:cmd_ccls]},
+            \ 'root_uri': {
+                \ server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(),
+                \ 'compile_commands.json'))
+                \ },
+            \ 'initialization_options': {'cache': {'directory': '/tmp/ccls/cache' }},
+            \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+            \ })
+   endif
 endif
 if g:tab_manager_enabled
     call s:load_plug('tab_manager')
 endif
-
     " LSP
     Plug 'prabirshrestha/async.vim'
     Plug 'prabirshrestha/vim-lsp'
