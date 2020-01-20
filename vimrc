@@ -361,35 +361,15 @@ function! Tcd()
     exec 'cd ' . g:gitroot
 endfunction
 
-" helper for fast list of files
-function! s:GetFileList()
-    call Tcd()
-    if has("unix") && !empty(glob('.git')) && executable('python')
-        if executable('rg')
-            return 'python ' . s:cfg_path  . '/gitsub.py --rg'
-        else
-            return 'python ' . s:cfg_path  . '/gitsub.py'
-        endif
-    elseif executable('rg')
-        return 'rg --color=never --no-messages --glob "" --files .'
-    elseif executable('ag')
-        return 'ag . -l --nocolor -g ""'
-    elseif has("unix")
-        return 'find . -not -path "*/\.*" -type f \( ! -iname ".*" \)| head -50000'
-    else
-        return 'dir . /-n /b /s /a-d'
-    endif
-endfunction
-
-" tries to find utility executable if not in system path
+" tries to find utility executable, prefers /usr/local paths
 " args:
 "   cmd_str     plain command, e.g. 'clang-format'
 "   formula     homebrew's package 'formula' (optional)
-function! s:FindExecutable(cmd_str, formula)
+function! FindExecutable(cmd_str, formula)
     let l:path_prefix = [
-        \ '',
-        \ '/usr/local/bin/',
         \ '/usr/local/opt/' . a:formula . '/bin/',
+        \ '/usr/local/bin/',
+        \ '',
         \ '/usr/bin/'
         \ ]
     for prefix in l:path_prefix
@@ -397,6 +377,33 @@ function! s:FindExecutable(cmd_str, formula)
             return prefix . a:cmd_str
         endif
     endfor
+endfunction
+
+let s:cmd_python2 = FindExecutable('python2', 'python2')
+let s:cmd_python3 = FindExecutable('python3', 'python3')
+let s:cmd_python = s:cmd_python3
+if !executable(s:cmd_python)
+    let s:cmd_python = s:cmd_python2
+endif
+let s:cmd_rg = FindExecutable('rg', 'ripgrep')
+" helper for fast list of files
+function! s:GetFileList()
+    call Tcd()
+    if has("unix") && !empty(glob('.git')) && executable(s:cmd_python)
+        if executable(s:cmd_rg)
+            return s:cmd_python . ' ' . s:cfg_path  . '/gitsub.py --rg'
+        else
+            return s:cmd_python . 'python ' . s:cfg_path  . '/gitsub.py'
+        endif
+    elseif executable(s:cmd_rg)
+        return s:cmd_rg . ' --color=never --no-messages --glob "" --files .'
+    elseif executable('ag')
+        return 'ag . -l --nocolor -g ""'
+    elseif has("unix")
+        return 'find . -not -path "*/\.*" -type f \( ! -iname ".*" \)| head -50000'
+    else
+        return 'dir . /-n /b /s /a-d'
+    endif
 endfunction
 
 "  tag helpers (ctags) {
@@ -492,12 +499,12 @@ if has('nvim')
     " exit terminal mode (go back with 'i')
     tnoremap <Esc> <C-\><C-N>
 
-    if (!empty(glob('/usr/local/bin/python2')))
-        let g:python_host_prog  = '/usr/local/bin/python2'
+    if executable(s:cmd_python2)
+        let g:python_host_prog  = s:cmd_python2
     endif
 
-    if (!empty(glob('/usr/local/bin/python3')))
-        let g:python3_host_prog = '/usr/local/bin/python3'
+    if executable(s:cmd_python3)
+        let g:python3_host_prog = s:cmd_python3
     endif
 endif
 
@@ -592,7 +599,8 @@ endif
     call s:load_plug('fugitive')
 
     " tag: ctrlp, fuzzy
-if executable('fzy')
+let g:fuzzy_executable = FindExecutable('fzy', 'fzy')
+if has('nvim') && executable(g:fuzzy_executable)
     Plug 'cloudhead/neovim-fuzzy'
     nnoremap <C-p> :FuzzyOpen<CR>
 else
@@ -671,8 +679,8 @@ if !has("gui_running")
 endif
 
 " tags: completion {
-    let s:cmd_clangd = s:FindExecutable('clangd', 'llvm')
-    let s:cmd_ccls = s:FindExecutable('ccls', 'ccls')
+    let s:cmd_clangd = FindExecutable('clangd', 'llvm')
+    let s:cmd_ccls = FindExecutable('ccls', 'ccls')
     " omni
     let g:ycm_enabled    = 0
     let g:clang_complete = !executable(s:cmd_clangd) && !executable(s:cmd_ccls)
@@ -692,7 +700,7 @@ else
             let g:lsp_settings['clangd'] = { 'cmd': [s:cmd_clangd] }
         endif
     elseif executable(s:cmd_ccls)
-        " Register ccls C++ lanuage server.
+        " ccls: https://github.com/MaskRay/ccls/wiki/Project-Setup
         au User lsp_setup call lsp#register_server({
             \ 'name': 'ccls',
             \ 'cmd': {server_info->[s:cmd_ccls]},
@@ -709,12 +717,6 @@ if g:tab_manager_enabled
     call s:load_plug('tab_manager')
 endif
     " LSP
-    Plug 'prabirshrestha/async.vim'
-    Plug 'prabirshrestha/vim-lsp'
-    Plug 'prabirshrestha/asyncomplete.vim'
-    Plug 'prabirshrestha/asyncomplete-lsp.vim'
-    Plug 'mattn/vim-lsp-settings'
-    " ccls: https://github.com/MaskRay/ccls/wiki/Project-Setup
 if executable('svls')
     " system verilog
     au User lsp_setup call lsp#register_server({
@@ -723,6 +725,11 @@ if executable('svls')
         \ 'whitelist': ['systemverilog'],
         \ })
 endif
+    Plug 'prabirshrestha/async.vim'
+    Plug 'prabirshrestha/vim-lsp'
+    Plug 'prabirshrestha/asyncomplete.vim'
+    Plug 'prabirshrestha/asyncomplete-lsp.vim'
+    Plug 'mattn/vim-lsp-settings'
 " }
 
     call s:load_plug('smartword')
@@ -810,8 +817,8 @@ exec 'source' s:cfg_path .'/utils/hex2dec.vim'
 call s:load_utility('indent')
 call s:load_utility('shell')
 
-" Fuzzy finder helper
-if executable('fzy')
+" Fuzzy finder helper (vim & neovim)
+if executable(g:fuzzy_executable)
 function! FzyCommand(vim_command) abort
     let l:callback = {
                 \ 'window_id': win_getid(),
