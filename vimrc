@@ -600,9 +600,21 @@ endif
 
     " tag: ctrlp, fuzzy
 let g:fuzzy_executable = FindExecutable('fzy', 'fzy')
-if has('nvim') && executable(g:fuzzy_executable)
-    Plug 'cloudhead/neovim-fuzzy'
-    nnoremap <C-p> :FuzzyOpen<CR>
+if executable(g:fuzzy_executable)
+    let g:picker_selector_executable = g:fuzzy_executable
+    Plug 'srstevenson/vim-picker'
+    nnoremap <C-p> <Plug>(PickerEdit)
+    nmap <unique> <leader>fe <Plug>(PickerEdit)
+    nmap <unique> <leader>fs <Plug>(PickerSplit)
+    nmap <unique> <leader>ft <Plug>(PickerTabedit)
+    nmap <unique> <leader>fv <Plug>(PickerVsplit)
+    nmap <unique> <leader>fb <Plug>(PickerBuffer)
+    nmap <unique> <leader>f] <Plug>(PickerTag)
+    nmap <unique> <leader>fw <Plug>(PickerStag)
+    nmap <unique> <leader>fo <Plug>(PickerBufferTag)
+    nmap <unique> <leader>fh <Plug>(PickerHelp)
+    " suppress unexpected 'f' command
+    nmap <unique> <leader>f <Plug>(PickerEdit)
 else
     call s:load_plug('ctrlp')
 endif
@@ -841,7 +853,7 @@ function! FzyCommand(vim_command) abort
 
     botright 10 new
     let l:choice_command = s:GetFileList()
-    let l:term_command = l:choice_command . ' | fzy > ' .  l:callback.filename
+    let l:term_command = l:choice_command . ' | ' . g:fuzzy_executable ' > ' .  l:callback.filename
     silent call termopen(l:term_command, l:callback)
     setlocal nonumber norelativenumber
     startinsert
