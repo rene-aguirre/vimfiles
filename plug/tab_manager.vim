@@ -71,10 +71,6 @@ else
     Plug 'ajh17/VimCompletesMe'
 endif
 
-" enter to accept choice, <Esc> to cancel completions (keeps insert mode)
-inoremap <expr> <CR>  pumvisible() ? "\<C-y>" : "\<CR>"
-inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
-
 " Ctrl-P like mappings
 inoremap <expr> <C-j> pumvisible() ?  "\<Down>" : "\<C-j>"
 inoremap <expr> <C-k> pumvisible() ?  "\<Up>"   : "\<C-k>"
