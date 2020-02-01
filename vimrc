@@ -112,6 +112,9 @@ if has("autocmd")
     " resize windows when vim changes size
     autocmd VimResized * wincmd =
 
+	" close preview window when exiting insert mode
+	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | silent! pclose | endif
+
     augroup end
 
 endif " has("autocmd")
@@ -161,6 +164,8 @@ endif
 vnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
 inoremap <C-V>  <C-O>:set paste<CR><C-O>"+gP<C-O>:set nopaste<CR>
 cnoremap <C-V>  <C-R>+
+nnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
+
 
 " CTRL-Z is Undo, insert only
 inoremap <C-Z> <C-O>u
@@ -655,8 +660,7 @@ endif
 
 if has("autocmd")
     autocmd filetype cpp,objcpp setlocal matchpairs+=<:>
-    autocmd filetype objcpp setlocal synmaxcol=512
-    autocmd filetype objc setlocal synmaxcol=512
+    autocmd filetype objc,objcpp setlocal synmaxcol=512
     " refresh ObjC++ on read (avoid some detection issues)
     autocmd bufreadpost,bufnewfile *.mm setlocal filetype=objcpp
     autocmd bufreadpost,bufnewfile *.m setlocal filetype=objc
@@ -737,6 +741,10 @@ if executable('svls')
         \ 'whitelist': ['systemverilog'],
         \ })
 endif
+	let g:lsp_diagnostics_enabled = 1
+    let g:lsp_virtual_text_enabled = 1
+	let g:lsp_virtual_text_prefix = " ‣ "
+
     Plug 'prabirshrestha/async.vim'
     Plug 'prabirshrestha/vim-lsp'
     Plug 'prabirshrestha/asyncomplete.vim'
