@@ -875,6 +875,7 @@ let g:xml_namespace_transparent=1
 
 " source any local project config
 if (!empty(glob('.vimrc~')))
+    call Tcd()
     source .vimrc~
 endif
 
