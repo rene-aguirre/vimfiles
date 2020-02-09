@@ -796,6 +796,11 @@ if has('nvim')
 " }
 endif
 
+" local configuation helper {
+	let g:localvimrc_ask = 0
+    Plug 'embear/vim-localvimrc'
+" }
+
 call plug#end()
 
 " }
@@ -872,9 +877,4 @@ endif
 
 " this improves XML syntax highlighting with huge files
 let g:xml_namespace_transparent=1
-
-" source any local project config
-if (!empty(glob('.vimrc~')))
-    source .vimrc~
-endif
 
