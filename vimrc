@@ -353,17 +353,19 @@ set equalalways
 set eadirection=ver
 
 " Change to top level git repo, works with nested git modules
-" (repo, sumboules, etc)
-function! Tcd()
-    exec 'Gcd'
-    let topgit=system('git rev-parse --show-toplevel')
+" (repo, submodules, etc)
+function! Tcd() abort
+    let s:top_dir = get(s:, 'top_dir', getcwd())
+    let l:test_dir=system('git rev-parse --show-toplevel')
     while !v:shell_error
-        let g:gitroot=topgit
-        exec 'cd ' . topgit
+        let s:top_dir=l:test_dir
+        exec 'cd ' . s:top_dir
         exec 'cd ..'
-        let topgit=system('git rev-parse --show-toplevel')
+        let l:test_dir=system('git rev-parse --show-toplevel')
     endwhile
-    exec 'cd ' . g:gitroot
+    if getcwd() != s:top_dir
+        exec 'cd ' . s:top_dir
+    endif
 endfunction
 
 " tries to find utility executable, prefers /usr/local paths
@@ -707,7 +709,8 @@ if g:ycm_enabled
 elseif g:clang_complete
     call s:load_plug('clang_complete')
 else
-    " LSP
+    " Language Server Protocol
+    let g:lsp_enabled = 1 " custom
     let g:lsp_settings = { }
     if executable(s:cmd_clangd)
         if s:cmd_clangd != 'clangd'
@@ -728,29 +731,29 @@ else
             \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
             \ })
    endif
-endif
+    if executable('svls')
+        " system verilog
+        au User lsp_setup call lsp#register_server({
+            \ 'name': 'svls',
+            \ 'cmd': {server_info->['svls']},
+            \ 'whitelist': ['systemverilog'],
+            \ })
+    endif
+	    let g:lsp_diagnostics_enabled = 0
+        let g:lsp_virtual_text_enabled = 1
+	    let g:lsp_virtual_text_prefix = " ‣ "
+
+        Plug 'prabirshrestha/async.vim'
+        Plug 'prabirshrestha/vim-lsp'
+        Plug 'prabirshrestha/asyncomplete.vim'
+        Plug 'prabirshrestha/asyncomplete-lsp.vim'
+        Plug 'mattn/vim-lsp-settings'
+    endif
+" }
+
 if g:tab_manager_enabled
     call s:load_plug('tab_manager')
 endif
-    " LSP
-if executable('svls')
-    " system verilog
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'svls',
-        \ 'cmd': {server_info->['svls']},
-        \ 'whitelist': ['systemverilog'],
-        \ })
-endif
-	let g:lsp_diagnostics_enabled = 1
-    let g:lsp_virtual_text_enabled = 1
-	let g:lsp_virtual_text_prefix = " ‣ "
-
-    Plug 'prabirshrestha/async.vim'
-    Plug 'prabirshrestha/vim-lsp'
-    Plug 'prabirshrestha/asyncomplete.vim'
-    Plug 'prabirshrestha/asyncomplete-lsp.vim'
-    Plug 'mattn/vim-lsp-settings'
-" }
 
     call s:load_plug('smartword')
 
@@ -786,19 +789,35 @@ if has('nvim')
 " Floating preview helper {
     Plug 'ncm2/float-preview.nvim'
 
-    function! DisableExtras()
+    function! s:DisableExtras()
         call nvim_win_set_option(g:float_preview#win, 'number', v:false)
         call nvim_win_set_option(g:float_preview#win, 'relativenumber', v:false)
         call nvim_win_set_option(g:float_preview#win, 'cursorline', v:false)
     endfunction
 
-    autocmd User FloatPreviewWinOpen call DisableExtras()
+    autocmd User FloatPreviewWinOpen call s:DisableExtras()
 " }
 endif
 
 " local configuation helper {
 	let g:localvimrc_ask = 0
     Plug 'embear/vim-localvimrc'
+if g:lsp_enabled
+    autocmd User LocalVimRCPost call Tcd()
+
+    function! s:cwd_updated(cdir, scope) abort
+        if scope != 'global'
+            return
+        endif
+        let g:lsp_diagnostics_enabled = !empty(glob('compile_commands.json')) || !empty(glob('compile_flags.txt'))
+    endfunction
+
+    if has('nvim')
+        autocmd DirChanged * call s:cwd_updated(v:event['cwd'], v:event['scope'])
+    else
+        autocmd DirChanged global call s:cwd_updated(getcwd(), 'global')
+    endif
+endif
 " }
 
 call plug#end()
