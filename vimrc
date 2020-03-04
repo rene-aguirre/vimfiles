@@ -373,10 +373,13 @@ endfunction
 "   cmd_str     plain command, e.g. 'clang-format'
 "   formula     homebrew's package 'formula' (optional)
 function! FindExecutable(cmd_str, formula)
+    let l:cmd_path = system('command -v ' . a:cmd_str)
+    if !v:shell_error && executable(l:cmd_path)
+        return l:cmd_path
+    endif
     let l:path_prefix = [
         \ '/usr/local/opt/' . a:formula . '/bin/',
         \ '/usr/local/bin/',
-        \ '',
         \ '/usr/bin/'
         \ ]
     for prefix in l:path_prefix
