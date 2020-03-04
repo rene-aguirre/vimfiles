@@ -809,7 +809,7 @@ if g:lsp_enabled
     autocmd User LocalVimRCPost call Tcd()
 
     function! s:cwd_updated(cdir, scope) abort
-        if scope != 'global'
+        if a:scope != 'global'
             return
         endif
         let g:lsp_diagnostics_enabled = !empty(glob('compile_commands.json')) || !empty(glob('compile_flags.txt'))
