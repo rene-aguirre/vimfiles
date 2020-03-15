@@ -54,6 +54,7 @@ elseif s:clevertab_enabled
 " Clevertab {
     " Forked 'neitanod/vim-clevertab'
     Plug 'rene-aguirre/vim-clevertab'
+    let g:UltiSnipsMappingsToIgnore = [ "CleverTab", ]
     inoremap <silent><tab> <c-r>=CleverTab#Complete('start')<cr>
                         \<c-r>=CleverTab#Complete('tab')<cr>
                         \<c-r>=CleverTab#Complete('ultisnips')<cr>
@@ -61,6 +62,7 @@ elseif s:clevertab_enabled
                         \<c-r>=CleverTab#Complete('keyword')<cr>
                         \<c-r>=CleverTab#Complete('file')<cr>
                         \<c-r>=CleverTab#Complete('nopumtab')<cr>
+                        \<c-r>=CleverTab#Complete('next')<cr>
                         \<c-r>=CleverTab#Complete('stop')<cr>
     inoremap <silent><s-tab> <c-r>=CleverTab#Complete('prev')<cr>
 " }
