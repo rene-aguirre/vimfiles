@@ -161,10 +161,16 @@ set clipboard^=unnamed
 endif
 
 " Ctrl-V and SHIFT-Insert are Paste
-vnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
-inoremap <C-V>  <C-O>:set paste<CR><C-O>"+gP<C-O>:set nopaste<CR>
-cnoremap <C-V>  <C-R>+
-nnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
+if has('nvim')
+    nnoremap <D-V>  :set paste<CR>"+gP:set nopaste<CR>
+    vnoremap <D-V>  :set paste<CR>"+gP:set nopaste<CR>
+    inoremap <D-V>  <C-O>:set paste<CR><C-O>"+gP<C-O>:set nopaste<CR>
+    cnoremap <D-V>  <C-R>+
+else
+    vnoremap <C-V>  :set paste<CR>"+gP:set nopaste<CR>
+    inoremap <C-V>  <C-O>:set paste<CR><C-O>"+gP<C-O>:set nopaste<CR>
+    cnoremap <C-V>  <C-R>+
+endif
 
 
 " CTRL-Z is Undo, insert only
@@ -768,6 +774,10 @@ endif
 " }
 
     call s:load_plug('startify')
+
+    let g:startify_skiplist = [
+           \ '/home',
+           \ ]
 
 if has('nvim')
     Plug 'neomake/neomake'
