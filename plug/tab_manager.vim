@@ -7,14 +7,11 @@
 if s:mucomplete_enabled || s:clevertab_enabled || s:supertab_enabled
     " Neither Tab nor <C-J> / <C-K> 
     let g:UltiSnipsExpandTrigger="∆" " <Option-j>
-    let g:UltiSnipsJumpForwardTrigger="∆"
-    let g:UltiSnipsJumpBackwardTrigger="˚" " <Option-k>
 else
-    " let g:UltiSnipsListSnippets = "<c-tab>"
     let g:UltiSnipsExpandTrigger = "<tab>"
-    let g:UltiSnipsJumpForwardTrigger = "<tab>"
-    let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 endif
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
 if s:supertab_enabled
 " SuperTab plug-in {
