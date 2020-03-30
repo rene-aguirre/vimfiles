@@ -631,6 +631,12 @@ if executable(g:fuzzy_executable)
     nmap <unique> <leader>fh <Plug>(PickerHelp)
     " suppress unexpected 'f' command
     nmap <unique> <leader>f <Plug>(PickerEdit)
+    let g:picker_custom_find_executable = 'python'
+    if executable('rg')
+        let g:picker_custom_find_flags = s:cfg_path . '/gitsub.py --rg'
+    else
+        let g:picker_custom_find_flags = s:cfg_path . '/gitsub.py'
+    endif
 else
     call s:load_plug('ctrlp')
 endif
