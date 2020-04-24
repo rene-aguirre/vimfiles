@@ -96,8 +96,6 @@ if has("autocmd")
 
     autocmd filetype rust compiler cargo
 
-    autocmd filetype markdown setlocal spell spelllang=en_us
-
     " Change Color when entering Insert Mode
     " autocmd InsertEnter * set cursorline
 
@@ -646,10 +644,14 @@ endif
     " Plant UML syntax and helper
     Plug 'aklt/plantuml-syntax'
 
-if has('nvim') && executable("yarn")
-    " Markdown preview, if you have nodejs and yarn
-    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
-endif
+" {
+    Plug 'godlygeek/tabular'
+    Plug 'plasticboy/vim-markdown'
+    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
+
+    autocmd filetype markdown setlocal spell spelllang=en_us conceallevel=2
+
+" }
 
     " :OverCommandLine for completion/highlight %s commands
     Plug 'osyo-manga/vim-over'
