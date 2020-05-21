@@ -401,7 +401,7 @@ if !executable(s:cmd_python)
 endif
 let s:cmd_rg = FindExecutable('rg', 'ripgrep')
 " helper for fast list of files
-function! s:GetFileList()
+function! s:GetFileListCmd()
     call Tcd()
     if has("unix") && !empty(glob('.git')) && executable(s:cmd_python)
         if executable(s:cmd_rg)
@@ -747,7 +747,7 @@ else
             \ 'initialization_options': {'cache': {'directory': '/tmp/ccls/cache' }},
             \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
             \ })
-   endif
+    endif
     if executable('svls')
         " system verilog
         au User lsp_setup call lsp#register_server({
@@ -756,16 +756,17 @@ else
             \ 'whitelist': ['systemverilog'],
             \ })
     endif
-	    let g:lsp_diagnostics_enabled = 0
-        let g:lsp_virtual_text_enabled = 1
-	    let g:lsp_virtual_text_prefix = " ‣ "
+	let g:lsp_diagnostics_enabled = 0
+    let g:lsp_virtual_text_enabled = 1
+	let g:lsp_virtual_text_prefix = " ‣ "
 
-        Plug 'prabirshrestha/async.vim'
-        Plug 'prabirshrestha/vim-lsp'
-        Plug 'prabirshrestha/asyncomplete.vim'
-        Plug 'prabirshrestha/asyncomplete-lsp.vim'
-        Plug 'mattn/vim-lsp-settings'
-    endif
+    " LSP: Language Server Protocol
+    Plug 'prabirshrestha/async.vim'
+    Plug 'prabirshrestha/vim-lsp'
+    Plug 'prabirshrestha/asyncomplete.vim'
+    Plug 'prabirshrestha/asyncomplete-lsp.vim'
+    Plug 'mattn/vim-lsp-settings' " :LspInstallServer
+endif
 " }
 
 if g:tab_manager_enabled
@@ -884,35 +885,6 @@ call s:load_utility('shell')
 
 " Fuzzy finder helper (vim & neovim)
 if executable(g:fuzzy_executable)
-function! FzyCommand(vim_command) abort
-    let l:callback = {
-                \ 'window_id': win_getid(),
-                \ 'filename': tempname(),
-                \  'vim_command':  a:vim_command
-                \ }
-
-    function! l:callback.on_exit(job_id, data, event) abort
-        bdelete!
-        call win_gotoid(self.window_id)
-        if filereadable(self.filename)
-            try
-                let l:selected_filename = readfile(self.filename)[0]
-                exec self.vim_command . l:selected_filename
-            catch /E684/
-            endtry
-        endif
-        call delete(self.filename)
-    endfunction
-
-    botright 10 new
-    let l:choice_command = s:GetFileList()
-    let l:term_command = l:choice_command . ' | ' . g:fuzzy_executable ' > ' .  l:callback.filename
-    silent call termopen(l:term_command, l:callback)
-    setlocal nonumber norelativenumber
-    startinsert
-endfunction
-
-nnoremap <leader>e :call FzyCommand(":e")<cr>
 endif
 
 " this improves XML syntax highlighting with huge files
