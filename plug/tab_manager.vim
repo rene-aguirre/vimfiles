@@ -54,17 +54,54 @@ elseif s:clevertab_enabled
 " Clevertab {
     " Forked 'neitanod/vim-clevertab'
     Plug 'rene-aguirre/vim-clevertab'
+    let g:UltiSnipsRemoveSelectModeMappings = 1
     let g:UltiSnipsMappingsToIgnore = [ "CleverTab", ]
-    inoremap <silent><tab> <c-r>=CleverTab#Complete('start')<cr>
-                        \<c-r>=CleverTab#Complete('tab')<cr>
-                        \<c-r>=CleverTab#Complete('ultisnips')<cr>
-                        \<c-r>=CleverTab#Complete('omni')<cr>
-                        \<c-r>=CleverTab#Complete('keyword')<cr>
-                        \<c-r>=CleverTab#Complete('file')<cr>
-                        \<c-r>=CleverTab#Complete('nopumtab')<cr>
-                        \<c-r>=CleverTab#Complete('next')<cr>
-                        \<c-r>=CleverTab#Complete('stop')<cr>
-    inoremap <silent><s-tab> <c-r>=CleverTab#Complete('prev')<cr>
+
+    function s:tabComplete(tagStr)
+        return "<c-r>=CleverTab#Complete('" . a:tagStr . "')<cr>"
+    endfunction
+
+    function s:getTabMapSetupStr()
+        let mapStr = 'inoremap <silent><tab> '
+        let tagItems = [ 'start', 'tab',
+            \ 'ultisnips', 'omni', 'keyword', 'file',
+            \ 'nopumtab', 'next', 'stop' ]
+        for seqTag in tagItems
+            let mapStr = mapStr . s:tabComplete(seqTag)
+        endfor
+        return mapStr
+    endfunction()
+
+    let s:tabMapStr = s:getTabMapSetupStr()
+
+    function s:tabSetup()
+        execute s:tabMapStr
+        execute "inoremap <silent><s-tab> <c-r>=CleverTab#Complete('prev')<cr>"
+    endfunction()
+
+    autocmd InsertEnter * call s:tabSetup()
+
+    function! GetAllSnippetsCmd()
+        call UltiSnips#SnippetsInCurrentScope(1)
+        let l:snipps = []
+        for [key, info] in items(g:current_ulti_dict_info)
+            call add(l:snipps, key)
+        endfor
+        return 'echo "' . join(l:snipps, "\n"). '"'
+    endfunction
+
+    function s:vexpand_snippet(snippet)
+        call UltiSnips#SaveLastVisualSelection()
+        " 'gv' selects previous visual
+        " 's' substitute, it enter insert deletig selection
+        call feedkeys("gvs" . a:snippet . "\<c-r>=UltiSnips#ExpandSnippet()\<cr>")
+    endfunction()
+    command! -nargs=1 VSnippet call s:vexpand_snippet(<f-args>)
+    if executable(g:fuzzy_executable)
+        xnoremap <tab> :call picker#String(GetAllSnippetsCmd(), 'VSnippet')<cr>
+    else
+        xnoremap <tab> :<c-u><c-r>="VSnippet "<cr>
+    endif
 " }
 else
     Plug 'ajh17/VimCompletesMe'
