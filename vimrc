@@ -883,10 +883,6 @@ exec 'source' s:cfg_path .'/utils/hex2dec.vim'
 call s:load_utility('indent')
 call s:load_utility('shell')
 
-" Fuzzy finder helper (vim & neovim)
-if executable(g:fuzzy_executable)
-endif
-
 " this improves XML syntax highlighting with huge files
 let g:xml_namespace_transparent=1
 
