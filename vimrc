@@ -685,6 +685,10 @@ if has("autocmd")
     autocmd bufreadpost,bufnewfile *.m setlocal filetype=objc
 endif
 
+if has("mac")
+    " CopyRTF copy with color to Clipboard
+    Plug 'zerowidth/vim-copy-as-rtf'
+endif
 " }
 
 " https://vim.fandom.com/wiki/Faster_loading_of_large_files
