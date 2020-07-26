@@ -73,6 +73,7 @@ pip2 install -U --user pynvim || exit 1
 pip3 install -U --user pynvim || exit 1
 pip3 install -U --user pylint || exit 1
 pip3 install -U --user python-language-server || exit 1
+pip3 install -U --user cmake-language-server || exit 1
 
 echo "NeoVim PlugInstall."
 if [ -f ~/.vim/plugged/cpsm/bin/cpsm_cli ]; then

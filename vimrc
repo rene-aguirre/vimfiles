@@ -760,6 +760,20 @@ else
             \ 'whitelist': ['systemverilog'],
             \ })
     endif
+    if executable('cmake-language-server')
+        au User lsp_setup call lsp#register_server({
+            \ 'name': 'cmake-language-server',
+            \ 'cmd': {server_info->['cmake-language-server']},
+            \ 'root_uri': {
+                \ server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(),
+                \ 'build/'))
+                \ },
+            \ 'initialization_options': {
+                \ "buildDirectory": "build"
+                \ },
+            \ 'whitelist': ['cmake'],
+            \ })
+    endif
 	let g:lsp_diagnostics_enabled = 0
     let g:lsp_virtual_text_enabled = 1
 	let g:lsp_virtual_text_prefix = " ‣ "
