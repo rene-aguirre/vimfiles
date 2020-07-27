@@ -35,6 +35,7 @@ ft_map = {
     'cpp':      ['c', 'cpp', 'asm', 'h', 'hpp'],
     'objc':     ['c', 'h', 'm'],
     'objcpp':   ['c', 'cpp', 'asm', 'h', 'hpp', 'mm', 'm'],
+    'swift':    ['swift', 'm', 'mm', 'h']
 }
 
 default_ext = os.path.splitext(vim.eval("a:sFile"))[1].strip()
@@ -62,6 +63,8 @@ else:
 vim.command('return "{0}"'.format(result_str))
 
 endpython
+
+return ''
 endfunction
 
 function! GetRgExt(sFt, sFile)
@@ -69,7 +72,7 @@ function! GetRgExt(sFt, sFile)
 " sFile, reference filename
 
 if a:sFile == ''
-    return
+    return ''
 endif
 
 python << endpython
@@ -77,19 +80,20 @@ import vim
 import os.path
 ft_map = {
     'asm':      '-t asm',
-    'c' :       '-t c -t cpp -t h -t objc -t objcpp',
-    'cpp':      '-t c -t cpp -t h -t objc -t objcpp',
-    'objc':     '-t c -t cpp -t h -t objc -t objcpp',
-    'objcpp':   '-t c -t cpp -t h -t objc -t objcpp',
+    'c' :       '-t c -t cpp -t h -t objc -t objcpp -t swift',
+    'cpp':      '-t c -t cpp -t h -t objc -t objcpp -t swift',
+    'objc':     '-t c -t cpp -t h -t objc -t objcpp -t swift',
+    'objcpp':   '-t c -t cpp -t h -t objc -t objcpp -t swift',
     'kalimba':  '-t asm',
     'make':     '-t make',
     'python':   '-t py',
     'rust':     '-t rust',
     'vim':      '-t vimscript',
+    'swift':    '-t c -t cpp -t h -t objc -t objcpp -t swift',
 }
 
 rgtype = ft_map.get(vim.eval("a:sFt"), '')
-vim.command('return "{0}"'.format(rgtype))
+vim.command('return "{}"'.format(rgtype))
 
 endpython
 endfunction
