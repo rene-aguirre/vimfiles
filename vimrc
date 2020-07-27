@@ -360,37 +360,47 @@ set eadirection=ver
 " (repo, submodules, etc)
 function! Tcd() abort
     let s:top_dir = get(s:, 'top_dir', getcwd())
-    let l:test_dir=system('git rev-parse --show-toplevel')
+    let l:test_dir=trim(system('git rev-parse --show-toplevel'))
     while !v:shell_error
         let s:top_dir=l:test_dir
         exec 'cd ' . s:top_dir
         exec 'cd ..'
-        let l:test_dir=system('git rev-parse --show-toplevel')
+        let l:test_dir=trim(system('git rev-parse --show-toplevel'))
     endwhile
     if getcwd() != s:top_dir
         exec 'cd ' . s:top_dir
     endif
 endfunction
 
+let s:xcode_dev_path = trim(system("xcode-select -p 2>/dev/null"))
+let s:xcode_toolchain_path = glob(s:xcode_dev_path . '/Toolchains/XcodeDefault.xctoolchain')
 " tries to find utility executable, prefers /usr/local paths
 " args:
 "   cmd_str     plain command, e.g. 'clang-format'
 "   formula     homebrew's package 'formula' (optional)
 function! FindExecutable(cmd_str, formula)
-    let l:cmd_path = system('command -v ' . a:cmd_str)
+    let l:cmd_path = trim(system('command -v ' . a:cmd_str))
     if !v:shell_error && executable(l:cmd_path)
         return l:cmd_path
     endif
     let l:path_prefix = [
         \ '/usr/local/opt/' . a:formula . '/bin/',
         \ '/usr/local/bin/',
-        \ '/usr/bin/'
+        \ '/usr/bin/',
         \ ]
     for prefix in l:path_prefix
         if executable(prefix . a:cmd_str)
             return prefix . a:cmd_str
         endif
     endfor
+    if !empty(s:xcode_toolchain_path)
+        for prefix in l:path_prefix
+            if executable(s:xcode_toolchain_path . prefix . a:cmd_str)
+                return s:xcode_toolchain_path . prefix . a:cmd_str
+            endif
+        endfor
+    endif
+    return ""
 endfunction
 
 let s:cmd_python2 = FindExecutable('python2', 'python2')
@@ -760,10 +770,11 @@ else
             \ 'whitelist': ['systemverilog'],
             \ })
     endif
-    if executable('cmake-language-server')
+    let s:cmake_lsp = FindExecutable('cmake-language-server', 'cmake-language-server')
+    if executable(s:cmake_lsp)
         au User lsp_setup call lsp#register_server({
             \ 'name': 'cmake-language-server',
-            \ 'cmd': {server_info->['cmake-language-server']},
+            \ 'cmd': {server_info->[s:cmake_lsp]},
             \ 'root_uri': {
                 \ server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(),
                 \ 'build/'))
@@ -772,6 +783,14 @@ else
                 \ "buildDirectory": "build"
                 \ },
             \ 'whitelist': ['cmake'],
+            \ })
+    endif
+    let s:sourcekit_lsp = FindExecutable('sourcekit-lsp', 'swift')
+    if executable(s:sourcekit_lsp)
+        au User lsp_setup call lsp#register_server({
+            \ 'name': 'sourcekit-lsp',
+            \ 'cmd': {server_info->[s:sourcekit_lsp]},
+            \ 'whitelist': ['swift'],
             \ })
     endif
 	let g:lsp_diagnostics_enabled = 0
