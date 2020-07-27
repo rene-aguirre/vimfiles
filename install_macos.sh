@@ -90,10 +90,11 @@ command -v pip3 &>/dev/null || \
 
 echo "Python helper packages"
 pip2 install -U --user pynvim || exit 1
-pip3 install -U --user pynvim || exit 1
-pip3 install -U --user pylint || exit 1
-pip3 install -U --user python-language-server || exit 1
-pip3 install -U --user cmake-language-server || exit 1
+PY_PKGS=( pynvim pylint python-language-server cmake-language-server hdl-checker )
+for PKG_NAME in "${PY_PKGS[@]}"; do
+    echo "Install/upgrade python package ${PKG_NAME}"
+    pip3 install -U --user "${PKG_NAME}" || exit 1
+done
 
 echo "NeoVim PlugInstall."
 if [ -f ~/.vim/plugged/cpsm/bin/cpsm_cli ]; then

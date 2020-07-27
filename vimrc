@@ -767,31 +767,33 @@ else
         au User lsp_setup call lsp#register_server({
             \ 'name': 'svls',
             \ 'cmd': {server_info->['svls']},
-            \ 'whitelist': ['systemverilog'],
+            \ 'whitelist': ['verilog', 'systemverilog'],
             \ })
     endif
-    let s:cmake_lsp = FindExecutable('cmake-language-server', 'cmake-language-server')
-    if executable(s:cmake_lsp)
-        au User lsp_setup call lsp#register_server({
-            \ 'name': 'cmake-language-server',
-            \ 'cmd': {server_info->[s:cmake_lsp]},
-            \ 'root_uri': {
-                \ server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(),
-                \ 'build/'))
-                \ },
-            \ 'initialization_options': {
-                \ "buildDirectory": "build"
-                \ },
-            \ 'whitelist': ['cmake'],
-            \ })
+    let s:swifth_lsp_enabled = 0 " not quite there yet
+    if s:swifth_lsp_enabled
+        let s:sourcekit_lsp = FindExecutable('sourcekit-lsp', 'swift')
+        if executable(s:sourcekit_lsp)
+            au User lsp_setup call lsp#register_server({
+                \ 'name': 'sourcekit-lsp',
+                \ 'cmd': {server_info->[s:sourcekit_lsp]},
+                \ 'whitelist': ['swift'],
+                \ })
+        endif
     endif
-    let s:sourcekit_lsp = FindExecutable('sourcekit-lsp', 'swift')
-    if executable(s:sourcekit_lsp)
+    let s:hdl_checker = FindExecutable('hdl_checker', 'hdl_checker')
+    if executable(s:hdl_checker)
         au User lsp_setup call lsp#register_server({
-            \ 'name': 'sourcekit-lsp',
-            \ 'cmd': {server_info->[s:sourcekit_lsp]},
-            \ 'whitelist': ['swift'],
-            \ })
+        \ 'name': 'hdl_checker',
+        \ 'cmd': {server_info->lsp_settings#get('hdl_checker', 'cmd', [s:hdl_checker , '--lsp'])},
+        \ 'root_uri':{server_info->lsp_settings#get('hdl_checker', 'root_uri', lsp_settings#root_uri('hdl_checker'))},
+        \ 'initialization_options': lsp_settings#get('hdl_checker', 'initialization_options', {'diagnostics': 'true'}),
+        \ 'allowlist': lsp_settings#get('hdl_checker', 'allowlist', ['verilog', 'vhdl', 'systemverilog']),
+        \ 'blocklist': lsp_settings#get('hdl_checker', 'blocklist', []),
+        \ 'config': lsp_settings#get('hdl_checker', 'config', lsp_settings#server_config('hdl_checker')),
+        \ 'workspace_config': lsp_settings#get('hdl_checker', 'workspace_config', {}),
+        \ 'semantic_highlight': lsp_settings#get('hdl_checker', 'semantic_highlight', {}),
+        \ })
     endif
 	let g:lsp_diagnostics_enabled = 0
     let g:lsp_virtual_text_enabled = 1
