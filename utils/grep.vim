@@ -1,9 +1,10 @@
 
 " use ripgrep as default 'grep' if available
-if executable("/usr/local/bin/rg")
-    let s:rg_path="/usr/local/bin/rg""
-else
-    let s:rg_path="rg"
+let s:rg_path = FindExecutable('rg', 'ripgrep')
+if executable(s:rg_path)
+    " as default grep
+    let s:rg_grepprg=s:rg_path . " --vimgrep --no-heading --no-messages"
+    let s:rg_grepformat="%f:%l:%c:%m,%f:%l:%m"
 endif
 
 function! GetRgRepoGrep()
@@ -12,7 +13,7 @@ function! GetRgRepoGrep()
         " restore if not in repo
         let &grepprg=s:rg_grepprg
     else
-        set grepprg=repo\ forall\ -c\ 'echo\ ../$REPO_PATH'\ \\\|\ xargs\ rg\ --vimgrep\ --no-heading\ --no-messages
+        set grepprg="repo forall -c 'echo ../$REPO_PATH' \| xargs " . s:rg_grepprg
     endif
     return "grep! "
 endfunction
@@ -105,9 +106,7 @@ noremap <leader>gg :silent Ggrep! -n <c-r>=expand("<cword>") .
 " ff: find in filetype grep helper
 if executable(s:rg_path)
     " as default grep
-    let s:rg_grepprg=s:rg_path . " --vimgrep --no-heading --no-messages "
-    let s:rg_grepformat="%f:%l:%c:%m,%f:%l:%m"
-
+    let &grepprg=s:rg_grepprg
     noremap <leader>ff :silent  <c-r>=GetRgRepoGrep() .
         \ GetRgExt(&filetype, bufname('%')) . " " . expand("<cword>") <CR>
 elseif has("unix")
