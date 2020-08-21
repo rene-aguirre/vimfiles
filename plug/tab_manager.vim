@@ -108,6 +108,7 @@ else
 endif
 
 " Ctrl-P like mappings
+inoremap <c-x><c-k> <c-x><c-k>
 inoremap <expr> <C-j> pumvisible() ?  "\<Down>" : "\<C-j>"
 inoremap <expr> <C-k> pumvisible() ?  "\<Up>"   : "\<C-k>"
 
