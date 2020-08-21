@@ -649,18 +649,20 @@ else
     call s:load_plug('ctrlp')
 endif
 
+    " disabled tab expand on table, fixes UltiSnips expands
+    let g:vimwiki_table_mappings = 0
     call s:load_plug('vimwiki')
 
     " Plant UML syntax and helper
     Plug 'aklt/plantuml-syntax'
 
 " {
+    let g:vim_markdown_auto_insert_bullets = 0
+    " let g:vim_markdown_new_list_item_indent = 0
     Plug 'godlygeek/tabular'
     Plug 'plasticboy/vim-markdown'
     Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
-
-    autocmd filetype markdown setlocal spell spelllang=en_us conceallevel=2
-
+    autocmd filetype markdown setlocal spell spelllang=en_us conceallevel=2 textwidth=80
 " }
 
     " :OverCommandLine for completion/highlight %s commands
