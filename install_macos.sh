@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+verbose() {
+    true
+}
+
 # just in case /usr/local/bin is not in current path
 USRLOCALBIN="/usr/local/bin"
 [[ ":$PATH:" != *":${USRLOCALBIN}:"* ]] && export PATH="${USRLOCALBIN}:${PATH}"
@@ -14,6 +18,51 @@ if [ -z "$(command -v brew)" ]; then
     exit 1;
 fi
 
+echo "Checking Homebrew packages..."
+# package installation cache
+BP="$(brew list -1)"
+# check if brew has package
+brew_has() {
+    grep -e "^$1$" &>/dev/null <<<"$BP"
+}
+
+# package outdated cache
+BO="$(brew outdated)"
+# check if package is outdated
+brew_outdated() {
+    grep -e "^$1$" &>/dev/null <<<"$BO"
+}
+
+# install (or upgrades) package if required
+brew_check_install() {
+    PKG="$1"
+    echo "Checking for ${PKG}."
+    if brew_has "${PKG}"; then
+        verbose && echo "  - ${PKG} found."
+        if brew_outdated "${PKG}"; then
+            echo "  - ${PKG} is outdated, upgrading..."
+            ( brew upgrade "${PKG}" --force-bottle && echo "  - ${PKG} upgraded." ) || \
+                { \
+                    echo "Can't upgrade '${PKG}'. Fix manually.";
+                    false;
+                    return;
+                }
+        else
+            verbose && echo "  - ${PKG} Up to date"
+        fi
+    else
+        verbose && echo "  - Installing ${PKG}..."
+        brew install "${PKG}" --force-bottle || \
+            {
+                echo "Can't Install '${PKG}'. Fix manually.";
+                false;
+                return;
+            }
+        verbose && echo "  - ${PKG} has been installed."
+    fi
+    true
+}
+
 echo "Brew update & cleanup."
 brew update && brew cleanup \
     || { echo "Need root to fix homebrew"; sudo chown -R "$(whoami)" "$(brew --prefix)/*" ; } \
@@ -25,20 +74,19 @@ BREW_PKGS=( python@2 python pyenv cmake neovim ripgrep boost shellcheck fzy yaml
 
 echo "Homebrew packages, check & install/upgrade..."
 for PKG_NAME in "${BREW_PKGS[@]}"; do
-    echo "Checking for ${PKG_NAME}."
-    brew list "${PKG_NAME}" &>/dev/null && brew upgrade "${PKG_NAME}" || brew install "${PKG_NAME}" --force-bottle || exit 1
+    brew_check_install "${PKG_NAME}" || exit 1
 done
 
-# maybe already installed (system)
+# maybe already installed (keep system's)
 BREW_PKGS=( git )
 
 for PKG_NAME in "${BREW_PKGS[@]}"; do
     echo "Checking for ${PKG_NAME}."
-    command -v "${PKG_NAME}" &>/dev/null || brew list "${PKG_NAME}" &>/dev/null && brew upgrade "${PKG_NAME}" || brew install "${PKG_NAME}" --force-bottle || exit 1
+    command -v "${PKG_NAME}" &>/dev/null || brew_check_install "${PKG_NAME}" || exit 1
 done
 
 echo "Checking for universal-ctags"
-brew list universal-ctags &>/dev/null || brew install --HEAD universal-ctags/universal-ctags/universal-ctags || exit 1
+brew_has universal-ctags || brew install --HEAD universal-ctags/universal-ctags/universal-ctags || exit 1
 
 echo "Checking for Nerd Font."
 ls ~/Library/Fonts/Hack\ Regular\ Nerd\ Font\ Complete\ Mono.ttf &>/dev/null \
@@ -48,7 +96,7 @@ ls ~/Library/Fonts/Hack\ Regular\ Nerd\ Font\ Complete\ Mono.ttf &>/dev/null \
 
 if [ -x "$(command -v pyenv)" ]; then
     # checking if pyenv had installed already
-    echo $PATH | grep "$(pyenv root)/shims" \
+    grep "$(pyenv root)/shims" <<< "$PATH" \
         || { echo "Need to add 'eval \$(pyenv init -)' to startup profile!"; eval "$(pyenv init -)"; }
 else
     echo "pyenv not found, please re-install or fix"
@@ -57,25 +105,38 @@ fi
 
 echo Installing brew packages needed to build pyenv python as framework
 
-BREW_PKGS=( openssl readline sqlite3 xz zlib )
+BREW_PKGS=( openssl@1.1 readline sqlite xz zlib bzip2 )
 for PKG_NAME in "${BREW_PKGS[@]}"; do
-    echo "Checking for ${PKG_NAME}."
-    brew list "${PKG_NAME}" &>/dev/null && brew upgrade "${PKG_NAME}" || brew install "${PKG_NAME}" --force-bottle || exit 1
+    brew_check_install "${PKG_NAME}" || exit 1
 done
+
+echo forcing homebrew zlib
+export LDFLAGS="-L$(brew --prefix zlib)/lib"
+export CPPFLAGS="-I$(brew --prefix zlib)/include"
+export PKG_CONFIG_PATH="$(brew --prefix zlib)/lib/pkgconfig"
+
+verbose && echo "LDFLAGS=$LDFLAGS"
+verbose && echo "CPPFLAGS=$CPPFLAGS"
+verbose && echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
 
 PYENV_VERSIONS=( 3.8.5 2.7.18 )
 for PY_VER in "${PYENV_VERSIONS[@]}"; do
-    pyenv versions --bare | grep -e "^${PY_VER}\$" &>/dev/null || \
-        echo "Install python ${PY_VER} with pyenv" \
-        env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install "$PY_VER" \
-            || { echo "Error: Couldn't install pyenv python ${PY_VER}"; exit 1; }
+    ( pyenv versions --bare | grep -e "^${PY_VER}\$" &>/dev/null ) || \
+        (
+            echo "Installing python ${PY_VER} with pyenv" && \
+            env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install "$PY_VER"
+        ) || \
+        {
+            echo "Error: Couldn't install pyenv python ${PY_VER}";
+            exit 1;
+        }
     pyenv versions --bare | grep -e "^${PY_VER}\$" || \
         { echo "pyenv doesn't show python ${PY_VER} is installed"; exit 1; }
 done
 # post install
 pyenv rehash
 echo "Setting pyenv default global versions"
-pushd ~ && pyenv global "${PYENV_VERSIONS[@]}" && popd
+pushd ~ && pyenv global "${PYENV_VERSIONS[@]}" && popd || exit 1
 
 # test pip installs
 command -v pip2 &>/dev/null || \
