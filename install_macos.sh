@@ -30,7 +30,7 @@ brew_has() {
 BO="$(brew outdated)"
 # check if package is outdated
 brew_outdated() {
-    grep -e "^$1$" &>/dev/null <<<"$BO"
+    grep -e "^$1 " &>/dev/null <<<"$BO"
 }
 
 # install (or upgrades) package if required
