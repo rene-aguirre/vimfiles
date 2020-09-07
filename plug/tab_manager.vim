@@ -82,7 +82,12 @@ elseif s:clevertab_enabled
     autocmd InsertEnter * call s:tabSetup()
 
     function! GetAllSnippetsCmd()
-        call UltiSnips#SnippetsInCurrentScope(1)
+        try
+            call UltiSnips#SnippetsInCurrentScope(1)
+        catch
+            echo "UltiSnips not installed"
+            return
+        endtry
         let l:snipps = []
         for [key, info] in items(g:current_ulti_dict_info)
             call add(l:snipps, key)
@@ -91,7 +96,12 @@ elseif s:clevertab_enabled
     endfunction
 
     function s:vexpand_snippet(snippet)
-        call UltiSnips#SaveLastVisualSelection()
+        try
+            call UltiSnips#SaveLastVisualSelection()
+        catch
+            echo "UltiSnips not installed"
+            return
+        endtry
         " 'gv' selects previous visual
         " 's' substitute, it enter insert deletig selection
         call feedkeys("gvs" . a:snippet . "\<c-r>=UltiSnips#ExpandSnippet()\<cr>")
