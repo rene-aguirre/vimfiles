@@ -65,7 +65,7 @@ elseif s:clevertab_enabled
         let mapStr = 'inoremap <silent><tab> '
         let tagItems = [ 'start', 'tab',
             \ 'ultisnips', 'omni', 'keyword', 'file',
-            \ 'nopumtab', 'next', 'stop' ]
+            \ 'next', 'complete', 'stop' ]
         for seqTag in tagItems
             let mapStr = mapStr . s:tabComplete(seqTag)
         endfor
