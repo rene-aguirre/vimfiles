@@ -361,13 +361,15 @@ set eadirection=ver
 function! Tcd() abort
     let s:top_dir = get(s:, 'top_dir', getcwd())
     let l:test_dir=trim(system('git rev-parse --show-toplevel'))
-    while !v:shell_error
+    let l:test_dir_prev=''
+    while !v:shell_error && l:test_dir == l:test_dir_prev
         let s:top_dir=l:test_dir
         exec 'cd ' . s:top_dir
         exec 'cd ..'
+        let l:test_dir_prev=l:test_dir
         let l:test_dir=trim(system('git rev-parse --show-toplevel'))
     endwhile
-    if getcwd() != s:top_dir
+    if s:top_dir || getcwd() != s:top_dir
         exec 'cd ' . s:top_dir
     endif
 endfunction
@@ -661,7 +663,8 @@ endif
     " let g:vim_markdown_new_list_item_indent = 0
     Plug 'godlygeek/tabular'
     Plug 'plasticboy/vim-markdown'
-    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
+    " If you have nodejs and yarn
+    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
     autocmd filetype markdown setlocal spell spelllang=en_us conceallevel=2 textwidth=80
 " }
 
@@ -737,6 +740,7 @@ endif
     let g:clang_complete = !executable(s:cmd_clangd) && !executable(s:cmd_ccls)
     " use tab manager
     let g:tab_manager_enabled = 1
+    let g:lsp_enabled = 0
 if g:ycm_enabled
     call s:load_plug('ycm')
 elseif g:clang_complete
@@ -906,6 +910,7 @@ set errorformat^=\[\ \ \ LINE\ \ \ \]\ ---\ %f:%l:\ %m
 " clang
 set errorformat^=%f:%l:%c:\ %trror:\ %m
 set errorformat^=%f:%l:%c:\ %tarning:\ %m
+set errorformat^=❌\ %f:%l:%c:%m
 " usually false positives (e.g. dates + time)
 set errorformat-=%f:%l:%c:%m
 set errorformat-=%f:%l:%m
