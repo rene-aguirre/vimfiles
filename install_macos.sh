@@ -70,7 +70,7 @@ brew update && brew cleanup \
     || exit 1
 
 # homebrew's python required for homebrew's finary packages (linked to)
-BREW_PKGS=( python@2 python pyenv cmake neovim ripgrep boost shellcheck fzy yamllint zstd llvm swiftlint swift-format clang-format )
+BREW_PKGS=( python@2 python pyenv cmake neovim ripgrep boost shellcheck fzy yamllint zstd llvm swiftlint swift-format clang-format yarn )
 
 echo "Homebrew packages, check & install/upgrade..."
 for PKG_NAME in "${BREW_PKGS[@]}"; do
