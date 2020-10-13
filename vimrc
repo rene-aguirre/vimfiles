@@ -867,17 +867,23 @@ if has('nvim')
 endif
 
 " local configuation helper {
-	let g:localvimrc_ask = 0
+    let g:localvimrc_ask = 0
     Plug 'embear/vim-localvimrc'
 if g:lsp_enabled
     autocmd User LocalVimRCPost call Tcd()
 
     function! s:cwd_updated(cdir, scope) abort
+        let g:lsp_diagnostics_enabled = 0
+        if &diff
+            " not in vimdiff
+            return
+        endif
         if a:scope != 'global'
             return
         endif
         let g:lsp_diagnostics_enabled = !empty(glob('compile_commands.json')) || !empty(glob('compile_flags.txt'))
     endfunction
+
 
     if has('nvim')
         autocmd DirChanged * call s:cwd_updated(v:event['cwd'], v:event['scope'])
