@@ -221,6 +221,8 @@ nmap <leader>s :set list!<CR>
     set hlsearch    " highlight searches
     set ignorecase  " Do case insensitive matching
     set smartcase
+    set incsearch " vim incremental search
+    set inccommand=split " neovim incremental search (:s only)
 " }
 
 set laststatus=2 " always show status window
