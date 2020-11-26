@@ -38,6 +38,7 @@ endif
 
 " current file path, follow symlinks and get only directory
 let s:cfg_path=fnamemodify(resolve(expand("<sfile>:p")), ":h")
+let g:CFG_PATH=s:cfg_path
 
 function s:load_config(from_path)
     exec 'source ' . s:cfg_path . a:from_path
@@ -221,8 +222,11 @@ nmap <leader>s :set list!<CR>
     set hlsearch    " highlight searches
     set ignorecase  " Do case insensitive matching
     set smartcase
-    set incsearch " vim incremental search
+if has('nvim')
     set inccommand=split " neovim incremental search (:s only)
+else
+    set incsearch " vim incremental search
+endif
 " }
 
 set laststatus=2 " always show status window
@@ -437,8 +441,8 @@ endfunction
 "  tag helpers (ctags) {
     " run ctags in the current folder
     if has("win32") || has("win64")
-        command! BuildTags execute '!' . expand('~') .
-            \ "\\vimfiles\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+        command! BuildTags execute '!' . s:cfg_path .
+            \ "\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
     else
         if (!empty(glob('/usr/local/opt/universal-ctags/bin/ctags')))
             " brew install --HEAD universal-ctags/universal-ctags/universal-ctags
@@ -537,15 +541,15 @@ if has('nvim')
 endif
 
 " clang-format helper
-vnoremap <Leader>c :pyfile ~/vimfiles/clang-format.py<cr>
-nnoremap <Leader>c :pyfile ~/vimfiles/clang-format.py<cr>
+vnoremap <Leader>c :pyfile s:cfg_path . 'clang-format.py'<cr>
+nnoremap <Leader>c :pyfile s:cfg_path . 'clang-format.py'<cr>
 " use g:clang_format_path for custom tool path
 
 " ------------------
 " Pluggin management {
 "
 " plug.vim is in my vimfiles/autoload repo
-set rtp+=~/vimfiles
+exe 'set rtp+=' . s:cfg_path
 call plug#begin('~/.vim/plugged')
     " Make sure to use single quotes
     "
@@ -902,7 +906,7 @@ call plug#end()
 let g:startify_custom_header = g:ascii + startify#fortune#boxed()
 
 " tags: textobj, motion, Extended %
-"runtime macros/matchit.vim
+runtime macros/matchit.vim
 
 " seoul256 (dark):
 " "   Range:   233 (darkest) ~ 239 (lightest)
@@ -939,4 +943,3 @@ call s:load_utility('shell')
 
 " this improves XML syntax highlighting with huge files
 let g:xml_namespace_transparent=1
-

@@ -45,7 +45,7 @@ endif
     let g:ctrlp_max_files = 100000
 
     " indexing speed up
-    let s:ctrlp_git_command = 'cd %s && python ~/vimfiles/gitsub.py --rg'
+    let s:ctrlp_git_command = 'cd %s && python ' . g:CFG_PATH . '/gitsub.py --rg'
     if executable('rg')
         " let s:ctrlp_git_command = 'rg --color=never --no-messages --glob "" --files %s'
         let s:ctrlp_git_command = s:ctrlp_git_command . '--rg'
@@ -77,7 +77,7 @@ endif
         endif
         let g:ctrlp_user_command = {
             \ 'types': {
-                \ 1: ['.git', 'cd %s && python %%userprofile%%\\vimfiles\\gitsub.py'],
+                \ 1: ['.git', 'cd %s && python ' . g:CFG_PATH . '\\gitsub.py'],
                 \ 2: ['.hg', 'hg --cwd %s locate -I .'],
                 \ 3: ['.svn', 'svn status %s -q -v | sed ' . "'" . 's/^.\\{28\}\\s*\\(.*\\s\\)//'],
                 \ },

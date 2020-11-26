@@ -6,13 +6,7 @@ function! s:s_build(...)
         if (! empty(glob('./build.sh~'))) " local build helper
             execute ':set makeprg=source\ ./build.sh~'
         elseif (! empty(glob('./CMakeLists.txt')))
-            if (empty(glob('./build')))
-                execute "!mkdir ./build"
-            endif
-            if (empty(glob('./build/Makefile')))
-                execute "!cd ./build && cmake .. && cd .."
-            endif
-            execute ':set makeprg=make\ -C\ ./build'
+            execute ':set makeprg=' . g:CFG_PATH . '/makeprg.sh'
         else
             " use default makeprg
         endif
@@ -39,12 +33,10 @@ function! s:s_build_edit(...)
 endfunction
 command! -nargs=* BuildEdit call s:s_build_edit(<f-args>)
 
-function! s:s_test()
-    if (! empty(glob('./CMakeLists.txt'))) && (! empty(glob('./build/Makefile')))
-        execute "make test ARGS=--output-on-failure -C ./build"
-    else
-        execute "make test " . join(a:000, ' ')
-    endif
+function! s:s_test(...)
+    call s:s_build()
+    call call('s:s_build', ['test'] + a:000)
 endfunction
-command! -nargs=* Test call s:s_test()
+
+command! -nargs=* Test call s:s_test(<f-args>)
 
