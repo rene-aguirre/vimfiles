@@ -20,7 +20,7 @@ fi
 
 echo "Checking Homebrew packages..."
 # package installation cache
-BP="$(brew list -1)"
+BP="$(brew list --formula -1)"
 # check if brew has package
 brew_has() {
     grep -e "^$1$" &>/dev/null <<<"$BP"
@@ -33,15 +33,28 @@ brew_outdated() {
     grep -e "^$1 " &>/dev/null <<<"$BO"
 }
 
+bottle_disabled() {
+    PKG="$1"
+    brew info --json=v1 "${PKG}" | jq '.[0].bottle_disabled'
+}
+
 # install (or upgrades) package if required
 brew_check_install() {
     PKG="$1"
+    PKG_FORCE_BOTTLE=( "$1" )
+    if [ "$PKG" != "jq" ]; then
+        BOTTLE_DISABLED="$(bottle_disabled "$1")"
+        verbose && echo "$1 bottle disabled = '$BOTTLE_DISABLED'"
+        if [ "${BOTTLE_DISABLED}" = "false" ]; then
+            PKG_FORCE_BOTTLE+=( "--force-bottle" )
+        fi
+    fi
     echo "Checking for ${PKG}."
     if brew_has "${PKG}"; then
         verbose && echo "  - ${PKG} found."
         if brew_outdated "${PKG}"; then
             echo "  - ${PKG} is outdated, upgrading..."
-            ( brew upgrade "${PKG}" --force-bottle && echo "  - ${PKG} upgraded." ) || \
+            ( brew upgrade "${PKG_FORCE_BOTTLE[@]}" && echo "  - ${PKG} upgraded." ) || \
                 { \
                     echo "Can't upgrade '${PKG}'. Fix manually.";
                     false;
@@ -52,7 +65,7 @@ brew_check_install() {
         fi
     else
         verbose && echo "  - Installing ${PKG}..."
-        brew install "${PKG}" --force-bottle || \
+        brew install "${PKG_FORCE_BOTTLE[@]}" || \
             {
                 echo "Can't Install '${PKG}'. Fix manually.";
                 false;
@@ -70,7 +83,7 @@ brew update && brew cleanup \
     || exit 1
 
 # homebrew's python required for homebrew's finary packages (linked to)
-BREW_PKGS=( python@2 python pyenv cmake neovim ripgrep boost shellcheck fzy yamllint zstd llvm swiftlint swift-format clang-format yarn )
+BREW_PKGS=( jq python@2 python pyenv cmake neovim ripgrep boost shellcheck fzy yamllint zstd llvm swiftlint swift-format clang-format yarn )
 
 echo "Homebrew packages, check & install/upgrade..."
 for PKG_NAME in "${BREW_PKGS[@]}"; do
