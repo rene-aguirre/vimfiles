@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 OUT_BINARY_PATH=./build
 
-
 if [ ! -d "${OUT_BINARY_PATH}" ]; then
     DEBUG_OPT=""
-    if [ -n "$DEBUG" ];then
+    if [ "${DEBUG:-0}" != "0" ]; then
         echo "Using DEBUG build"
         DEBUG_OPT="-DCMAKE_BUILD_TYPE=Debug"
     fi
