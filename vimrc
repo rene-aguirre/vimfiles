@@ -382,21 +382,30 @@ endfunction
 
 let s:xcode_dev_path = trim(system("xcode-select -p 2>/dev/null"))
 let s:xcode_toolchain_path = glob(s:xcode_dev_path . '/Toolchains/XcodeDefault.xctoolchain')
+" w/ brew prefix
+let s:brew_path = trim(system('brew --prefix'))
+if v:shell_error
+    let s:brew_path=''
+endif
 " tries to find utility executable, prefers /usr/local paths
 " args:
 "   cmd_str     plain command, e.g. 'clang-format'
 "   formula     homebrew's package 'formula' (optional)
-function! FindExecutable(cmd_str, formula)
-    let l:cmd_path = trim(system('command -v ' . a:cmd_str))
-    if !v:shell_error && executable(l:cmd_path)
-        return l:cmd_path
+function! FindExecutableBase(cmd_str, formula, path_first)
+    if a:path_first
+        let l:cmd_path = trim(system('command -v ' . a:cmd_str))
+        if !v:shell_error && executable(l:cmd_path)
+            return l:cmd_path
+        endif
     endif
     let l:path_prefix = [
+        \ s:brew_path . '/opt/' . a:formula . '/bin/',
         \ '/usr/local/opt/' . a:formula . '/bin/',
         \ '/usr/local/bin/',
         \ '/usr/bin/',
         \ ]
     for prefix in l:path_prefix
+        " echom 'Checking: ' . prefix . a:cmd_str
         if executable(prefix . a:cmd_str)
             return prefix . a:cmd_str
         endif
@@ -408,7 +417,21 @@ function! FindExecutable(cmd_str, formula)
             endif
         endfor
     endif
+    if !a:path_first
+        let l:cmd_path = trim(system('command -v ' . a:cmd_str))
+        if !v:shell_error && executable(l:cmd_path)
+            return l:cmd_path
+        endif
+    endif
     return ""
+endfunction
+
+function! FindExecutable(cmd_str, formula)
+    return FindExecutableBase(a:cmd_str, a:formula, 1)
+endfunction
+
+function! FindExecutableOpt(cmd_str, formula)
+    return FindExecutableBase(a:cmd_str, a:formula, 0)
 endfunction
 
 let s:cmd_python2 = FindExecutable('python2', 'python2')
@@ -444,16 +467,11 @@ endfunction
         command! BuildTags execute '!' . s:cfg_path .
             \ "\\ctags.exe -R --c++-kinds=+p --fields=+iaS --extra=+q ."
     else
-        if (!empty(glob('/usr/local/opt/universal-ctags/bin/ctags')))
-            " brew install --HEAD universal-ctags/universal-ctags/universal-ctags
-            let s:ctags = "/usr/local/opt/universal-ctags/bin/ctags"
-        else
-            let s:ctags = "ctags"
-        endif
-        command! BuildTags execute '!' . s:ctags
+        let s:cmd_ctags = FindExecutableOpt('ctags', 'universal-ctags')
+        command! BuildTags execute '!' . s:cmd_ctags
             \ " -R --c++-kinds=+p --ObjectiveC-kinds=+p --fields=+iaS --extras=+q ."
     endif
-    set tags=./tags;
+    set tags=./tags,tags
     " work with git hooks (so top level repo path applies)
     set notagrelative
 " }
