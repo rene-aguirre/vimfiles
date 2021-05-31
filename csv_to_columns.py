@@ -44,11 +44,15 @@ def main(arguments):
             writter.writerow(row)
         return
 
+    def special_len(some_str):
+        # lines_len = [len(s.strip()) for s in some_str.split("\n")]
+        return len(some_str.split("\n")[0].strip())
+
     for full_row in reader:
         row = full_row[args.start:args.end]
         if len(widths) < len(row):
             widths += [0,] * (len(row) - len(widths))
-        widths = [max(a, b) for a, b in zip(map(len, row), widths)]
+        widths = [max(a, b) for a, b in zip(map(special_len, row), widths)]
         rows.append(row)
     col_fmts = ["{{: <{}}}".format(w) for w in widths]
     for row in rows:
